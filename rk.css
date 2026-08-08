@@ -463,6 +463,16 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 .rk-nav__burger i{
   display:block;width:22px;height:8px;position:relative;flex:none;
 }
+/* THE TARGET IS NOT THE ICON.                                   [PHASE 3]
+   Two 22px rules 8px apart is a 24x17 hit box — the primary navigation
+   control on every phone, at a third of the minimum target size. The icon
+   does not move: the TARGET is grown to 44x44 with a pseudo element, so
+   nothing in the header reflows and no other breakpoint notices. */
+.rk-nav__burger{position:relative}
+.rk-nav__burger::after{
+  content:"";position:absolute;top:50%;left:50%;
+  width:max(100%,44px);height:44px;transform:translate(-50%,-50%);
+}
 .rk-nav__burger i::before,.rk-nav__burger i::after{
   content:"";position:absolute;left:0;width:100%;height:1px;background:currentColor;
   transition:transform var(--dur) var(--ease-out);
@@ -734,6 +744,14 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   text-transform:uppercase;
 }
 .rk-foot__legal{display:flex;flex-wrap:wrap;gap:1.4rem}
+/* THE LEGAL ROW IS STILL A TARGET.                              [PHASE 3]
+   Four 19px-tall links — under the 24px minimum on the one row a visitor
+   reaches for when they specifically want the privacy notice. Coarse
+   pointers only, and taken as padding on an inline-block so the row's
+   baseline and the underline's origin do not move. */
+@media (hover:none),(pointer:coarse){
+  .rk-foot__bottom .ulink{display:inline-block;padding-block:.22rem}
+}
 
 /* --------------------------------------------------------------------------
    19 — RESPONSIVE
@@ -772,6 +790,18 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .rk-nav__cta-short{display:inline}
   .rk-nav__burger span{display:none}   /* icon-only; aria-label carries it */
   .rk-nav__burger i{width:24px}
+}
+
+/* THE MENU ROW IS A NAME, NOT A SPECIFICATION.                  [PHASE 3]
+   .rk-menu__tag is flex:none inside a link with overflow:hidden, so on a
+   narrow screen it is not shrunk — it is CUT. At 390 the panel read
+   "OENTOEZOERENDSZER  ZONAZO" and "REFERENCIAK  MEGEPITETT KERT", both
+   sliced mid-word at the gutter. There is no room for a display name and
+   a tracked mono string on one row at this width, and the tags are
+   repeated in full in SERVICES. Usability first here (§23): the menu is
+   the one place on the site that is not asked to be cinematic. */
+@media (max-width:560px){
+  .rk-menu__tag{display:none}
 }
 
 @media (max-width:520px){
@@ -2165,6 +2195,55 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 .end{position:relative;overflow:hidden}
 .end__inner{position:relative;z-index:2}
 
+/* SHORT DESKTOPS: THE HERO BLOCK STOPS OVERFLOWING ITS OWN FRAME.
+                                                                 [PHASE 3]
+   .gd__ch centres its inner, and .gd__inner carries padding-block of
+   14vh. At 1366x768 that is 107px a side, which makes the block 769px
+   tall in a 768px viewport — so it centres by OVERFLOWING, and the top
+   padding stops holding anything off. Measured there: the hero eyebrow
+   ran at y 49-60 while the header logo occupies 26-56 at the same x, i.e.
+   "Rapidkert Kft." printed on top of "Rapidkert Kft.".
+
+   Padding alone cannot answer it. The hero's content is 670px at this
+   size, so CENTRED in 768 it has 49px above it however the padding is
+   set, and the header needs 82. The block has to be pushed DOWN, which
+   means the hero stops being centred at short heights and is hung from a
+   top padding that clears the header explicitly. The datum solve follows
+   it — measureDatum() reads the band's real position every resize, so
+   type and grade plane stay on one line (measured error: 0px). Tall
+   desktops are untouched and keep the centred 14vh composition. */
+@media (min-width:1024px) and (max-height:820px){
+  .gd-on .gd__ch--hero{align-items:flex-start}
+  .gd-on .gd__ch--hero .gd__inner{
+    padding-top:clamp(96px,12.5vh,124px);padding-bottom:0;
+  }
+  /* The 28px the header took back come off the rule above the stats
+     rather than off the type: at 1366x768 the row's foot landed at 781
+     in a 768 frame, and three facts half below the fold read as an
+     accident. 4.4vh -> 2.6vh and 1.1rem -> .8rem puts it at 757. */
+  .gd-on .gd__ch--hero .gd__foot{
+    margin-top:clamp(1.2rem,2.6vh,2.2rem);padding-top:.8rem;
+  }
+}
+
+/* THE CTA ROW OBEYS THE MODEL, NOT JUST THE COLUMN.            [PHASE 3]
+   Measured at 1280x800: the block's near-left silhouette edge projects to
+   x=555 through the CTA's own vertical band (530-611) and the button pair
+   ended at x=567. Twelve pixels of overlap — the known tight relationship
+   at this viewport, and a real collision rather than a near miss.
+
+   The lede already answers to the specimen (min(42ch,37vw) above); the
+   buttons never did, so they kept desktop's 1.9em cheeks all the way down
+   to the width where the model arrives. Taking the padding back buys 26px
+   across the pair and leaves 14px of actual air between the second button
+   and the near corner. Not a scrim, not a smaller model, and no wrap — the
+   row stays one row, which is what keeps the stats on the first viewport.
+   Released again at 1440, where the model is far enough right not to care. */
+@media (min-width:1024px) and (max-width:1439px){
+  .gd-on .gd__ch--hero .gd__cta .btn{padding-inline:1.35em;letter-spacing:.075em}
+  .gd-on .gd__ch--hero .gd__cta .btn__arrow{width:.9em}
+}
+
 /* --------------------------------------------------------------------------
    31.8 — RESPONSIVE
    --------------------------------------------------------------------------
@@ -2284,7 +2363,15 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 
 @media (max-width:520px){
   .gd-on .gd__scroll{height:600svh}
-  .gd__foot .cue{display:none}
+  /* THE CUE COMES BACK.                                         [PHASE 3]
+     Hiding it left 167px of dead black at the foot of the 390x844 hero AND
+     took away the only scroll affordance a touch visitor has — the pointer
+     language of §24 does not exist on a phone. It stacks UNDER the stats
+     rather than beside them: at this width there is height going spare and
+     no width at all. */
+  .gd__foot{flex-direction:column;align-items:flex-start;gap:.95rem}
+  .gd__foot .cue{display:inline-flex}
+  .gd__foot .cue__line{height:22px}
   .gd__stats{gap:.5rem 1.1rem}
   /* Three facts do not fit a 320px row; the third is the least load-bearing
      and is repeated verbatim in the trust section below. */
@@ -2293,10 +2380,102 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 }
 
 /* Short viewports (landscape phones) — the model needs the room more than
-   the stats row does. */
-@media (max-height:560px) and (max-width:1024px){
+   the stats row does.
+   600, not 560.                                                [PHASE 3]
+   At 320x568 the authored hero block stands 707px tall in a 568px viewport.
+   The stats row was inside that overflow: present, below the fold, and
+   pushing the headline's gap so far down that the camera solved the grade
+   plane 86px off the type it is supposed to share a datum with. The three
+   facts are repeated verbatim in PROOF; the datum contract is not repeated
+   anywhere. 568 sits just past the old threshold, which is why it never
+   fired on the one viewport that needed it most. */
+@media (max-height:600px) and (max-width:1024px){
   .gd-on .gd__foot{display:none}
   .gd-on .gd__ch .btn{margin-top:1rem}
+}
+
+/* 320-class phones. Removing the stats row recovers 109px of the 139px
+   overflow; the specimen's band gives up the remaining 40 rather than the
+   headline giving up a line. The band is still 120px of section — the
+   object stays an object, which is the thing that must not collapse. */
+@media (max-width:360px){
+  .gd-on .gd__ch--hero .gd__datum{height:clamp(120px,21vh,168px)}
+  .gd-on .gd__ch--hero .gd__inner{padding-top:clamp(64px,10vh,96px)}
+}
+
+/* --------------------------------------------------------------------------
+   31.85 — LANDSCAPE PHONES ARE NOT NARROW SCREENS               [PHASE 3]
+   --------------------------------------------------------------------------
+   844x390 satisfies (max-width:860px), so it inherited the whole portrait
+   treatment above: a scrim banded for "specimen on top, copy underneath"
+   and a datum band with a 158px floor. At an aspect ratio of 2.16 that
+   scrim lands squarely ON the specimen — the hero rendered as a black blob
+   in an empty frame — and the 158px band pushed "kezdodik." past the
+   bottom edge with the lede and both buttons behind it.
+
+   A landscape phone is not short of width, it is short of HEIGHT. It has a
+   left and a right, which is the desktop's own composition. So the side
+   scrims come back, the band is sized in vh with no pixel floor, and the
+   copy takes a column rather than the full measure. The concept is
+   unchanged in both directions — type and specimen still share one grade
+   datum — it is the AXIS of the split that follows the viewport.
+   -------------------------------------------------------------------------- */
+@media (max-width:860px) and (min-aspect-ratio:7/5){
+  .gd-on .gd__ch{align-items:center}
+  .gd-on .gd__inner{padding-block:clamp(58px,13vh,88px)}
+  .gd-on .gd__ch--hero .gd__inner{padding-top:clamp(58px,13vh,88px);padding-bottom:0}
+  .gd-on .gd__ch--rail .gd__inner{padding-top:clamp(58px,13vh,88px)}
+  .gd-on .gd__ch--mid .gd__inner{padding-block:0}
+
+  /* The band is a gap in the headline again, not a stage for the object. */
+  .gd-on .gd__ch--hero .gd__datum{height:clamp(1.7rem,7vh,3rem);--anchor:.5}
+
+  /* Back to the desktop's side scrims — see 31.5. Overriding !important. */
+  .gd-on .gd__ch--hero::before{
+    background:radial-gradient(74% 62% at 2% 84%,rgba(10,11,8,.52),
+               rgba(10,11,8,.20) 46%,transparent 74%) !important;
+  }
+  .gd-on .gd__ch--left::before,.gd-on .gd__ch--rail::before{
+    background:linear-gradient(100deg,rgba(10,11,8,.88) 0%,rgba(10,11,8,.60) 26%,
+               rgba(10,11,8,.18) 46%,transparent 62%) !important;
+  }
+  .gd-on .gd__ch--right::before{
+    background:linear-gradient(260deg,rgba(10,11,8,.88) 0%,rgba(10,11,8,.62) 26%,
+               rgba(10,11,8,.20) 46%,transparent 62%) !important;
+  }
+  .gd-on .gd__ch--mid::before,.gd-on .gd__ch--step::before{
+    background:radial-gradient(120% 82% at 50% 58%,rgba(10,11,8,.88),
+               rgba(10,11,8,.32) 58%,transparent 78%) !important;
+  }
+
+  /* The copy takes a column and leaves the other half to the object. */
+  .gd-on .gd__ch--right,.gd-on .gd__ch--center{text-align:left}
+  .gd-on .gd__ch--left .gd__inner > *,
+  .gd-on .gd__ch--hero .gd__inner > *{max-width:min(54vw,46ch)}
+  .gd-on .gd__ch--right .gd__inner > *{max-width:min(50vw,42ch);margin-left:auto}
+  .gd-on .gd__ch--right .gd__inner{align-items:flex-end;text-align:right}
+
+  .gd__h1{font-size:clamp(1.55rem,4.4vw,2.5rem);margin:.5rem 0 .6rem}
+  .gd__h2{font-size:clamp(1.4rem,4vw,2.2rem);margin:.5rem 0 .55rem}
+  .gd__h2--wide,.gd__h2--real{font-size:clamp(1.4rem,3.8vw,2.1rem)}
+  .gd__step{font-size:clamp(1.9rem,7vw,3.2rem);margin-bottom:.5rem}
+  .gd__mid{font-size:clamp(1rem,3vw,1.5rem)}
+  .gd__lede,.gd__body{font-size:.82rem;line-height:1.45}
+  .gd__ch .btn{margin-top:.7rem}
+  .gd__cta{gap:8px}
+  .gd__rail{gap:.3rem .8rem}
+
+  /* The horizon keeps its rule and its depth, and gives up its word.
+     §31.4 puts the marker BELOW the rule because above it lands on the
+     headline's second line. In a 390px-tall frame the band is 27px, so
+     below the rule it lands on the THIRD line instead — measured overlap
+     37-91 x 191-200, straight through the "KEZ" of "kezdodik.". Above and
+     below are both occupied; buying clearance would cost 16px of a
+     viewport that has none. The rule is still pinned to the projected top
+     face and "0,00 M" still reads at the other end, over the object and
+     clear of the copy — the datum is intact, it is just not captioned
+     twice. */
+  .gd__horizon-l{display:none}
 }
 
 /* --------------------------------------------------------------------------
@@ -3906,6 +4085,26 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .fld__all{top:auto;bottom:clamp(84px,14svh,130px);right:var(--pad)}
   .fld__cur{display:none}
 
+  /* THE METADATA COMES OFF THE PLATE.                           [PHASE 3]
+     A caption is a strip under a photograph. On a phone the pass plates
+     cross the frame at 2.2x, so that strip is ~450px wide on a 390px
+     screen and it lands wherever its plate happens to be — over the sheet
+     number, or half off the right edge mid-word ("GYOR KORN"). Measured at
+     390x844: the closing run put "Terburkolat / Gyor kornyeke" at
+     763-808px, directly on top of "07" at 770-802.
+
+     So the plate keeps the picture and the STATIONARY rig keeps the
+     metadata, which is what a rig is for. The station name is written into
+     the sheet label by rk.js §12.2, between the number and the run's
+     measure — the numbering stays, the bar stays, and nothing rides. */
+  .fld__cap{display:none}
+  .fld__hud-t{
+    left:calc(var(--pad) + clamp(56px,14vw,92px));
+    right:calc(var(--pad) + min(30vw,320px) + 14px);
+    color:var(--limestone);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+
   /* ---- SERVICES: the same three transformations, framed for portrait.
      The camera table in rk.js §12.3 holds two to four metres of the
      section instead of twelve, with each state framed on its own
@@ -3915,7 +4114,10 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
      measure cannot wrap it, so the measure has to come off the size. */
   .lyr__name{font-size:clamp(1.9rem,10.4vw,4.2rem);max-width:none}
   .lyr__desc{max-width:26ch;margin-top:.9rem}
-  .lyr__tag{max-width:26ch;margin-top:1.1rem}
+  /* A ch measure does not count letter-spacing, and this string is mono at
+     .13em: 26ch cut "Terep - Struktura - Novenyy" after "Struktura" and
+     opened the second line on a separator. It is one short line by design. */
+  .lyr__tag{max-width:none;margin-top:1.1rem}
   .lyr__it{top:auto;bottom:clamp(18px,4vh,40px);transform:none}
   .lyr__list{display:flex;align-items:flex-end}
   .lyr__go{margin-top:1.1rem}
@@ -3989,7 +4191,7 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
      cannot be broken — clears the gutter at 320px as well as at 520. */
   .lyr__name{font-size:clamp(1.6rem,9.4vw,3rem)}
   .lyr__desc{font-size:.86rem;max-width:24ch}
-  .lyr__tag{max-width:24ch}
+  .lyr__tag{max-width:none}
   .prf__big{font-size:clamp(2.4rem,19vw,4.4rem)}
   .fld__hud-l,.fld__hud-r{font-size:.62rem}
 }

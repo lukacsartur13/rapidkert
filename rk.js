@@ -1931,6 +1931,14 @@
       var cutEl = pin.querySelector('[data-fld-cut]');
       var veilEl = pin.querySelector('[data-fld-veil]');
       var allEl = pin.querySelector('.fld__all');
+      /* The sheet's label. On desktop it reads "Lap" beside the station
+         number; below 860 it carries the station's NAME, because the
+         caption that used to is hidden there. Live-matched rather than
+         read once, so a rotation resolves it without a reload. */
+      var ttlEl = pin.querySelector('.fld__hud-t');
+      var ttlBase = ttlEl ? ttlEl.textContent.trim() : '';
+      var mqRig = window.matchMedia('(max-width:860px)');
+      var lastTtl = null;
 
       var mob = mobile();
       if (mob) A = 46;
@@ -1939,6 +1947,12 @@
         var run = parseFloat(el.dataset.run) || 0;
         el.__run = run;
         el.__no = el.dataset.no || '';
+        /* The station's name, read off the caption that carries it in the
+           markup. Narrow viewports hide that caption (rk.css §32.9 — it
+           rides with a plate crossing the frame at 2.2x and lands on the
+           sheet number) and show the name in the stationary rig instead. */
+        var capEl = el.querySelector('.fld__cap span');
+        el.__name = capEl ? capEl.textContent.trim() : '';
         /* Authored release. The defaults are deliberately the most timid
            pair in the file, so a plate added without the two attributes
            stays a distant one rather than silently becoming a 190vw event.
@@ -2177,6 +2191,11 @@
         if (noEl && curEl && curEl.__no !== lastNo) {
           lastNo = curEl.__no;
           noEl.textContent = curEl.__no;
+        }
+        /* The station's name, in the rig rather than on the plate. */
+        if (ttlEl && curEl) {
+          var wantTtl = mqRig.matches && curEl.__name ? curEl.__name : ttlBase;
+          if (wantTtl !== lastTtl) { lastTtl = wantTtl; ttlEl.textContent = wantTtl; }
         }
         if (barEl) barEl.style.transform = 'scaleX(' + q.toFixed(4) + ')';
 
