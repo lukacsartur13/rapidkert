@@ -25,7 +25,9 @@ pre-commit: rk.css FAILED the structural guard — commit refused.
 This is the check that would have caught the 2026-08-08 splice, which
 deleted ~1,470 lines while still parsing as valid CSS.
 
-  - restore from git:  git checkout -- rk.css
+  - restore from git:  git checkout HEAD -- rk.css
+    (HEAD, not `git checkout -- rk.css` — the bad version is already
+     staged, and a bare checkout would restore it from the index)
   - or inspect:        python3 .claude/tools/rkguard.py rk.css
   - if the change is genuinely intended (e.g. you removed a section on
     purpose), update the floors/section list in .claude/tools/rkguard.py
