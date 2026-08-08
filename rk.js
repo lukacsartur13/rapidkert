@@ -1966,6 +1966,27 @@
            release depth would cull the one plate whose entire job is to
            survive the boundary, and the section would end on nothing. */
         if (mob && el.__pass && el !== last) { el.__near = 820; el.__cull = 980; }
+        /* THE VEIL IS ABOUT COVERAGE, NOT DEPTH.               [PHASE 3.1]
+           620 and 940 are the depths at which a 30vw plate covers about a
+           half and about four fifths of a 1440px frame. They were read as
+           universal, and they are not: the same plate is 240px wide on a
+           390px screen — 61% of the frame before it has travelled at all —
+           so it reaches full bleed at a depth of 566 and the veil, waiting
+           for 620, never opened. Measured at 390x844 on station 07 with the
+           plate at 385px of a 390px frame: veil 0.000, and "GYŐR ÉS 40 KM-ES
+           VONZÁSKÖRZETE" printed in clay straight across a bright sky.
+
+           So the two stops are re-derived per plate from the share of the
+           frame it actually covers, inverting cover = w * P / (P - d) at the
+           same 0.51 and 0.80 the desktop numbers encode. Desktop is left on
+           its authored constants — for a 30vw plate at 1440 this returns 618
+           and 938, which is the same veil to within two pixels of depth, but
+           there is no reason to re-solve a case that was never wrong. */
+        if (mob && el.__pass) {
+          var wf = el.offsetWidth / window.innerWidth;
+          el.__vs = P * (1 - wf / 0.51);
+          el.__ve = P * (1 - wf / 0.80);
+        } else { el.__vs = 620; el.__ve = 940; }
         /* World position: its station along the travel axis, plus the
            offset that gives it its own place in the composition. Depth is
            the station alone now — a separate dz only made the same number
@@ -2163,7 +2184,7 @@
              the ground the rig is written on. Between 620 and 940 of depth
              a pass plate crosses from a picture standing in the space to
              the whole frame, and the veil crosses with it. */
-          if (el.__pass && vis) veil = Math.max(veil, clamp((d - 620) / 320, 0, 1));
+          if (el.__pass && vis) veil = Math.max(veil, clamp((d - el.__vs) / (el.__ve - el.__vs), 0, 1));
           if (vis && d > curD) { curD = d; curEl = el; }
         }
         if (veilEl && veilEl.__o !== veil) {
