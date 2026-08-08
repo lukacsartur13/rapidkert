@@ -623,6 +623,12 @@
     var Y_ROOT = 98;                   // how far the root zone reaches
     var LATS = [200, 440, 680, 920, 1120];   // laterals / emitters
     var SLABS = [[470, 84], [566, 84]];      // paving, x and width
+    /* The lines the design is set out from. Ends of the cut and three
+       between them — the same interval as the survey stations, because a
+       setting-out drawing and a survey of the same site are measured from
+       the same places. */
+    var AXES = [40, 320, 600, 880, 1160];
+
 
     /* ---- THE PROFILE --------------------------------------------------
        Deterministic, like §01's contour generator and for the same
@@ -633,6 +639,38 @@
       return 9 * Math.sin(x / 300 + 0.6)
            + 5 * Math.sin(x / 127 - 1.1)
            + 3 * Math.sin(x / 61 + 2.2);
+    }
+
+    /* ---- THE DESIGNED GRADE ------------------------------- [PHASE 2.4]
+       What the ground is regraded TO. A single, constant fall across the
+       site — which is what a levelled garden is in section, and the one
+       shape three sines can never be mistaken for.
+
+       This is the object PROCESS station 03 needed and did not have. In
+       2.3 that station acquired strata, hatching, boundaries and grit: a
+       drawing gaining detail. None of it changed a shape the visitor had
+       already been looking at for two sections, so nothing about it said
+       EARTH WAS MOVED — it said "more of this drawing exists now". The
+       surveyed profile becoming this one is the only event in the section
+       that alters something already known, and that is what makes it
+       legible as work rather than as rendering.
+
+       12 units of fall over a 1120-unit cut, on a profile whose own
+       undulation is 34: the small stuff is taken out and a deliberate
+       slope is left. The direction matters — it falls AWAY across the
+       site, because a garden is graded to shed water, and this is the one
+       drawing on the page that would be wrong if it did not. */
+    function D(x) {
+      return -6 + 12 * clamp((x - CUT0) / (CUT1 - CUT0), 0, 1);
+    }
+
+    /* THE SURFACE, at any point in the regrade. form 0 is what the survey
+       found; form 1 is what was built. Everything below reads the ground
+       through this and never through P() directly — a component placed on
+       P() while the surface is at S() is a pipe hanging in mid-air, which
+       is exactly what the cut-and-fill notation used to do. */
+    function S(x, form) {
+      return form ? P(x) + (D(x) - P(x)) * form : P(x);
     }
 
     /* EACH STRATUM HAS ITS OWN SURFACE.
@@ -648,19 +686,22 @@
     var SWELL = [0, 4.5, 7, 9];
     var SW_F  = [0, 1 / 210, 1 / 173, 1 / 246];
     var SW_P  = [0, 1.9, 3.4, 5.1];
-    function Pk(x, k) {
-      return P(x) * ATT[k] + SWELL[k] * Math.sin(x * SW_F[k] + SW_P[k]);
+    /* The strata follow the surface through the regrade, attenuated as
+       they always were: cut the top of a site and the formation levels
+       under it come with it, while the drain layer barely notices. */
+    function Pk(x, k, form) {
+      return S(x, form) * ATT[k] + SWELL[k] * Math.sin(x * SW_F[k] + SW_P[k]);
     }
 
     /* Catmull-Rom through the samples, emitted as cubics. A polyline at
        this sample density is visibly faceted once the camera is inside
        the root zone, and the whole point of that state is that the
        visitor is looking at ground rather than at a chart. */
-    function profileD(relief, closed, k, drop) {
+    function profileD(relief, closed, k, drop, form) {
       var n = 26, d = '', pts = [];
       for (var i = 0; i <= n; i++) {
         var x = X0 + (X1 - X0) * i / n;
-        pts.push([x, Pk(x, k || 0) * relief + (drop || 0)]);
+        pts.push([x, Pk(x, k || 0, form) * relief + (drop || 0)]);
       }
       d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(2);
       for (var j = 0; j < pts.length - 1; j++) {
@@ -751,20 +792,38 @@
       svg.appendChild(gc);
 
       /* CUT AND FILL — where material is taken away and where it is
-         brought in. Construction notation, not decoration. */
+         brought in. Construction notation, not decoration.
+
+         THE GEOMETRY MOVED INTO reshape() IN 2.4, and that is the whole
+         point of it. These were drawn once at P(x) — the EXISTING ground —
+         and never touched again, so the moment the process section began to
+         regrade the terrain the notation stayed behind, floating over a
+         surface that was no longer under it. Each mark is now an arrow from
+         the level the ground WAS at to the level it IS at: where those two
+         differ, the arrow is the material that moved. */
       var gf = grp('wrl__fill-marks', 'cutfill');
       [140, 300, 520, 760, 980].forEach(function (x, i) {
-        var y = P(x);
-        var up = i % 2 === 0;
-        gf.appendChild(el('path', {
-          'class': 'wrl__cf',
-          d: 'M' + x + ' ' + (y + (up ? -34 : 34)).toFixed(1) + 'V' + y.toFixed(1) +
-             'M' + (x - 7) + ' ' + (y + (up ? -12 : 12)).toFixed(1) +
-             'L' + x + ' ' + y.toFixed(1) +
-             'L' + (x + 7) + ' ' + (y + (up ? -12 : 12)).toFixed(1)
-        }));
+        gf.appendChild(el('path', { 'class': 'wrl__cf', 'data-x': x, 'data-i': i, d: '' }));
       });
       svg.appendChild(gf);
+
+      /* THE SETTING-OUT.  02 · TERV ÉS AJÁNLAT                [PHASE 2.4]
+         Construction axes at the lines the design is measured from, each
+         with the ring a setting-out drawing puts at the head of an axis,
+         and a dimension chain across them. This is what separates a survey
+         from a plan: the survey records what is there, and the plan puts a
+         geometry on it. Graphic only — there is still not one dimension
+         figure anywhere in this world, for the reason given at MEASUREMENT
+         below. */
+      var gax = grp('wrl__axes', 'axes');
+      AXES.forEach(function (x, i) {
+        var g = el('g', { 'class': 'wrl__ax', 'data-x': x, 'data-i': i });
+        g.appendChild(el('path', { 'class': 'wrl__axl', d: '' }));
+        g.appendChild(el('circle', { 'class': 'wrl__axr', r: 10, cx: x, cy: -252 }));
+        gax.appendChild(g);
+      });
+      gax.appendChild(el('path', { 'class': 'wrl__axd', d: '' }));
+      svg.appendChild(gax);
 
       /* THE GROUND. Painter's order, shallowest first: each stratum is
          the profile offset to its own depth with a body running off the
@@ -883,13 +942,33 @@
          own offset and its own angle, and RESOLVE onto their correct
          positions in the section. Coordination is not a graphic about
          people; it is four drawings agreeing. */
+      /* THE FOUR ARE NAMED IN 2.4, and they are named out of the site's own
+         vocabulary: the services section sets "Terep · Struktúra · Növény"
+         under the first service and the second service is the irrigation.
+         Four unlabelled lines resolving is a nice piece of motion and an
+         argument about nothing — the statement is that these particular
+         disciplines are one responsibility, so they have to be legible as
+         disciplines. The names ride WITH their own trace and leave as it
+         resolves, so what is left at the end is one section and one node,
+         which is the claim. No count of people is stated anywhere: the copy
+         does not support one. */
       var gcv = grp('wrl__conv', 'conv');
-      [[-150, -74, -2.4], [190, 96, 3.1], [-90, 128, 1.7], [130, -108, -3.6]]
+      [[-150, -74, -2.4, 'Terep', 250],
+       [190,  96,  3.1, 'Öntözés', 470],
+       [-90,  128, 1.7, 'Struktúra', 730],
+       [130, -108, -3.6, 'Növény', 950]]
         .forEach(function (o, i) {
-          var u = el('use', { href: '#' + ID_L, 'class': 'wrl__cv',
+          var g = el('g', { 'class': 'wrl__cvg',
             'data-dx': o[0], 'data-dy': o[1], 'data-r': o[2], 'data-i': i });
-          gcv.appendChild(u);
+          g.appendChild(el('use', { href: '#' + ID_L, 'class': 'wrl__cv' }));
+          var t = el('text', { 'class': 'wrl__ntx wrl__cvt', 'data-x': o[4] });
+          t.textContent = o[3];
+          g.appendChild(t);
+          gcv.appendChild(g);
         });
+      /* The shared node. Four drawings agreeing is only an argument if
+         there is a point at which they agree. */
+      gcv.appendChild(el('circle', { 'class': 'wrl__cvn', r: 7, cx: 600, cy: 0 }));
       svg.appendChild(gcv);
 
       /* 40 KM — a measured service radius over the ground, not a map.
@@ -903,6 +982,15 @@
         grd.appendChild(el('path', { 'class': 'wrl__rr' + (i === 3 ? ' wrl__rr--out' : ''),
           'data-f': f, d: '' }));
       });
+      /* THE MEASUREMENT ITSELF.                               [PHASE 2.4]
+         Concentric arcs on their own are orbits — the eye reads rings
+         around a point, not a distance from it. This is the dimension: a
+         run from the service point out to the outer ring, ticked at both
+         ends and at every ring it crosses, drawn exactly as the overall run
+         under the section is drawn. It sits INSIDE the group, so it is
+         scaled by the same transform the arcs are, which is what makes it
+         one measurement being taken rather than a caption on a picture. */
+      grd.appendChild(el('path', { 'class': 'wrl__rdm', d: '' }));
       svg.appendChild(grd);
 
       /* 70% — two sections of the same soil, side by side.
@@ -915,10 +1003,39 @@
       var gcp = grp('wrl__compare', 'compare');
       gcp.appendChild(el('path', { 'class': 'wrl__cpdiv', d: '' }));
       gcp.appendChild(el('path', { 'class': 'wrl__cpwetA', d: '' }));   // shallow band
+      gcp.appendChild(el('path', { 'class': 'wrl__cpfrn', d: '' }));    // its wetting front
       gcp.appendChild(el('path', { 'class': 'wrl__cpevap', d: '' }));   // what leaves
-      gcp.appendChild(el('path', { 'class': 'wrl__cpdryA', d: '' }));   // dry root zone
-      [['Szórófejes locsolás', 400, -1], ['Felszín alatti öntözés', 800, 1]].forEach(function (n) {
-        var g = el('g', { 'class': 'wrl__cplb', 'data-x': n[1], 'data-dir': n[2] });
+      /* THE LEFT-HAND ROOT ZONE IS DRY, AND IT HAS TO LOOK IT.
+                                                            [PHASE 2.4.1]
+         The right half of this comparison carries a dark wetting lens at
+         62 units of depth. The left half carried nothing there at all —
+         and "nothing" is not a reading, it is an absence the visitor has
+         to notice and then interpret. So the same depth band on the left
+         is drawn as dry granular soil, in the broken-dash register the
+         rest of this world uses for material: same height, same width,
+         opposite state. The comparison is then two drawn conditions of one
+         soil rather than one drawn condition and an empty space. */
+      gcp.appendChild(el('path', { 'class': 'wrl__cpdryB', d: '' }));   // dry soil, at lens depth
+      gcp.appendChild(el('path', { 'class': 'wrl__cpdryA', d: '' }));   // roots reaching for it
+      /* FOUR LABELS, AND THE SECOND PAIR IS THE ARGUMENT.     [PHASE 2.4]
+         The first two name the two halves. The second two name what is
+         being compared — where the water GOES — because that is the whole
+         claim and it was the one thing in this state a visitor had to work
+         out for themselves: risers off the top of the left-hand section and
+         a dark lens under the right-hand one are only legible as
+         "evaporation" and "root zone" if somebody says so.
+
+         Both words are the site's own: "Szórófej nélkül, párolgás nélkül"
+         and "Gyökérzónás, föld alatti csepegtető rendszer" are the third
+         service's copy. The 70% figure stays where it belongs, in the
+         claim, with its qualifier — this drawing shows the MECHANISM and
+         makes no measurement of its own.
+
+         data-y is an offset from that half's own ground level, so a label
+         under grade stays under grade whatever the terrain is doing. */
+      [['Szórófejes locsolás', 400, -128], ['Felszín alatti öntözés', 800, -128],
+       ['Párolgás', 400, -62], ['Gyökérzóna', 800, 116]].forEach(function (n) {
+        var g = el('g', { 'class': 'wrl__cplb', 'data-x': n[1], 'data-y': n[2] });
         var t = el('text', { 'class': 'wrl__ntx' });
         t.textContent = n[0];
         g.appendChild(t);
@@ -978,8 +1095,21 @@
       gg2.appendChild(el('use', { href: '#' + ID_L, y: 0, 'class': 'wrl__gd' }));
       svg.appendChild(gg2);
 
+      /* TURF, ONE TUFT PER ELEMENT.                           [PHASE 2.4]
+         It was a single path with every blade in it, which is cheaper and
+         is why it was written that way — but a lawn that arrives all at
+         once is a lawn that was switched on. The process section's last
+         station is the surface CLOSING, and a surface closes from one end
+         of a garden to the other. Twenty-two elements is the same order as
+         the grit already in this world and the stagger costs one opacity
+         write each, on one section, for a sixth of its run. */
       var gt = grp('wrl__turf', 'turf');
-      gt.appendChild(el('path', { 'class': 'wrl__tf', d: '' }));
+      for (var t0 = 0; t0 < 22; t0++) {
+        gt.appendChild(el('path', {
+          'class': 'wrl__tf', 'data-i': t0,
+          'data-x': (CUT0 + 30 + t0 * ((CUT1 - CUT0 - 60) / 21)).toFixed(1), d: ''
+        }));
+      }
       svg.appendChild(gt);
 
       var gp = grp('wrl__pave', 'pave');
@@ -987,6 +1117,23 @@
         gp.appendChild(el('path', { 'class': 'wrl__pv', 'data-x': s[0], 'data-w': s[1], d: '' }));
       });
       svg.appendChild(gp);
+
+      /* GARANCIA — THE SYSTEM BOUNDARY.                       [PHASE 2.4]
+         Four corners of one bracket, standing off the four corners of the
+         whole build-up and closing onto it. Everything this page has spent
+         its length separating — terrain, structure, network, planting —
+         ends up inside one outline, and the outline is drawn by the same
+         hand as the rest of the drawing.
+
+         Four things resolving into one is deliberately the same move as
+         EGY CSAPAT above, because it is the same argument arriving at the
+         other end of the section: four trades agreeing at the start of the
+         work, one boundary around the result of it. */
+      var gbk = grp('wrl__frame', 'frame');
+      for (var c0 = 0; c0 < 4; c0++) {
+        gbk.appendChild(el('path', { 'class': 'wrl__bk', 'data-i': c0, d: '' }));
+      }
+      svg.appendChild(gbk);
 
       /* MEASUREMENT. A level reference, survey stations on it and one
          overall run. Graphic measurement only — there is no dimension
@@ -1006,19 +1153,26 @@
         line: pLine,
         clip: 'url(#' + ID_C + ')',
         L: {},                    // layer groups, filled below
-        relief: -1, depth: -1
+        relief: -1, depth: -1, form: -1
       };
     }
 
-    /* ---- GEOMETRY THAT DEPENDS ON RELIEF AND DEPTH --------------------
+    /* ---- GEOMETRY THAT DEPENDS ON RELIEF, DEPTH AND FORM --------------
        Everything that is not a copy of the profile has to be placed ON
-       the profile, so it moves when the ground does. Recomputed only
-       when one of the two actually changes. */
-    function reshape(w, relief, depth) {
-      var svg = w.svg;
-      w.line.setAttribute('d', profileD(relief, false));
+       the profile, so it moves when the ground does. Recomputed only when
+       one of the three actually changes.
 
-      function py(x) { return P(x) * relief; }
+       FORM joined the other two in 2.4. Nothing below reaches for P()
+       any more: py() is the ground's CURRENT level and every component in
+       this world is placed against it. That is not tidiness — it is the
+       reason the regrade can happen at all. A single call to P() left in
+       here is one object that stays at the level the survey found while
+       the garden is built at the level it was designed to. */
+    function reshape(w, relief, depth, form) {
+      var svg = w.svg;
+      w.line.setAttribute('d', profileD(relief, false, 0, 0, form));
+
+      function py(x) { return S(x, form) * relief; }
 
       /* Strata, hatch and boundaries. Four surfaces, each its own curve at
          its own depth — eight path strings, rebuilt only when the ground
@@ -1026,8 +1180,8 @@
       var fills = [], lines = [];
       for (var k = 0; k < STRATA.length; k++) {
         var drop = STRATA[k].d * depth;
-        fills[k] = profileD(relief, true, k, drop);
-        lines[k] = profileD(relief, false, k, drop);
+        fills[k] = profileD(relief, true, k, drop, form);
+        lines[k] = profileD(relief, false, k, drop, form);
       }
       svg.querySelectorAll('.wrl__st').forEach(function (u) { u.setAttribute('d', fills[+u.dataset.k]); });
       svg.querySelectorAll('.wrl__hf').forEach(function (u) { u.setAttribute('d', fills[+u.dataset.k]); });
@@ -1039,10 +1193,71 @@
          hole in ground that is not level rather than a rectangle. */
       [CUT0, CUT1].forEach(function (x, i) {
         var top = py(x);
-        var bot = Pk(x, 3) * relief + (STRATA[3].d + 58) * depth;
+        var bot = Pk(x, 3, form) * relief + (STRATA[3].d + 58) * depth;
         svg.querySelectorAll('.wrl__ed')[i]
            .setAttribute('d', 'M' + x + ' ' + top.toFixed(1) + 'V' + bot.toFixed(1));
       });
+
+      /* CUT AND FILL — the material that moved.               [PHASE 2.4]
+         The shaft runs from the level the ground was at (relief 1, the
+         existing terrain) to the level it is at now, and the head lands on
+         the current surface. Where the profile has been flattened the high
+         ground reads as cut and the hollows as fill, which is what the
+         regrade in PROCESS station 03 actually does. Where nothing has been
+         regraded yet the two levels coincide, so the mark falls back to the
+         fixed alternating tick the notation has always used — an arrow of
+         no length would simply vanish, and the layer is on screen before
+         the earth moves. */
+      svg.querySelectorAll('.wrl__cf').forEach(function (p) {
+        var x = +p.dataset.x, i = +p.dataset.i;
+        var was = P(x) * relief, now = py(x);
+        var moved = now - was;
+        /* Down the screen is down into the ground: a mark that travels
+           positive is fill arriving, negative is material cut away. */
+        var dir = Math.abs(moved) > 0.6 ? (moved > 0 ? 1 : -1) : (i % 2 === 0 ? -1 : 1);
+        /* 20 is the shortest a mark may be — below that it stops reading as
+           notation — but anything the regrade actually moves further than
+           that is drawn at its true length, so the arrows are longest where
+           the most earth was shifted. */
+        var len = Math.max(Math.abs(moved), 20);
+        p.setAttribute('d',
+          'M' + x + ' ' + (now - dir * len).toFixed(1) + 'V' + now.toFixed(1) +
+          'M' + (x - 7) + ' ' + (now - dir * 12).toFixed(1) +
+          'L' + x + ' ' + now.toFixed(1) +
+          'L' + (x + 7) + ' ' + (now - dir * 12).toFixed(1));
+      });
+
+      /* THE SETTING-OUT. Axes from above the ground down through the whole
+         build-up, and one dimension chain across their heads. The chain
+         carries the 45-degree slash a construction drawing puts at a
+         dimension point and nothing else: no figure, for the reason at
+         MEASUREMENT. */
+      var axTop = -252, axChain = -214;
+      svg.querySelectorAll('.wrl__ax').forEach(function (g) {
+        var x = +g.dataset.x;
+        var foot = Pk(x, 3, form) * relief + (STRATA[3].d + 74) * depth;
+        g.querySelector('.wrl__axl').setAttribute('d',
+          'M' + x + ' ' + (axTop + 10) + 'V' + foot.toFixed(1));
+      });
+      var ax = 'M' + AXES[0] + ' ' + axChain + 'H' + AXES[AXES.length - 1];
+      AXES.forEach(function (x) {
+        ax += 'M' + (x - 7) + ' ' + (axChain + 7) + 'l14 -14';
+      });
+      svg.querySelector('.wrl__axd').setAttribute('d', ax);
+
+      /* THE SYSTEM BOUNDARY. Four corner brackets which, at full length,
+         are one closed rectangle around the entire build-up. */
+      var bx0 = CUT0 - 46, bx1 = CUT1 + 46;
+      var byT = Math.min(py(CUT0), py(600), py(CUT1)) - 74;
+      var byB = Pk(CUT1, 3, form) * relief + (STRATA[3].d + 96) * depth;
+      var bhw = (bx1 - bx0) / 2, bhh = (byB - byT) / 2;
+      [[bx0, byT, 1, 1], [bx1, byT, -1, 1], [bx1, byB, -1, -1], [bx0, byB, 1, -1]]
+        .forEach(function (c, i) {
+          svg.querySelectorAll('.wrl__bk')[i].setAttribute('d',
+            'M' + (c[0] + c[2] * bhw).toFixed(1) + ' ' + c[1].toFixed(1) +
+            'H' + c[0].toFixed(1) +
+            'V' + (c[1] + c[3] * bhh).toFixed(1));
+        });
 
       // grit
       svg.querySelectorAll('.wrl__gt').forEach(function (p) {
@@ -1052,9 +1267,9 @@
       });
 
       // the main, along the profile at its own depth
-      svg.querySelector('.wrl__mn').setAttribute('d', runAlong(relief, Y_MAIN * depth));
+      svg.querySelector('.wrl__mn').setAttribute('d', runAlong(relief, Y_MAIN * depth, form));
       // the dripline
-      svg.querySelector('.wrl__dp').setAttribute('d', runAlong(relief, Y_DRIP * depth));
+      svg.querySelector('.wrl__dp').setAttribute('d', runAlong(relief, Y_DRIP * depth, form));
 
       // laterals drop from the main to the dripline
       svg.querySelectorAll('.wrl__lt').forEach(function (p) {
@@ -1088,17 +1303,16 @@
          as grass — the eye counts the interval instead of seeing a
          surface. Three blades to a tuft, tufts a long way apart, and the
          gaps between them are what make it a lawn. */
-      var tf = '';
-      for (var t = 0; t < 22; t++) {
-        var bx = CUT0 + 30 + t * ((CUT1 - CUT0 - 60) / 21);
+      svg.querySelectorAll('.wrl__tf').forEach(function (p) {
+        var bx = +p.dataset.x, t = +p.dataset.i, tf = '';
         for (var b = -1; b <= 1; b++) {
           var x2 = bx + b * 7;
           var bh = 11 + Math.abs(b) * -3 + (t % 2) * 2;
           tf += 'M' + x2.toFixed(1) + ' ' + py(x2).toFixed(1) +
                 'l' + (b * 2.5).toFixed(1) + ' ' + (-bh).toFixed(1);
         }
-      }
-      svg.querySelector('.wrl__tf').setAttribute('d', tf);
+        p.setAttribute('d', tf);
+      });
 
       /* Slabs BEDDED into the surface, not resting on it: the top of the
          slab is flush with grade and its body is in the ground, which is
@@ -1131,48 +1345,110 @@
          camera is looking ALONG the section, not down at a plan, and a
          circle on the ground seen from the side of it is an ellipse. */
       svg.querySelectorAll('.wrl__rr').forEach(function (p) {
-        var f = +p.dataset.f, R = 620 * f, ry = R * 0.30, cy = P(600) * relief;
+        var f = +p.dataset.f, R = 620 * f, ry = R * 0.30, cy = py(600);
         p.setAttribute('d',
           'M' + (600 - R) + ' ' + cy.toFixed(1) +
           'a' + R + ' ' + ry.toFixed(1) + ' 0 1 0 ' + (2 * R) + ' 0' +
           'a' + R + ' ' + ry.toFixed(1) + ' 0 1 0 ' + (-2 * R) + ' 0');
       });
+      var rcy = py(600);
       var rc0 = svg.querySelector('.wrl__rc0');
-      if (rc0) rc0.setAttribute('cy', (P(600) * relief).toFixed(1));
+      if (rc0) rc0.setAttribute('cy', rcy.toFixed(1));
+      /* The dimension across the radius: a run from the service point out
+         to the furthest ring, ticked where it crosses each one. Set above
+         the ground plane so it is read against the arcs rather than lost
+         in them. */
+      var rdm = svg.querySelector('.wrl__rdm');
+      if (rdm) {
+        var ry0 = rcy - 34, rd = 'M600 ' + ry0.toFixed(1) + 'H1220';
+        [0, 0.125, 0.25, 0.5, 1].forEach(function (f) {
+          rd += 'M' + (600 + 620 * f) + ' ' + (ry0 - 7).toFixed(1) + 'v14';
+        });
+        rdm.setAttribute('d', rd);
+      }
 
       /* 70%. Both halves are the SAME soil — the only difference between
          them is where the water is, which is the entire argument. */
-      var mid = 600, cy0 = P(mid) * relief;
+      var mid = 600, cy0 = py(mid);
+      /* THE SECTION DIVIDER. Longer at both ends than the two halves it
+         separates — a section line runs past what it cuts — with a tick
+         at grade, so the eye lands on the one place where the two states
+         of the soil meet. Quiet, but no longer the faintest mark in a
+         frame whose whole job is to be read as two things. [PHASE 2.4.1] */
       svg.querySelector('.wrl__cpdiv').setAttribute('d',
-        'M' + mid + ' ' + (cy0 - 150).toFixed(1) + 'V' + (cy0 + 210 * depth).toFixed(1));
+        'M' + mid + ' ' + (cy0 - 212).toFixed(1) + 'V' + (cy0 + 244 * depth).toFixed(1) +
+        'M' + (mid - 9) + ' ' + cy0.toFixed(1) + 'h18');
       /* A: the wetted band hugs the surface across the left half. */
       /* 240-560 and 640-960: both halves have to be COMPLETE in one
          frame or the visitor is comparing a thing with a thing they
          cannot see. That is what sets the camera height for this state,
          not the other way round. */
+      /* Its top is GRADE, not four units under it.          [PHASE 2.4.1]
+         Held below the surface the band had a hard edge of its own with
+         pale soil above it, and it read as a dark slab lying in the
+         section rather than as the top of the profile being wet. Starting
+         it on the ground line makes it what it is: this soil, from the
+         surface down, and only that far. */
       var wa = '';
       for (var ax = 250; ax <= 555; ax += 10) {
-        var ay = P(ax) * relief;
-        wa += (ax === 250 ? 'M' : 'L') + ax + ' ' + (ay + 4).toFixed(1);
+        var ay = py(ax);
+        wa += (ax === 250 ? 'M' : 'L') + ax + ' ' + ay.toFixed(1);
       }
       for (var bx = 555; bx >= 250; bx -= 10) {
-        var by = P(bx) * relief;
+        var by = py(bx);
         wa += 'L' + bx + ' ' + (by + 26 * depth).toFixed(1);
       }
       svg.querySelector('.wrl__cpwetA').setAttribute('d', wa + 'Z');
-      /* A: what leaves again. Short risers off the surface — not arrows,
-         not droplets; the same tick the cut-and-fill notation uses. */
+      /* AND ITS FRONT IS DRAWN. A fill alone is a smudge that happens to
+         be near the top; the line along its underside is the depth the
+         water reached, which is the number this half of the comparison is
+         actually making. It is the same notation as every other measured
+         boundary in this world.                            [PHASE 2.4.1] */
+      var fr = '';
+      for (var fx = 250; fx <= 555; fx += 10) {
+        fr += (fx === 250 ? 'M' : 'L') + fx + ' ' + (py(fx) + 26 * depth).toFixed(1);
+      }
+      svg.querySelector('.wrl__cpfrn').setAttribute('d', fr);
+      /* A: what leaves again. Risers off the surface — not arrows, not
+         droplets; the same tick the cut-and-fill notation uses.
+         IN TWO TIERS, AND ONLY JUST TALLER.                [PHASE 2.4.1]
+         At 40 units, five identical stubs read as a fence along the top of
+         the section rather than as loss. At 76 — which is what this tried
+         first — five stems with heads on them read as ARROWS, and an
+         arrow field is the infographic this drawing exists instead of. 52
+         and 28, alternating, with the smallest head that still points: the
+         field reads as something leaving at different rates, and it is the
+         one part of the frame allowed above grade, which is what makes
+         UPWARD the difference between the two halves. */
       var ev = '';
       [280, 340, 400, 460, 520].forEach(function (x) {
-        var y = P(x) * relief;
-        ev += 'M' + x + ' ' + (y - 6).toFixed(1) + 'v-40' +
-              'M' + (x - 5) + ' ' + (y - 34).toFixed(1) + 'l5 -12l5 12';
+        var y = py(x);
+        ev += 'M' + x + ' ' + (y - 8).toFixed(1) + 'v-52' +
+              'M' + (x - 4) + ' ' + (y - 50).toFixed(1) + 'l4 -10l4 10';
+      });
+      [310, 370, 430, 490].forEach(function (x) {
+        var y = py(x);
+        ev += 'M' + x + ' ' + (y - 8).toFixed(1) + 'v-28' +
+              'M' + (x - 3) + ' ' + (y - 27).toFixed(1) + 'l3 -7l3 7';
       });
       svg.querySelector('.wrl__cpevap').setAttribute('d', ev);
+      /* A: dry granular soil, at exactly the depth the right-hand half
+         carries its wetting lens — 62 units, the dripline. Same band,
+         same width, and nothing in it. */
+      var db = '';
+      for (var gx = 266; gx <= 546; gx += 28) {
+        var gy = py(gx);
+        for (var gk = 0; gk < 3; gk++) {
+          var yy = gy + (34 + gk * 26) * depth;
+          db += 'M' + gx + ' ' + yy.toFixed(1) + 'h10' +
+                'M' + (gx + 15) + ' ' + (yy + 12 * depth).toFixed(1) + 'h6';
+        }
+      }
+      svg.querySelector('.wrl__cpdryB').setAttribute('d', db);
       /* A: and the root zone under it, dry. */
       var dr = '';
       [300, 400, 500].forEach(function (x) {
-        var y = P(x) * relief, h = Y_ROOT * depth;
+        var y = py(x), h = Y_ROOT * depth;
         dr += 'M' + x + ' ' + (y + 26 * depth).toFixed(1) +
               'c-5 ' + (h * .32).toFixed(1) + ' -15 ' + (h * .5).toFixed(1) + ' -26 ' + (h * .72).toFixed(1) +
               'M' + x + ' ' + (y + 26 * depth).toFixed(1) +
@@ -1180,12 +1456,27 @@
       });
       svg.querySelector('.wrl__cpdryA').setAttribute('d', dr);
       svg.querySelectorAll('.wrl__cplb').forEach(function (g) {
-        var x = +g.dataset.x;
+        var x = +g.dataset.x, dy = +g.dataset.y;
         var t = g.querySelector('text');
         t.setAttribute('x', x);
-        t.setAttribute('y', (P(x) * relief - 74).toFixed(1));
+        /* Above grade the offset is a plain distance; below it, it is a
+           depth, so it scales with how deep the ground currently is. */
+        t.setAttribute('y', (py(x) + (dy < 0 ? dy : dy * depth)).toFixed(1));
         t.setAttribute('text-anchor', 'middle');
       });
+
+      /* EGY CSAPAT. Each discipline's name sits on its own trace, so it
+         travels with it while the four are still separate and arrives at
+         the section with it. The node is where they agree. */
+      svg.querySelectorAll('.wrl__cvg').forEach(function (g) {
+        var t = g.querySelector('.wrl__cvt');
+        var x = +t.dataset.x;
+        t.setAttribute('x', x);
+        t.setAttribute('y', (Pk(x, 0, form) * relief - 16).toFixed(1));
+        t.setAttribute('text-anchor', 'middle');
+      });
+      var cvn = svg.querySelector('.wrl__cvn');
+      if (cvn) cvn.setAttribute('cy', py(600).toFixed(1));
 
       /* 1 MUNKANAP. The shadow is cast by the paving's own edge, so it
          belongs to the garden rather than being a shape laid over it.
@@ -1201,9 +1492,9 @@
         var a = Math.min(dx0, dx0 + len), b = Math.max(dx0, dx0 + len);
         if (b - a < 8) { p.setAttribute('d', ''); return; }
         var d = '', x;
-        for (x = a; x <= b; x += 12) d += (d ? 'L' : 'M') + x.toFixed(1) + ' ' + (P(x) * relief).toFixed(1);
-        d += 'L' + b.toFixed(1) + ' ' + (P(b) * relief).toFixed(1);
-        for (x = b; x >= a; x -= 12) d += 'L' + x.toFixed(1) + ' ' + (P(x) * relief + 13).toFixed(1);
+        for (x = a; x <= b; x += 12) d += (d ? 'L' : 'M') + x.toFixed(1) + ' ' + py(x).toFixed(1);
+        d += 'L' + b.toFixed(1) + ' ' + py(b).toFixed(1);
+        for (x = b; x >= a; x -= 12) d += 'L' + x.toFixed(1) + ' ' + (py(x) + 13).toFixed(1);
         p.setAttribute('d', d + 'Z');
       });
       svg.querySelector('.wrl__daybar').setAttribute('d', 'M180 -190H1020');
@@ -1227,17 +1518,18 @@
 
       w.relief = relief;
       w.depth = depth;
+      w.form = form;
     }
 
     /* The main and the dripline follow the ground, so they are the
        profile again — one more copy rather than a straight pipe under a
        curved surface, which is the detail that makes a section drawing
        look drawn by someone who has dug one. */
-    function runAlong(relief, off) {
+    function runAlong(relief, off, form) {
       var d = '', n = 18;
       for (var i = 0; i <= n; i++) {
         var x = CUT0 + (CUT1 - CUT0) * i / n;
-        var y = P(x) * relief + off;
+        var y = S(x, form) * relief + off;
         d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(2);
       }
       return d;
@@ -1287,7 +1579,23 @@
        arrives and STAYS, which is the default on purpose: this world is
        assembled, and a component that has been built does not un-build
        itself because the scroll moved on. */
-    function ramp(q, a, b) { return b <= a ? (q >= a ? 1 : 0) : clamp((q - a) / (b - a), 0, 1); }
+    /* WEIGHTED, NOT INTERPOLATED.                            [PHASE 2.4]
+       Every scheduled thing in this world used to arrive on a straight
+       line: constant rate in, stop dead at the end. That is what a
+       timeline does, and it is why several of these states read as a
+       property being tweened rather than as a component being placed. A
+       smoothstep costs one multiply and gives the whole world the same
+       behaviour — it takes up, it travels, it settles — which is how
+       earth, stone and water actually arrive.
+
+       It changes nothing about WHEN: ease(0) is 0 and ease(1) is 1, so
+       every window in every section still opens and closes on exactly the
+       number it is quoted at, including the ones whose whole point is
+       that they meet another window precisely. */
+    function ease(t) { return t * t * (3 - 2 * t); }
+    function ramp(q, a, b) {
+      return b <= a ? (q >= a ? 1 : 0) : ease(clamp((q - a) / (b - a), 0, 1));
+    }
     function band(q, s) {
       /* ABSENT MEANS ABSENT. A missing schedule is a layer this section
          does not use, not a layer at full strength — the difference is
@@ -1344,7 +1652,10 @@
 
         var relief = Math.round(band(q, opt.relief) * 100) / 100;
         var depth  = Math.round(band(q, opt.depth) * 100) / 100;
-        if (relief !== w.relief || depth !== w.depth) reshape(w, relief, depth);
+        var form   = Math.round(band(q, opt.form) * 100) / 100;
+        if (relief !== w.relief || depth !== w.depth || form !== w.form) {
+          reshape(w, relief, depth, form);
+        }
 
         var tech = band(q, opt.tech);
         if (w.__tech !== tech) {
@@ -1386,6 +1697,7 @@
       mount: mount,
       ALWAYS: ALWAYS,
       P: P,
+      S: S,
       CUT0: CUT0, CUT1: CUT1,
       Y_DRIP: Y_DRIP
     };
@@ -1447,9 +1759,14 @@
         var kv = pair.split(':');
         if (kv.length === 2) forced[kv[0].trim()] = clamp(parseFloat(kv[1]), 0, 1);
       });
+      var held = forced;                       // survives free(), see set()
       window.RK_STAGE = {
-        map: forced,
-        set: function (k, v) { forced[k] = clamp(v, 0, 1); runReaders(); },
+        map: held,
+        /* set() after free() used to throw: free() nulls `forced` and set()
+           wrote straight through it. Handing the stages back and then
+           freezing one again is the most ordinary thing to do at this
+           console, so it re-arms instead. */
+        set: function (k, v) { forced = held; held[k] = clamp(v, 0, 1); runReaders(); },
         free: function () { forced = null; runReaders(); }
       };
     }
@@ -1472,7 +1789,12 @@
        reading as a table. */
     function presence(q, i, n, width) {
       var u = (q - (i + 0.5) / n) * n;
-      return { u: u, o: clamp(1 - Math.abs(u) * (width || 1.9), 0, 1) };
+      /* Eased in 2.4, for the reason given at ramp() in §14: a written
+         stage that arrives at a constant rate and stops is a cross-fade,
+         and this page's states are meant to settle. The zero crossing is
+         unmoved — ease(0) is 0 — so the width contract documented at
+         ASSEMBLY below still holds exactly. */
+      return { u: u, o: ease(clamp(1 - Math.abs(u) * (width || 1.9), 0, 1)) };
     }
     /* A trapezoid: up over a-b, held b-c, down over c-d. Used wherever
        something has to be present FOR A WHILE rather than at an instant —
@@ -1617,13 +1939,19 @@
         var run = parseFloat(el.dataset.run) || 0;
         el.__run = run;
         el.__no = el.dataset.no || '';
-        /* Authored release. Defaults match the far marks, so a plate added
-           without the two attributes stays a distant one rather than
-           silently becoming a 150vw event. */
+        /* Authored release. The defaults are deliberately the most timid
+           pair in the file, so a plate added without the two attributes
+           stays a distant one rather than silently becoming a 190vw event.
+           Nothing in index.html uses them. */
         el.__near = el.dataset.near !== undefined ? +el.dataset.near : 120;
         el.__cull = el.dataset.cull !== undefined ? +el.dataset.cull : 420;
         el.__pass = el.classList.contains('fld__pl--near');
-        if (mob && el.__pass) { el.__near = 820; el.__cull = 980; }
+        /* The closing plate is a pass plate for the veil's purposes — it
+           reaches the whole frame and the rig has to stay legible over it —
+           but it is NEVER released, on any screen. Handing it the phone's
+           release depth would cull the one plate whose entire job is to
+           survive the boundary, and the section would end on nothing. */
+        if (mob && el.__pass && el !== last) { el.__near = 820; el.__cull = 980; }
         /* World position: its station along the travel axis, plus the
            offset that gives it its own place in the composition. Depth is
            the station alone now — a separate dz only made the same number
@@ -1676,7 +2004,90 @@
         return 0;
       }
 
-      var lastNo = '';
+      /* THE CLOSING BEAT DOES NOT END WHERE THE PIN DOES.   [PHASE 2.4.1]
+
+         q is the travel of the PINNED frame, and it saturates at 1 while
+         the stage still has a whole viewport of scroll left in it — the
+         beat where the frame slides up and the services section slides in
+         underneath. In 2.4 the crush finished at q = .968, which is 98px
+         before the pin even lets go, so that entire viewport of scroll —
+         520px, two and a half seconds at an ordinary scrolling rate —
+         had a 1px rule and a project number in it and nothing else. The
+         geometry was defensible and the SCREEN was empty, which is the
+         only measurement that counts.
+
+         So the closing transformation is quoted against its own progress,
+         c, which spans BOTH: the tail of the pinned run and the first part
+         of the stage's exit. The two are weighted BY THEIR SCROLL LENGTH
+         IN PIXELS, so c advances at one constant rate across the join and
+         the compaction does not change speed when the pin releases.
+
+           q  .945 ........ 1                  exit  0 ....... CE ..... 1
+              |--- pinned ---|--------- leaving the viewport --------|
+              |------------- c: 0 ......... 1 -|-- the bare datum --|
+
+         CE is where the crush finishes, as a fraction of the exit, and it
+         is fixed by two events that are pure geometry:
+
+           exit .32   KERTÉPÍTÉS clears the bottom edge. The services stage
+                      is exactly one viewport below this one, and the first
+                      service sits 285px down it, so it appears there and
+                      nowhere else.
+           exit .46   the residue leaves the top edge, because it is
+                      crushed onto --datum and --datum is 46% of the stage.
+                      The first service's grade line enters the bottom of
+                      the screen at the same instant, for the same reason.
+
+         .40 sits between them. The photographic strip is therefore still
+         on the screen when the incoming word arrives — they share one
+         composition, which is what the brief asked for and what a DOM
+         duplicate of the heading was the expensive way to get — and the
+         bare 1px state that follows is about a twentieth of a viewport:
+         a punctuation frame, not a chapter. */
+      var C0 = 0.945, CE = 0.40;
+
+      /* THE CRUSH, AUTHORED AS WHAT THE VIEWER SEES.        [PHASE 2.4.1]
+
+         Not a scale curve — the ON-SCREEN HEIGHT of the closing plate, in
+         svh, at each point of c. Scale is the wrong quantity to author in
+         because the plate is also approaching the camera: in 2.4 the
+         height scale fell on a tidy curve while the perspective was
+         multiplying it back up, and the number that actually mattered —
+         how much of the screen was photograph — was nobody's decision.
+         It is now the only thing decided here, and rk.js solves the scale
+         backwards from it.
+
+         GEOMETRIC PRESENCE IS NOT PERCEPTUAL PRESENCE. The states below
+         are named for what the visitor can identify, and the interval
+         between .74 and .86 is a floor, not a waypoint: while the incoming
+         service is not yet dominant the outgoing plate has to keep enough
+         height to still read as a photograph. A 1px datum occupies the
+         full width of the viewport and carries no presence at all.
+
+         WIDTH FIRST, HEIGHT LAST. For the first half the height is held
+         where it is and the plate keeps growing sideways — its own
+         approach takes it from 44vw to 165vw, and --crush-x stretches it
+         past that — so what the frame does over that half is WIDEN. */
+      var CRUSH = [
+        [0.00, 104.5],   // the frame the crush starts on: full bleed
+        [0.34,  93],     // still full bleed. THE CROP IS WIDENING
+        [0.55,  64],     // A VERY WIDE PHOTOGRAPHIC CROP
+        [0.74,  26],     // A SHALLOW PHOTOGRAPHIC STRIP
+        [0.86,  11],     // THE PERCEPTUAL FLOOR — still legibly photography
+        [0.96,   2.2],   // a coloured strip
+        [1.00,   0]      // one device pixel: the datum. Solved, see below
+      ];
+      function crushH(c) {
+        for (var i = 1; i < CRUSH.length; i++) {
+          if (c <= CRUSH[i][0]) {
+            var a = CRUSH[i - 1], b = CRUSH[i];
+            return a[1] + (b[1] - a[1]) * ((c - a[0]) / (b[0] - a[0]));
+          }
+        }
+        return 0;
+      }
+
+      var lastNo = '', lastClose = -1;
       if (still) return;
 
       onFrame(function () {
@@ -1686,12 +2097,31 @@
         deep.style.transform =
           'translate3d(' + (-A * q).toFixed(3) + 'vw,0,' + (B * q).toFixed(1) + 'px)';
 
-        /* The stage's own rule takes over from the crushed plate across
-           .90-.96, while both are a 1px line of the same colour at the same
-           height. Two complementary alphas of a 16% rule differ from one by
-           at most 0.6% at the crossover — the swap cannot be seen, and
-           after it the enormous composited layer can be dropped. */
-        var hand = clamp((q - 0.93) / 0.025, 0, 1);
+        /* How far the pinned frame has left the viewport. 0 while it is
+           still pinned, 1 when it has gone. ?stage=fld:1,fldx:.5 freezes a
+           point inside the exit, which is the half of this beat that
+           cannot be reached by forcing q alone. */
+        var stageH = stage.offsetHeight || 1;
+        var exit;
+        if (forced && forced.fld !== undefined) {
+          exit = forced.fldx !== undefined ? forced.fldx : 0;
+        } else {
+          exit = clamp((stageH - pin.getBoundingClientRect().bottom) / stageH, 0, 1);
+        }
+        /* Weighted by scroll length, so c is linear in pixels across the
+           join rather than linear in two different units either side. */
+        var wq = (1 - C0) * Math.max(1, pin.offsetHeight - stageH);
+        var we = CE * stageH;
+        var c = clamp((clamp((q - C0) / (1 - C0), 0, 1) * wq +
+                       clamp(exit / CE, 0, 1) * we) / (wq + we), 0, 1);
+
+        /* The stage's own rule takes over from the crushed plate over the
+           last tenth of the beat, while both are a 1px line of the same
+           colour at the same height. Two complementary alphas of a 16%
+           rule differ from one by at most 0.6% at the crossover — the swap
+           cannot be seen, and after it the enormous composited layer can
+           be dropped. */
+        var hand = ease(clamp((c - 0.90) / 0.10, 0, 1));
 
         /* THE CURRENT SHEET is the nearest plate that is actually on screen,
            not the nearest station in q. Those are not the same thing once
@@ -1750,6 +2180,19 @@
         }
         if (barEl) barEl.style.transform = 'scaleX(' + q.toFixed(4) + ')';
 
+        /* THE PROJECT LEAVES WITH THE PROJECT.               [PHASE 2.4.1]
+           The sheet number, its label and the run's measure are metadata
+           ABOUT the plate, and metadata that outlives the thing it
+           describes is what makes a composition look unfinished: 08 and a
+           progress bar standing on an empty black screen were the last
+           statement the section made. They now leave on the crush's own
+           progress — the number travelling up to the datum and shrinking
+           into a station mark on it before it goes. See rk.css §32.2. */
+        if (lastClose !== c) {
+          lastClose = c;
+          stage.style.setProperty('--close', c.toFixed(4));
+        }
+
         /* THE SURVIVOR.
            The last plate does not fade out and it is not replaced: it is
            CRUSHED onto the datum plane. Over the closing beat its height
@@ -1759,34 +2202,78 @@
            is cross-faded; the same object changes state and the next
            section opens with that object already in place.
 
-           It finishes at q = .96 rather than at 1, so the last beat of the
-           section is the bare line holding still. A survivor that is still
-           being formed as the boundary arrives is not yet an object. */
-        var k = ease(clamp((q - 0.84) / 0.09, 0, 1));
+           THE TRANSFORMATION IS THE SUBJECT.                  [PHASE 2.4]
+
+           WHAT 2.4.1 CHANGED, AND WHY THE 2.4 NUMBERS WERE WRONG.
+           2.4 measured the crush as a pair of scale curves and checked that
+           transformed geometry still covered the viewport. It did — and at
+           q = .944 the plate was a 3263 x 478 rectangle that was already
+           60% flooded with the datum's own flat colour, so what covered the
+           viewport was not a photograph. By q = .977, with 950px of scroll
+           still to run before the services section arrived, it was one
+           pixel tall. The recording was right and the geometry was right;
+           they were measuring two different things.
+
+           So the height is no longer a curve applied to a scale — it is the
+           authored table CRUSH above, in svh of screen, and the scale is
+           solved back from it. And the beat runs on c, which continues into
+           the stage's exit, so the transformation is still happening while
+           the frame leaves and the first service rises underneath it. The
+           two share one composition instead of queueing.
+
+           It is WEIGHTED, not interpolated: the table's own spacing is the
+           weight — a long hold, a middle that gives way, and a short, fast
+           resolve — because this is a tonne of ground being compacted and
+           not a panel sliding shut. */
         if (last) {
           /* THE RESIDUE IS SOLVED, NOT GUESSED.
              The crushed plate has to end at exactly ONE DEVICE PIXEL of
              height, because the line that continues into SERVICES is a 1px
              CSS rule and a 2px photographic smear handing over to a 1px
              rule is a visible step in the one object that is supposed to
-             survive. So the closing scale is computed from the plate's own
-             rendered height and its perspective scale at this moment
-             rather than from a tuned constant that is only correct at one
-             viewport height. */
+             survive. The whole table is solved the same way: the plate's
+             own rendered height and its perspective scale at this moment
+             turn a height in svh into the scale that produces it, at any
+             viewport, rather than a tuned constant that is only correct at
+             one of them. */
           var hPx = window.innerHeight * (+last.dataset.h || 60) / 100;
           var s = P / (P - B * (q - last.__run));
-          var floor = clamp(1 / (hPx * s), 0.00001, 0.02);
-          last.style.setProperty('--crush-y', (1 - k * (1 - floor)).toFixed(5));
-          last.style.setProperty('--crush-x', (1 + k * 3.4).toFixed(4));
+          var tPx = Math.max(1, crushH(c) * window.innerHeight / 100);
+          last.style.setProperty('--crush-y', clamp(tPx / (hPx * s), 0.00001, 1).toFixed(5));
+          /* .30, not 1.6. The plate's own approach already takes it from
+             44vw to 165vw across the beat, and that widening is OPTICAL —
+             the camera getting closer — where the stretch is a DISTORTION
+             of the photograph. 2.4's 1.6 smeared the picture two and a half
+             times sideways at the exact moment it is supposed to still be
+             recognisable as a garden, and at the scale this plate now
+             reaches it also asked for a 5800px composited layer. Enough of
+             it to read as a crop being pulled wide, and no more. */
+          last.style.setProperty('--crush-x', (1 + ease(clamp(c / 0.58, 0, 1)) * 0.30).toFixed(4));
           /* And it stops being a photograph on the way down: by the time it
              is a hairline it is the hairline's own colour, so what survives
              the boundary is a rule and not a strip of colour that happens
-             to be thin. */
-          last.style.setProperty('--flat', k.toFixed(4));
-          last.style.setProperty('--capo', clamp(1 - k * 4, 0, 1).toFixed(3));
+             to be thin.
+
+             IT DOES NOT START UNTIL THE PLATE IS ALREADY A STRIP.
+                                                          [PHASE 2.4.1]
+             2.4 ran this as kw^1.6, which put the picture at 60% of the
+             flat tone while it was still 478px tall and half the screen —
+             a grey band, not a photograph, for the whole middle of the
+             beat. That single value is most of what the recording caught.
+             It now waits until .80, where the plate is already down to an
+             18svh band, and resolves over the last fifth: PHOTOGRAPHIC
+             STRIP at 167px, COLOURED STRIP at 20px, then the rule. The
+             incoming word clears the bottom edge at .857, and at that
+             point this is still only a fifth resolved — so what it arrives
+             next to is a photograph, not a grey smear. */
+          last.style.setProperty('--flat', ease(clamp((c - 0.80) / 0.20, 0, 1)).toFixed(4));
+          last.style.setProperty('--capo', clamp(1 - c * 5, 0, 1).toFixed(3));
         }
         if (cutEl) cutEl.style.opacity = hand.toFixed(4);
-        if (allEl) toggle(allEl, 'is-on', q > 0.93);
+        /* Once the plate is a strip rather than a picture — not after the
+           whole beat has finished, which used to leave the archive link
+           alone on the screen as the section's closing statement. */
+        if (allEl) toggle(allEl, 'is-on', c > 0.72);
       });
 
       /* Contextual pointer — over the field only, desktop only. */
@@ -1907,9 +2394,17 @@
         camMob: CAM_M,
         /* THE TRANSFORMATION. Relief first, then depth — the line gains
            the SHAPE of the ground before it gains the substance of it,
-           which is the order a survey actually happens in. */
-        relief: [0.04, 0.20],
-        depth:  [0.09, 0.28],
+           which is the order a survey actually happens in.
+           STARTED AT ZERO IN 2.4. The section used to hold the inherited
+           rule dead straight for the first 14svh of its run while the
+           project field was also finished with its own — so the boundary
+           had a stretch on each side of it in which nothing at all was
+           happening, and the two stretches met. ramp(0, 0, .16) is still
+           exactly 0 at q = 0, so the line the field hands over is still
+           straight at the moment it is handed over; it simply begins to
+           acquire terrain on the very next pixel of scroll. */
+        relief: [0.00, 0.16],
+        depth:  [0.07, 0.26],
         /* No tech and no hatch anywhere in SERVICES: this section's whole
            claim is that the ground is REAL. The technical register belongs
            to PROCESS, which is where the same cut is drawn rather than
@@ -1921,15 +2416,15 @@
              description paragraph — and a technical line through a
              sentence is the cheapest way there is to make a page look
              unfinished. */
-          contour: [0.02, 0.06, 0.12, 0.17],
-          measure: [0.03, 0.07, 0.13, 0.18],
-          cutfill: [0.10, 0.17, 0.30, 0.36],
-          strata:  [0.09, 0.26],
-          bounds:  [0.09, 0.26],
-          ends:    [0.15, 0.27],
-          grit:    [0.21, 0.31],
-          turf:    [0.25, 0.35],
-          pave:    [0.27, 0.37],
+          contour: [0.00, 0.045, 0.12, 0.17],
+          measure: [0.005, 0.05, 0.13, 0.18],
+          cutfill: [0.08, 0.15, 0.28, 0.34],
+          strata:  [0.07, 0.24],
+          bounds:  [0.07, 0.24],
+          ends:    [0.13, 0.25],
+          grit:    [0.19, 0.29],
+          turf:    [0.23, 0.33],
+          pave:    [0.25, 0.35],
           /* The network is COMPLETE by the point the second service is
              being read, not half built. Arriving on the reading beat, it
              was still assembling itself behind the paragraph that
@@ -1976,6 +2471,37 @@
         for (var i = 0; i < n; i++) {
           /* See ASSEMBLY below for why this is 2.0 and not a taste value. */
           var s = presence(q, i, n, 2.0);
+          /* KERTÉPÍTÉS IS ALREADY ARRIVING WHEN THE SECTION OPENS.
+                                                            [PHASE 2.4]
+             presence() gives every slot the same symmetrical window, and
+             for the first slot of a section that means it enters from
+             nothing at exactly the point the previous section's last
+             object has finished leaving. Across the PROJECTS boundary
+             those two nothings met, and the join read as several seconds
+             of black with a project number in it.
+
+             So the first service — and only the first — is COMPOSED
+             BEFORE its own section is pinned: for the whole entry side it
+             is at full strength and at its reading position, and its
+             arrival is the stage rising into the frame rather than a fade
+             that starts once the stage has stopped.
+
+             HALF STRENGTH AND 12svh LOW WAS THE WRONG ANSWER.
+                                                          [PHASE 2.4.1]
+             The displacement is what the section uses to push one state
+             out with the next, and applying it to the entry put this word
+             108px further down a stage that is itself still 900px below
+             the fold: it did not clear the bottom of the screen until the
+             stage had travelled 393px, and when it did it was a ghost.
+             Both of those were bought with the one stretch of scroll that
+             had nothing else in it. It now clears the edge 108px earlier
+             and it is READABLE when it does, so the last of the crushed
+             plate and the first of KERTÉPÍTÉS are on the screen together.
+
+             Only the entry side is overridden; the slot leaves on
+             presence()'s own schedule like the other two, so the
+             section's internal rhythm is untouched. */
+          if (i === 0 && s.u < 0) { s.o = 1; s.u = 0; }
           var it = items[i];
           if (it.__o !== s.o) {
             it.__o = s.o;
@@ -2081,7 +2607,19 @@
         [0.00, 460, 130, 62, 0.32],   // inherited from SERVICES, exactly
         [0.08, 540, 380, 20, 0.30],   // pulling back out of the ground
         [0.16, 600, 640,  0, 0.52],   // 01 · the site line, and nothing else
-        [0.30, 600, 620,  0, 0.52],   // 02 · measured
+        /* THE CAMERA HAS TO DO SOMETHING BETWEEN THESE TWO. [PHASE 2.4]
+           .16 and .30 used to be 640 and 620 units at the same x and the
+           same anchor — a fifth of a viewport apart on screen and, for the
+           whole third of a viewport of scroll between them, indis-
+           tinguishable. Nothing in the drawing moved there either: the
+           survey was finished at .14 and the setting-out did not start
+           until .26. It was the longest stretch on the page in which the
+           answer to "what changed?" was "the paragraph".
+           The frame now OPENS UPWARD to take in the axis heads, which is
+           both a reason for the camera to move and the reason this station
+           needs more sky than the one before it. */
+        [0.23, 597, 668,  0, 0.545],  // opening for the setting-out
+        [0.30, 600, 700,  0, 0.56],   // 02 · measured, and set out
         [0.42, 600, 560,  0, 0.48],
         [0.50, 600, 480,  0, 0.46],   // 03 · reading
         /* THE DOMINANT FRAME. 152 units of build-up in a 330-unit view
@@ -2100,7 +2638,8 @@
         [0.00, 440, 132, 62, 0.34],   // inherited from SERVICES
         [0.08, 480, 300, 20, 0.32],
         [0.16, 560, 560,  0, 0.54],   // 01 · the site line
-        [0.30, 560, 540,  0, 0.54],   // 02 · measured
+        [0.23, 578, 580,  0, 0.55],
+        [0.30, 600, 610,  0, 0.56],   // 02 · measured, and set out
         [0.42, 555, 470,  0, 0.50],
         [0.50, 550, 400,  0, 0.48],   // 03 · reading
         [0.60, 545, 280,  0, 0.28],   // 03 -> 04 · the section owns the frame
@@ -2113,13 +2652,25 @@
       var world = host && RK_WORLD.mount(host, {
         cam: CAM,
         camMob: CAM_M,
-        /* Relief is inherited and never leaves — it is the same piece of
-           land. DEPTH is un-built and re-built: the section arrives fully
-           constructed from SERVICES, is stripped back to a survey line
-           over the first sixth of the run, and is then assembled again
-           WITH ITS MEASUREMENTS. That is the difference between a garden
-           and a garden somebody planned. */
+        /* RELIEF IS INHERITED. FORM IS NOT.                   [PHASE 2.4]
+
+           It is the same piece of land, and station 03 is the station at
+           which that land is MOVED. Up to .44 the surface is the profile
+           the survey found; across .44-.57 it becomes the designed grade —
+           the high ground is cut, the hollows are filled, and what is left
+           is one deliberate fall across the site. The cut-and-fill arrows
+           are on screen for exactly that stretch and each is drawn from the
+           old level to the new one, so the notation is not describing the
+           change, it is measuring it.
+
+           This is the difference the brief asked for between station 02 and
+           station 03. Adding more linework to a drawing is not construction
+           — 2.3's station 03 gained strata, hatching, boundaries and grit,
+           and every one of those is a thing being DRAWN. Earth moving is a
+           thing being DONE, and it is the only event in the section that
+           changes a shape the visitor already knows. */
         relief: RK_WORLD.ALWAYS,
+        form:   [0.44, 0.57],
         depth:  function (q) {
           /* Arrives built, is stripped to the survey line by .13, and is
              re-excavated and re-filled across station 03. */
@@ -2129,42 +2680,88 @@
         tech:   [0.03, 0.14, 0.66, 0.94],
         layers: {
           grade:   RK_WORLD.ALWAYS,
-          /* 01 · FELMÉRÉS — existing condition, and nothing else. */
-          contour: [0.12, 0.18, 0.44, 0.52],
+          /* 01 · FELMÉRÉS — existing condition, and nothing else. The site
+             line, the contours the survey found, and a level to read them
+             against at a third of its weight. That third IS the "minimal
+             measurement information" a survey carries, and it is what makes
+             station 02 read as a DECISION rather than as more drawing: the
+             same apparatus the visitor has already seen, coming up to full
+             and bringing a geometry with it. */
+          contour: [0.08, 0.14, 0.44, 0.52],
           /* 02 · TERV ÉS AJÁNLAT — graphic measurement. No figures. */
           /* Out again for the payoff: dimension apparatus over a finished
              lawn is a drawing nobody has taken the setting-out off. */
-          measure: [0.24, 0.31, 0.86, 0.93],
-          cutfill: [0.28, 0.35, 0.58, 0.66],
+          measure: function (q) {
+            return Math.max(0.30 * band3(q, 0.09, 0.14, 0.21, 0.26),
+                            band3(q, 0.19, 0.26, 0.86, 0.93));
+          },
+          /* The setting-out itself: construction axes and a dimension
+             chain. This is the layer that separates the two stations, and
+             it starts arriving in the GAP between them rather than after
+             the visitor has already begun reading station 02 — the whole
+             argument of the station is that the plan is a decision taken
+             on top of what the survey found, so it has to be seen being
+             taken. */
+          axes:    [0.19, 0.28, 0.84, 0.91],
+          cutfill: [0.30, 0.37, 0.60, 0.68],
           /* 03 · TEREP ÉS TALAJMUNKA — the drawing acquires depth. */
           strata:  [0.42, 0.52],
           hatch:   [0.42, 0.52],   // multiplied by --tech; see mount()
           bounds:  [0.42, 0.50],
           ends:    [0.46, 0.54],
           grit:    [0.50, 0.58],
-          /* 04 · KIVITELEZÉS — infrastructure enters the ground. */
-          main:    [0.62, 0.68],
-          lat:     [0.65, 0.71],
-          drip:    [0.68, 0.74],
-          root:    [0.72, 0.79],
+          /* 04 · KIVITELEZÉS — infrastructure enters the ground.
+             These four windows only have to OPEN the group; what the
+             visitor actually sees arriving is the per-component stagger in
+             after(), which runs on past the end of each of them. */
+          main:    [0.620, 0.665],
+          lat:     [0.645, 0.675],
+          drip:    [0.675, 0.700],
+          root:    [0.715, 0.750],
           wet:     [0.74, 0.80],
-          /* 05 · ÁTADÁS — the finished surface. */
-          turf:    [0.83, 0.90],
+          /* 05 · ÁTADÁS — the finished surface, closing across the garden. */
+          turf:    [0.82, 0.86],
           pave:    [0.85, 0.92]
         },
-        /* DEPTH IS RE-BUILT FROM THE TOP DOWN. The strata do not appear
-           together: each one settles into place as the excavation is
-           filled, which is the order the work actually happens in and
-           the reason this reads as construction rather than as a
-           cross-fade between two drawings. */
+        /* NOTHING IN THIS SECTION ARRIVES ALL AT ONCE.        [PHASE 2.4]
+
+           A layer whose opacity goes 0 to 1 is a layer being switched on,
+           and five of those in a row is a slideshow with the crossfades
+           left in. Every component that has more than one of itself is
+           staggered ALONG THE SECTION instead, so what the visitor watches
+           is the work being done from one end of the garden to the other:
+
+             03  the strata settle from the top down, as a filled
+                 excavation actually comes back up
+             04  the laterals drop off the main in order, each emitter
+                 follows its own lateral, and the planting goes in behind
+                 the pipework — which is the sequence on site, and the
+                 reason the copy can say "so nothing has to be dug twice"
+             05  the surface closes across the garden
+
+           Each of these costs a handful of opacity writes on one section
+           for a fraction of its run, and none of them is a new mechanism:
+           it is the same per-child stagger SERVICES already uses to move
+           water through the ground. */
         after: function (q, host, groups) {
-          var g = groups.strata;
-          if (!g || g.style.visibility === 'hidden') return;
-          var st = g.children;
-          for (var i = 0; i < st.length; i++) {
-            var o = clamp((q - (0.42 + (st.length - 1 - i) * 0.022)) / 0.06, 0, 1);
-            if (st[i].__o !== o) { st[i].__o = o; st[i].style.opacity = o.toFixed(3); }
+          function stagger(g, a, span, step, back) {
+            if (!g || g.style.visibility === 'hidden') return;
+            var c = g.children, n = c.length;
+            for (var i = 0; i < n; i++) {
+              var j = back ? n - 1 - i : i;
+              var o = clamp((q - (a + j * step)) / span, 0, 1);
+              if (c[i].__o !== o) { c[i].__o = o; c[i].style.opacity = o.toFixed(3); }
+            }
           }
+          /* 03 · the excavation fills from the bottom of the list up, which
+             on screen is the topsoil arriving last. */
+          stagger(groups.strata, 0.42, 0.06, 0.022, true);
+          /* 04 · the network is LAID, in order, from the source end. */
+          stagger(groups.lat,   0.650, 0.030, 0.011);
+          stagger(groups.drip,  0.682, 0.028, 0.009);
+          stagger(groups.root,  0.722, 0.038, 0.013);
+          /* 05 · and the surface closes across it. */
+          stagger(groups.turf,  0.828, 0.030, 0.0031);
         }
       });
 
@@ -2300,6 +2897,7 @@
       var slots = Array.prototype.slice.call(pin.querySelectorAll('.prf__slot'));
       var iEl = pin.querySelector('[data-prf-i]');
       var host = pin.querySelector('[data-prf-world]');
+      var rail = pin.querySelector('[data-prf-rail]');
       if (!stage || !slots.length) return;
 
       /* Opens on the exact frame PROCESS closed on. */
@@ -2353,7 +2951,16 @@
       var world = host && RK_WORLD.mount(host, {
         cam: CAM,
         camMob: CAM_M,
+        /* THE GROUND THIS SECTION MEASURES IS THE ONE PROCESS LEFT.
+           Not "the same shape as": the same. PROCESS station 03 regrades
+           the terrain to the designed fall, so form is 1 here from the
+           first frame. A proof section opening on the profile the SURVEY
+           found would be measuring a garden nobody built — and the ground
+           would visibly flick back to its old shape at the boundary, in
+           the one section whose whole authority is that it is measured.
+                                                            [PHASE 2.4] */
         relief: RK_WORLD.ALWAYS,
+        form:   RK_WORLD.ALWAYS,
         depth:  RK_WORLD.ALWAYS,
         /* The instrument reads more technically the further it is from
            the ground: nearly a drawing while the radius is being
@@ -2379,9 +2986,16 @@
           root:    ST(0.46, 0.52, 0.82, 0.88),
           conv:    [0.02, 0.07, 0.16, 0.21],
           radius:  [0.23, 0.29, 0.37, 0.43],
-          compare: [0.44, 0.50, 0.60, 0.66],
+          /* 03 · 70%. Held two beats longer than 2.3 at both ends: the
+             comparison is the one state here a visitor has to READ rather
+             than recognise, and it had less time on screen than the two
+             either side of it. */
+          compare: [0.42, 0.48, 0.62, 0.68],
           day:     [0.63, 0.69, 0.80, 0.86],
-          measure: [0.88, 0.94]
+          /* 05 · GARANCIA. The measurement resolves, and the system
+             boundary closes around everything it has measured. */
+          measure: [0.86, 0.92],
+          frame:   [0.865, 0.925]
         },
         after: function (q, host, groups) {
           /* EGY CSAPAT. Four lines resolving onto one. The residual is
@@ -2393,10 +3007,21 @@
             cv.__r = res;
             for (var i = 0; i < cv.children.length; i++) {
               var u = cv.children[i];
+              /* The node is the last child and has no offset of its own:
+                 it is the thing the other four arrive at, so it appears as
+                 they stop being four. */
+              if (u.dataset.dx === undefined) {
+                u.style.opacity = (1 - res).toFixed(3);
+                continue;
+              }
               u.setAttribute('transform',
                 'translate(' + (+u.dataset.dx * res).toFixed(1) + ',' +
                                (+u.dataset.dy * res).toFixed(1) + ') rotate(' +
                                (+u.dataset.r * res).toFixed(2) + ' 600 0)');
+              /* The names leave with the separation they describe. Four
+                 labels on one line are four labels for the same thing. */
+              var t = u.querySelector('.wrl__cvt');
+              if (t) t.style.opacity = clamp((res - 0.22) / 0.3, 0, 1).toFixed(3);
             }
           }
 
@@ -2413,7 +3038,11 @@
                  distance being measured; a camera that zooms out from a
                  fixed circle is a picture getting smaller. */
               var sc = (0.16 + 0.84 * reach).toFixed(4);
-              var cy = RK_WORLD.P(600);
+              /* The pivot is the service point ON THE GROUND, and this
+                 section's ground is the regraded one. Pivoting on the
+                 surveyed level would slide the whole measurement up the
+                 screen as it grew. */
+              var cy = RK_WORLD.S(600, 1);
               rg.setAttribute('transform',
                 'translate(600 ' + cy.toFixed(1) + ') scale(' + sc + ') translate(-600 ' + (-cy).toFixed(1) + ')');
               for (var r = 0; r < rg.children.length; r++) {
@@ -2441,6 +3070,42 @@
             if (half && world) g.setAttribute('clip-path', world.clip);
             else g.removeAttribute('clip-path');
           });
+
+          /* GARANCIA. THE BOUNDARY CLOSES.                    [PHASE 2.4]
+
+             The four corner brackets stand off the build-up and come in
+             onto it. At 0 they are four separate marks in the margin of
+             the drawing; at 1 they are one unbroken outline around the
+             terrain, the structure, the network and the planting together.
+
+             It is the same move as EGY CSAPAT at the other end of the
+             section, and that is the point of using it: four things
+             agreeing at the start of the work, and one boundary around the
+             result of it. "Mivel a tervezés és a teljes kivitelezés is
+             nálunk van" — the claim in the copy is that there is one
+             boundary, so the drawing draws one.
+
+             They arrive in sequence rather than together, because a
+             bracket whose four corners land at the same instant is a shape
+             appearing, and one that closes corner by corner is a shape
+             being closed. */
+          var fg = groups.frame;
+          if (fg && fg.style.visibility !== 'hidden') {
+            var shut = clamp((q - 0.868) / 0.052, 0, 1);
+            if (fg.__c !== shut) {
+              fg.__c = shut;
+              for (var b = 0; b < fg.children.length; b++) {
+                var c = fg.children[b];
+                var s2 = ease(clamp((shut - b * 0.11) / 0.56, 0, 1));
+                var sx = (b === 1 || b === 2) ? 1 : -1;
+                var sy = (b >= 2) ? 1 : -1;
+                c.setAttribute('transform',
+                  'translate(' + (sx * 130 * (1 - s2)).toFixed(1) + ',' +
+                                 (sy * 96 * (1 - s2)).toFixed(1) + ')');
+                c.style.opacity = s2.toFixed(3);
+              }
+            }
+          }
 
           /* 1 MUNKANAP. One shadow, from the paving's own edge, from one
              side of the garden to the other. --day is the day. */
@@ -2475,6 +3140,19 @@
           /* 2.6 leaves roughly a quarter of every slot at nothing at all.
              That emptiness is the section's whole argument. */
           var s = presence(q, i, n, 2.6);
+          /* THE EMPTINESS IS THE ARGUMENT. THE GHOST IS NOT.  [PHASE 2.4.1]
+             presence() ramps a claim from 0 to 1 over its whole approach,
+             so for most of the way in a statement sits at an intermediate
+             opacity — and a page of half-strength type does not read as
+             "arriving", it reads as DISABLED. 70% suffered worst because
+             it is the one claim here a visitor has to read rather than
+             recognise, and it spent the first visible part of its window
+             as a grey 70.
+             The zero crossings are untouched, so the gaps between the five
+             statements are exactly as long as they were; only the middle
+             of the ramp is steepened, and each claim reaches readable
+             weight in the first two fifths of its approach. */
+          s.o = clamp(s.o * 1.7, 0, 1);
           var el = slots[i];
           if (el.__o === s.o) continue;
           el.__o = s.o;
@@ -2489,8 +3167,114 @@
         stage.style.setProperty('--type',
           (1 - 0.72 * band3(q, 0.545, 0.575, 0.60, 0.635)).toFixed(3));
 
+        /* THE SURVIVOR STANDS UP.                          [PHASE 2.4]
+
+           It arrives lying on the instrument's own level line — its height
+           is read off the world's live viewBox rather than guessed, so it
+           IS that line and not a rule at about the same place — and then it
+           turns into the gutter. The pivot is its own top-left corner, so
+           the end that ends up in the gutter never moves: only the far end
+           swings. What crosses the boundary is a vertical hairline in the
+           page gutter with stations on it, which is what the specification
+           sheet's index rail is. */
+        if (rail) {
+          var ro = clamp((q - 0.87) / 0.05, 0, 1);
+          if (ro > 0) {
+            /* World y = -120 is the level reference (see MEASUREMENT in
+               §14). Where that lands on the screen is entirely the
+               camera's business, and the camera is still moving here. */
+            var vb = (world && world.svg.getAttribute('viewBox') || '').split(' ');
+            if (vb.length === 4) {
+              var top = +vb[1], hh = +vb[3];
+              var rt = (((-120 - top) / hh) * 100).toFixed(2) + '%';
+              if (rail.__t !== rt) { rail.__t = rt; rail.style.setProperty('--rail-top', rt); }
+            }
+          }
+          rail.style.setProperty('--rail', ro.toFixed(3));
+          rail.style.setProperty('--rail-r', ease(clamp((q - 0.93) / 0.07, 0, 1)).toFixed(4));
+          /* FOLLOW THE LINE.                                [PHASE 2.4.1]
+             The rail IS the same object across the boundary and the
+             transition is technically sound, but at the weight a page rule
+             is set to, a viewer does not track a 14%-alpha hairline
+             swinging through ninety degrees — they see one faint line stop
+             and another faint line start further down. So for the pivot
+             only, and only for the pivot, the line is drawn heavier and
+             its stations brighter, and then it stands back down to the
+             page's own rule weight once it is standing in the gutter.
+             Nothing is added and nothing is replaced; the same element is
+             briefly easier to see while it is the thing worth watching. */
+          rail.style.setProperty('--rail-hi',
+            band3(q, 0.905, 0.945, 0.985, 1.0).toFixed(3));
+          rail.style.visibility = ro > 0.004 ? 'visible' : 'hidden';
+        }
+
         var cu = Math.min(n - 1, Math.max(0, Math.round(q * n - 0.5)));
         if (cu !== lastI) { lastI = cu; if (iEl) iEl.textContent = '0' + (cu + 1); }
+      });
+    })();
+
+    /* ---------------------------------------------------------------- */
+    /* 12.6 — THE SURFACE RETURN  (faq -> cta)              [PHASE 2.4]  */
+    /* ---------------------------------------------------------------- */
+    /* THE LAST BEAT OF THE PAGE, AND THE ONE THE PAGE IS ABOUT.          */
+    /*                                                                    */
+    /* The hero says a good garden does not begin at the surface, and the  */
+    /* visitor has been under it for the whole length of the piece. This   */
+    /* is the surface, arriving:                                          */
+    /*                                                                    */
+    /*   the inherited rail descends the gutter                           */
+    /*   the page tone has already gone to soil (§32.6, no script)        */
+    /*   the rail lands on grade and GRADE DRAWS OUT from its foot        */
+    /*   turf and the datum marks stand on the line once it exists        */
+    /*   the headline settles onto it                                     */
+    /*                                                                    */
+    /* NOT A LOADER AND NOT A REVEAL. Every default in the stylesheet is   */
+    /* the RESOLVED value, so with scripting off — or before this reader   */
+    /* has ever run — the section is composed exactly as it was. All this  */
+    /* does is withhold four things for the three quarters of a viewport   */
+    /* in which the ground is arriving, and hand them back in the order    */
+    /* the ground actually arrives in.                                    */
+    /*                                                                    */
+    /* It is a reader on the same shared loop as everything above: no      */
+    /* observer, no rAF of its own, and nothing at all when the closing    */
+    /* section is not on the screen.                                      */
+    (function surface() {
+      var sec = document.querySelector('[data-grd]');
+      if (!sec) return;
+      var line = sec.querySelector('.grd__line');
+      var rail = sec.querySelector('.grd__rail');
+      if (!line) return;
+
+      /* The rail's length is the distance from the top of the section to
+         grade, measured rather than assumed — the header block above it is
+         two fluid clamps and a headline that wraps differently at every
+         width, so any figure written here would be right at one viewport. */
+      function measure() {
+        if (rail) sec.style.setProperty('--rail-h', line.offsetTop + 'px');
+      }
+      measure();
+      window.addEventListener('resize', measure, { passive: true });
+
+      /* Stilled, not absent: the rail is the section's one inherited
+         object and every other value here already defaults to its
+         resolved state. */
+      if (still) { sec.style.setProperty('--g-rail', '1'); return; }
+
+      onFrame(function () {
+        var r = sec.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > window.innerHeight + 200) return;
+        var vh = window.innerHeight || 1;
+        /* Grade's own approach, not the section's: the line is the object
+           this beat is about, and it is what the visitor is watching. */
+        var g = clamp(1 - (line.getBoundingClientRect().top - vh * 0.42) / (vh * 0.72), 0, 1);
+
+        /* Weighted, and in sequence. The rail is most of the way down
+           before the surface starts drawing out of it, and nothing stands
+           on the line until there is a line to stand on. */
+        sec.style.setProperty('--g-rail', ease(clamp(g / 0.62, 0, 1)).toFixed(3));
+        sec.style.setProperty('--g-rule', ease(clamp((g - 0.46) / 0.4, 0, 1)).toFixed(3));
+        sec.style.setProperty('--g-face', clamp((g - 0.74) / 0.22, 0, 1).toFixed(3));
+        sec.style.setProperty('--g-lift', (2.4 * (1 - ease(g))).toFixed(3));
       });
     })();
   })();

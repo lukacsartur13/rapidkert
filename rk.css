@@ -394,11 +394,25 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 .rk-nav__bar{
   display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
 }
-.rk-nav__logo{display:block;flex:none}
+.rk-nav__logo{position:relative;display:block;flex:none}
 .rk-nav__logo img{height:clamp(24px,2.4vw,30px);width:auto}
-/* Logo swaps with the header state: white over the dark hero, dark once solid */
-.rk-nav__logo .is-light{display:block}
-.rk-nav__logo .is-dark {display:none}
+/* THE MARK CROSS-FADES; IT DOES NOT SWAP.                   [PHASE 2.4]
+   The bar's sheet, its rule and its call to action all cross the light /
+   dark boundary over .45s, and the logo swapped with display:none — so
+   during the services section's colour inversion, which the page crosses
+   twice, the one element with the most contrast in the header changed in
+   a single frame while everything around it faded. That is the header
+   flash. Both marks are now stacked and only their opacity moves, on the
+   same curve and over the same time as the bar underneath them.
+
+   The light mark keeps the layout; the dark one is laid over it. So the
+   inner pages, which ship `rk-nav is-solid is-locked` in their markup and
+   never run this file's reader, resolve to the dark mark with no script
+   and no first-paint flicker. */
+.rk-nav__logo .is-light,.rk-nav__logo .is-dark{
+  display:block;transition:opacity .45s var(--ease);
+}
+.rk-nav__logo .is-dark{position:absolute;left:0;top:0;opacity:0}
 
 .rk-nav__right{display:flex;align-items:center;gap:clamp(14px,2vw,30px)}
 
@@ -407,7 +421,12 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 .rk-nav__links a{
   font-family:var(--font-mono);font-size:var(--t-label);
   letter-spacing:.15em;text-transform:uppercase;color:var(--on-dark);
-  opacity:.78;transition:opacity var(--dur-fast) var(--ease);
+  /* The colour is on the SLOW curve and the hover on the fast one: one is
+     the world changing underneath the bar, the other is the visitor. They
+     are different events and they had the same transition — which is to
+     say the colour had none, since only opacity was listed. */
+  opacity:.78;
+  transition:opacity var(--dur-fast) var(--ease),color .45s var(--ease);
 }
 .rk-nav__links a:hover{opacity:1}
 
@@ -426,8 +445,8 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border-bottom-color:var(--rule);
 }
-.rk-nav.is-solid .rk-nav__logo .is-light{display:none}
-.rk-nav.is-solid .rk-nav__logo .is-dark {display:block}
+.rk-nav.is-solid .rk-nav__logo .is-light{opacity:0}
+.rk-nav.is-solid .rk-nav__logo .is-dark {opacity:1}
 .rk-nav.is-solid .rk-nav__links a{color:var(--fg)}
 .rk-nav.is-solid .rk-nav__cta{background:var(--soil);color:var(--limestone)}
 .rk-nav.is-solid .rk-nav__cta:hover{background:var(--moss)}
@@ -436,6 +455,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 /* Menu button */
 .rk-nav__burger{
   display:flex;align-items:center;gap:.72em;color:var(--on-dark);
+  transition:color .45s var(--ease);
   font-family:var(--font-mono);font-size:var(--t-label);
   letter-spacing:.15em;text-transform:uppercase;
   padding:.4em 0;
@@ -2700,6 +2720,28 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   right:var(--pad);bottom:calc(clamp(28px,5vh,54px) + .5em);
   width:min(30vw,320px);height:1px;background:var(--rule-dark);overflow:hidden;
 }
+
+/* THE PROJECT'S METADATA LEAVES WITH THE PROJECT.           [PHASE 2.4.1]
+   --close is the closing beat's own progress, published on the stage by
+   rk.js §12.2. Until 2.4 nothing here read it, so the sheet number, its
+   label and the run's measure survived the photograph they describe and
+   stood on an empty black screen for the rest of the section — the exact
+   thing that makes a composition look unfinished, because the caption
+   outlived the work.
+
+   The number does not simply fade. It travels the 46svh from the foot of
+   the sheet up to --datum and shrinks as it goes, so it ARRIVES ON THE
+   LINE the plate is being crushed onto and reads for a moment as one more
+   station mark on it, in the same register as .fld__datum i. Then it goes,
+   while the strip is still a photograph. The label and the measure have no
+   such destination and simply stand down, earlier. */
+.fld__hud-n{
+  transform-origin:0 100%;
+  transform:translate3d(0,calc(var(--close,0) * -46svh),0)
+            scale(calc(1 - var(--close,0) * .66));
+  opacity:clamp(0,calc((.86 - var(--close,0)) / .3),1);
+}
+.fld__hud-t,.fld__hud-bar{opacity:clamp(0,calc(1 - var(--close,0) * 2.4),1)}
 .fld__hud-bar i{display:block;height:100%;background:var(--clay);transform-origin:left center;transform:scaleX(0)}
 
 /* Below the datum, not across it. It appears only after the last plate has
@@ -2732,7 +2774,16 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
       exactly one device pixel tall, which is what this rule is.
    3. TONE. The plate stops being a photograph on the way down (--flat),
       so the hairline it becomes is already this rule's colour before the
-      cross-fade starts. */
+      cross-fade starts.
+
+   AND IT DOES NOT FINISH WHILE THE STAGE IS STILL PINNED. [PHASE 2.4.1]
+   The stage has a whole viewport of scroll left in it after --q saturates
+   — the beat where it slides up and SERVICES slides in underneath — and
+   until 2.4.1 the crush had been over for 98px before that beat even
+   started. The closing progress rk.js §12.2 publishes as --close spans
+   both, so the plate is still resolving as the frame leaves. What the
+   visitor sees at the join is a photographic strip becoming this rule
+   while the first service rises past it, not a rule waiting alone. */
 /* OPAQUE, not a 16% wash. The crushed plate cannot become a translucent
    rule — there is a photograph behind it — so the survivor is quoted as
    the SOLID colour rgba(232,229,218,.16) resolves to over this ground,
@@ -2857,6 +2908,17 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 .wrl__cl{stroke:var(--ink-soft);stroke-width:1;stroke-opacity:.34}
 .wrl__cf{stroke:var(--clay);stroke-width:1;stroke-opacity:.85}
 
+/* ---- THE SETTING-OUT  (process station 02) ---------------- [PHASE 2.4]
+   The line a survey did not have: a construction axis, with the ring a
+   setting-out drawing puts at its head and a dimension chain across the
+   heads. Chain-dashed, because that is what an axis is drawn as and
+   because it has to be distinguishable at a glance from the strata
+   boundaries it crosses — the whole job of this layer is to look like a
+   DECISION over a drawing of what was already there. */
+.wrl__axl{stroke:var(--ink-soft);stroke-width:1;stroke-dasharray:16 5 3 5;stroke-opacity:.6}
+.wrl__axr{fill:none;stroke:var(--clay);stroke-width:1;stroke-opacity:.9}
+.wrl__axd{stroke:var(--clay);stroke-width:1;stroke-opacity:.8}
+
 /* ---- GRADE --------------------------------------------------------------
    The one line that is never hidden, in the tone the project field handed
    it over in. It becomes moss once the page is in the light, because by
@@ -2926,11 +2988,19 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
    here is a chart: there is no pie, no ring, no bar, and the only figures
    anywhere in the section are the ones the copy already publishes.       */
 
-/* EGY CSAPAT — four trades' lines resolving onto one datum. */
-.wrl__cv{stroke:var(--clay);stroke-width:1.1;stroke-opacity:.62}
-.wrl__cv:nth-child(2){stroke:var(--water)}
-.wrl__cv:nth-child(3){stroke:var(--moss)}
-.wrl__cv:nth-child(4){stroke:var(--ink-soft)}
+/* EGY CSAPAT — four trades' lines resolving onto one datum, each named
+   from the site's own vocabulary and each carrying its name with it.
+   ONE colour per discipline, quoted once as --cvc and used by both the
+   trace and its label: a label in a different ink from the line it
+   belongs to is a label for something else. */
+.wrl__cvg{--cvc:var(--clay)}
+.wrl__cvg:nth-child(2){--cvc:var(--water)}
+.wrl__cvg:nth-child(3){--cvc:var(--moss)}
+.wrl__cvg:nth-child(4){--cvc:var(--ink-soft)}
+.wrl__cv{stroke:var(--cvc);stroke-width:1.1;stroke-opacity:.62}
+.wrl__cvt{fill:var(--cvc);opacity:.9}
+/* Where they agree. */
+.wrl__cvn{fill:none;stroke:var(--clay);stroke-width:1.4}
 
 /* 40 KM — a service radius on the ground plane. Flattened, because the
    camera is looking ALONG the section and a circle on the ground seen
@@ -2939,6 +3009,11 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 .wrl__rr{stroke:var(--ink-soft);stroke-width:1;stroke-dasharray:6 8;stroke-opacity:.6}
 .wrl__rr--out{stroke:var(--clay);stroke-width:1.4;stroke-dasharray:none;stroke-opacity:1}
 .wrl__rc0{fill:var(--clay)}
+/* The dimension across the radius. Drawn in exactly the ink and weight
+   the overall run under the section is drawn in (.wrl__run), because it
+   is the same kind of object: a distance, measured. It is what stops the
+   arcs reading as orbits. */
+.wrl__rdm{stroke:var(--clay);stroke-width:1;stroke-opacity:.85}
 
 /* 70% — two sections of the same soil.
    The left half is what happens when water is put on the SURFACE: a
@@ -2947,10 +3022,30 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
    soil with the line under it. Both halves are drawn in exactly the same
    materials as everywhere else on the page — the comparison is between
    two states of one garden, not between two graphics. */
-.wrl__cpdiv{stroke:var(--ink-soft);stroke-width:1;stroke-dasharray:3 6;stroke-opacity:.55}
-.wrl__cpwetA{fill:#22282A;fill-opacity:.30;stroke:none}
-.wrl__cpevap{stroke:var(--water);stroke-width:1.1;stroke-opacity:.72}
-.wrl__cpdryA{stroke:var(--clay);stroke-width:1.1;stroke-opacity:.32}
+/* The section line between the two halves. .8 and a tighter dash: at .55
+   it was fainter than the material either side of it, so the frame read as
+   one drawing with an odd gap rather than as two sections. [PHASE 2.4.1] */
+.wrl__cpdiv{stroke:var(--ink-soft);stroke-width:1;stroke-dasharray:2 5;stroke-opacity:.8}
+/* .37, not .30. This band IS the left-hand claim — the water stayed at the
+   top — and it has to be the most present thing on that side of the
+   divider, because everything else over there is an absence. Not higher:
+   at .44 it stopped being wet ground and became a dark slab lying on the
+   section, which is a different object entirely. The definition it needed
+   came from drawing its underside, not from more fill. */
+.wrl__cpwetA{fill:#22282A;fill-opacity:.37;stroke:none}
+/* The depth the water reached, drawn as a measured boundary rather than
+   left as the edge of a fill. */
+.wrl__cpfrn{fill:none;stroke:#22282A;stroke-width:1.2;stroke-opacity:.62}
+.wrl__cpevap{fill:none;stroke:var(--water);stroke-width:1.1;stroke-opacity:.78}
+/* Dry granular soil at the dripline's own depth, opposite the right-hand
+   wetting lens. Deliberately the driest mark in the world's vocabulary:
+   broken, sparse, and in the neutral ink rather than in water or clay. */
+.wrl__cpdryB{fill:none;stroke:var(--ink-soft);stroke-width:1;stroke-opacity:.5}
+/* .38, not .32. This is the half of the comparison that is meant to read
+   as "the roots never get any", and at a third of a stroke's weight the
+   dry root zone was the faintest thing in the frame — which argued the
+   opposite. Still well under the wetted right-hand side. */
+.wrl__cpdryA{stroke:var(--clay);stroke-width:1.1;stroke-opacity:.38}
 
 /* 1 MUNKANAP — a shadow crossing the finished surface, and a time datum
    above it. No sun, no sunrise, no colour temperature. */
@@ -2967,6 +3062,15 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 .wrl__lv{stroke:var(--ink-soft);stroke-width:1;stroke-dasharray:2 7;stroke-opacity:.5}
 .wrl__tk{stroke:var(--clay);stroke-width:1;stroke-opacity:.75}
 .wrl__run{stroke:var(--ink-soft);stroke-width:1;stroke-opacity:.6}
+
+/* GARANCIA — THE SYSTEM BOUNDARY.                            [PHASE 2.4]
+   Four corner brackets that close into one outline around the whole
+   build-up. Clay, like every other thing on this page that is a
+   RESPONSIBILITY rather than a material — the station ticks, the axis
+   rings, the radius dimension — and heavier than a stratum boundary,
+   because it is around all of them. No fill: this is a boundary, not a
+   box, and a box would put the drawing inside a panel. */
+.wrl__bk{stroke:var(--clay);stroke-width:1.6;stroke-opacity:.92;stroke-linecap:square}
 
 /* THE TWO INKS. Resolved per section, because the same world is drawn on
    limestone in one place and inside the soil in another. */
@@ -3361,6 +3465,15 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   font-size:.19em;letter-spacing:.02em;font-weight:500;
   color:var(--moss);align-self:flex-end;padding-bottom:.9em;
 }
+/* The qualifier on the one figure that has to carry one, set as a mark
+   against the top of the numeral rather than as a word in front of it —
+   it belongs to the claim without competing with it. */
+.prf__upto{
+  font-style:normal;font-family:var(--font-mono);
+  font-size:.115em;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--fg-mute);align-self:flex-start;
+  padding-top:.7em;margin-right:.5em;
+}
 .prf__big--word{font-size:clamp(2.4rem,8.4vw,8.4rem);letter-spacing:-.045em;display:block}
 .prf__big em{font-style:normal;color:var(--moss)}
 /* The qualifier sits BELOW the line, in the lower half — so the rule reads
@@ -3370,6 +3483,61 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   margin-top:clamp(1.4rem,3vh,2.4rem);
   max-width:52ch;font-size:var(--t-sm);line-height:1.65;color:var(--fg-mute);
 }
+
+/* THE SURVIVOR — PROOF -> FAQ.                              [PHASE 2.4]
+   One 1px line that arrives lying along the instrument's level and stands
+   up into the page gutter. --rail is its presence, --rail-r its turn, and
+   --rail-top the level's own height on the screen, all written by rk.js
+   §12.5 from the world's live viewBox — so it lies exactly on the level
+   line rather than near it.
+
+   ONE ELEMENT, ROTATED. Two elements cross-fading is the thing this
+   transition was accused of and it would be accused of it again: a
+   horizontal rule leaving while a vertical rule arrives is two rules.
+   The transform origin is the line's own top-left corner, which is the
+   corner that stays put — so the far end swings and the end in the gutter
+   does not move at all, and the gutter is where the sheet's rail is. */
+.prf__rail{
+  position:absolute;left:0;right:0;top:0;height:100%;z-index:2;pointer-events:none;
+  width:min(100% - var(--pad) * 2,var(--page));margin-inline:auto;
+  opacity:var(--rail,0);
+}
+.prf__rail i{
+  position:absolute;left:0;top:var(--rail-top,46%);
+  /* Long enough to cross the page lying down AND to leave the bottom of
+     the viewport standing up. It is clipped by the stage either way. */
+  width:1px;height:200svh;
+  background:var(--rule);
+  transform-origin:0 0;
+  /* --rail-hi is the pivot, and only the pivot. See THE SURVIVOR in
+     rk.js §12.5: the same 1px line, temporarily dark enough to be
+     followed through ninety degrees, then back to the page's own rule
+     weight. Written as an overlay on the line rather than as a second
+     colour so there is never a frame with two rules in it. */
+  /* NEGATIVE. A positive CSS rotation is clockwise, and this line points
+     DOWN before it is rotated — so +90deg lays it out to the LEFT of the
+     gutter, off the page. -90deg lays it across the page to the right,
+     which is where the level line it is standing in for actually is. */
+  transform:rotate(calc((1 - var(--rail-r,0)) * -90deg));
+}
+.prf__rail i::before{
+  content:"";position:absolute;inset:0;
+  background:var(--ink);
+  opacity:calc(var(--rail-hi,0) * .62);
+}
+/* The stations, ALONG the line rather than across it — so they are the
+   same mark in both orientations, and the mark they become is exactly
+   .sheet__row > summary::before. */
+.prf__rail b{
+  position:absolute;left:0;width:1px;height:12px;
+  background:var(--clay);opacity:calc(.65 + var(--rail-hi,0) * .35);
+}
+.prf__rail b:nth-child(1){top:8svh}
+.prf__rail b:nth-child(2){top:20svh}
+.prf__rail b:nth-child(3){top:32svh}
+.prf__rail b:nth-child(4){top:44svh}
+.prf__rail b:nth-child(5){top:56svh}
+.prf__rail b:nth-child(6){top:68svh}
 
 .prf__foot{
   position:relative;z-index:2;
@@ -3418,8 +3586,14 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   width:min(100% - var(--pad) * 2,var(--page));margin-inline:auto;
 }
 .sheet__grid i{display:none}
+/* top:0, NOT the section's own padding.                    [PHASE 2.4]
+   The rail is inherited: it is standing in this gutter, at this weight,
+   before the sheet's first pixel is on the screen, and a rail that starts
+   12vh down is a rail that starts. The head's own station mark still sits
+   where the heading is, so nothing about the sheet's composition moves —
+   the line simply arrives already drawn. */
 .sheet__grid::before{
-  content:"";position:absolute;left:0;top:clamp(80px,12vh,170px);bottom:0;
+  content:"";position:absolute;left:0;top:0;bottom:0;
   width:1px;background:linear-gradient(180deg,var(--rule),var(--rule) 86%,transparent);
 }
 .sheet .shell{position:relative;z-index:1}
@@ -3482,6 +3656,23 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 }
 .sheet__a p{grid-column:2;max-width:66ch;font-size:var(--t-sm);line-height:1.7;color:var(--fg-mute)}
 
+/* THE TONE DARKENS BEFORE THE SECTION DOES.                 [PHASE 2.4]
+   The page has to arrive at the surface, and a limestone sheet meeting a
+   near-black one at a section edge is an edge, not an arrival. The last
+   part of a viewport of this section goes to the closing section's own
+   ground, so the visitor is already in the dark by the time the grade
+   line draws — which is the beat the brief asks for, and it costs one
+   gradient and no script.
+
+   The ramp is weighted to the foot deliberately: at the height the last
+   line of type sits, the wash is under a quarter, and the type is dark on
+   limestone either way. */
+.sheet::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;z-index:0;
+  height:clamp(120px,20vh,280px);pointer-events:none;
+  background:linear-gradient(180deg,rgba(14,15,11,0),rgba(14,15,11,.22) 58%,#0E0F0B);
+}
+
 .sheet__call{
   margin-top:clamp(2rem,4vh,3.4rem);
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
@@ -3513,7 +3704,31 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
     radial-gradient(90% 120% at 50% 100%,rgba(120,84,52,.16),transparent 62%),
     linear-gradient(180deg,#0B0C09,#12130E);
 }
-.grd__above{position:relative;z-index:2;padding-bottom:clamp(2.2rem,5vh,4rem)}
+/* THE INHERITED RAIL, AND WHERE IT STOPS.                   [PHASE 2.4]
+   Same gutter as .sheet__grid and .prf__rail, same weight, and its height
+   is MEASURED — it runs from the top of this section to the exact top of
+   .grd__line, because the whole point is that it stops on grade and hands
+   over. --rail-h comes from rk.js §12.6; with scripting off it is 0 and
+   the rail simply is not there, which costs the section nothing. */
+.grd__rail{
+  position:absolute;left:0;right:0;top:0;z-index:3;pointer-events:none;
+  width:min(100% - var(--pad) * 2,var(--page));margin-inline:auto;
+  height:var(--rail-h,0px);
+}
+.grd__rail i{
+  position:absolute;left:0;top:0;width:1px;height:100%;
+  /* It arrives out of the dark and resolves to the grade line's own moss
+     as it reaches it, so the corner where the two meet is one colour. */
+  background:linear-gradient(180deg,transparent,var(--rule-dark) 22%,var(--moss-lift));
+  transform-origin:0 0;transform:scaleY(var(--g-rail,0));
+}
+
+/* The headline settles ONTO the ground rather than being there already.
+   Default 0, so with scripting off it is composed exactly as before. */
+.grd__above{
+  position:relative;z-index:2;padding-bottom:clamp(2.2rem,5vh,4rem);
+  transform:translate3d(0,calc(var(--g-lift,0) * -1svh),0);
+}
 .grd__no{display:block;color:var(--clay);margin-bottom:1.6rem}
 /* MONUMENTAL — the fourth and last time on the page. */
 .grd__h2{
@@ -3526,18 +3741,26 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
    and comes later in the document, so at the same stacking level it painted
    straight over the datum marks that name the line. */
 .grd__line{position:relative;z-index:3;height:1px}
+/* GRADE DRAWS OUT FROM THE RAIL'S FOOT.                     [PHASE 2.4]
+   transform-origin is the left gutter, which is where the rail lands, so
+   the surface is not revealed — it is DRAWN, from the corner, outward.
+   Default 1 so the line is simply there with scripting off. */
 .grd__rule{
   position:absolute;left:0;right:0;top:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--moss-lift) 6%,
              var(--moss-lift) 94%,transparent);
   opacity:.9;
+  transform:scaleX(var(--g-rule,1));transform-origin:0 50%;
 }
+/* What stands on the line once the line exists. */
+.grd__mk,.grd__turf{opacity:var(--g-face,1)}
 .grd__mk{
   position:absolute;top:.9em;color:var(--on-dark-mute);white-space:nowrap;
 }
 .grd__mk--l{left:var(--pad)}
 .grd__mk--r{right:var(--pad);color:var(--clay)}
-.grd__turf{position:absolute;left:0;right:0;bottom:0;height:18px;width:100%}
+.grd__turf{position:absolute;left:0;right:0;bottom:0;height:18px;width:100%;
+  transition:opacity .4s var(--ease)}
 .grd__turf path{fill:none;stroke:var(--moss-lift);stroke-width:1.2;opacity:.7;vector-effect:non-scaling-stroke}
 
 .grd__below{
@@ -3852,6 +4075,11 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .prf__stage{padding-block:clamp(70px,11vh,130px)}
   .prf__stage::after{display:none}
   .prf__rig{display:none}
+  /* The turning rail is a MOVE, and this is the one section where the
+     stage has collapsed to ordinary flow — there is no pinned frame for
+     it to turn in. The sheet's own rail and the closing section's
+     inherited one are both static objects and both stay. */
+  .prf__rail{display:none}
   .prf__slot{padding-block:clamp(30px,5vh,60px);border-bottom:1px solid var(--rule)}
   .prf__d{position:relative;top:auto;margin-top:1.2rem}
   .grd__head{animation:none;opacity:.7;transform:translateX(600px)}

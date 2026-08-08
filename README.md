@@ -26,6 +26,24 @@ sh .claude/tools/serve.sh
 Then open <http://localhost:8811/index.html>. (The mirror-to-`/private/tmp`
 dance is because iCloud Drive blocks `os.getcwd()` for the server process.)
 
+Set `PORT` to run a second preview alongside the first — the mirror is
+per-port, so two servers never rsync over each other:
+
+```bash
+PORT=8814 sh .claude/tools/serve.sh
+```
+
+The mirror is a **copy**. Re-run the script (or just the `rsync` line inside
+it) after editing, or the browser will keep serving the last snapshot.
+
+### Freezing a state
+
+Every stage takes a scroll position from the URL, which is the only exact way
+to inspect one: `?stage=fld:.92`, `?stage=lyr:.5,asm:.8`, or from the console
+`RK_STAGE.set('prf', .9)` / `RK_STAGE.free()`. `RK_STAGE.set` runs the readers
+**synchronously**, which also makes it the only way to drive them in a tab
+that is not producing animation frames.
+
 ## Editing rk.css — read this first
 
 `rk.css` has repeated boundary strings by design: `@media (max-width:1024px){`

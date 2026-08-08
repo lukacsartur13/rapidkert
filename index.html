@@ -513,15 +513,18 @@
        data-run   the point of the run at which this plate is level with
                   the camera (d = 0). Everything else is derived.
        data-near  the depth at which the plate begins to be released.
-                  SMALL for the far marks — they never come close, which
-                  is what buys the quiet between the dominant plates —
-                  and LARGE for the three the camera actually passes
-                  through, which reach 90-150vw before they go by.
+                  1.4-1.9x for the plates that stand IN the space, so they
+                  reach a third to a half of the width and are let go
+                  again; 2.4-3.9x for the three the camera passes THROUGH,
+                  which reach 80-190vw before they go by.
        data-cull  the depth at which it is gone.
 
-       The 3.6x growth between the far station and the near release is
-       the whole point: a plate is not "bigger", it is CLOSER, and the
-       viewer loses its border entirely before it is released.          -->
+       The growth between the station and the release is the whole point:
+       a plate is not "bigger", it is CLOSER, and the viewer loses its
+       border entirely before it is released.
+
+       PHASE 2.4 — there is no such thing as a far mark here any more.
+       See THE RHYTHM below.                                            -->
   <div class="fld__field" data-fld>
     <div class="fld__stage">
       <div class="fld__deep" data-fld-deep>
@@ -539,77 +542,136 @@
              twenty-six places for it to stop being regular. -->
         <div class="fld__datum" data-fld-datum data-step="700" data-n="26" aria-hidden="true"></div>
 
-        <!-- 02 · far, and it stays far. Establishes the size of the room. -->
-        <figure class="fld__pl" data-run=".07" data-dx="30" data-dy="-6" data-w="14" data-h="60"
-                data-near="120" data-cull="420" data-no="02">
+        <!-- ══ THE RHYTHM ═══════════════════════════════════ [PHASE 2.4]
+             The stations are ordered here exactly as the visitor meets them,
+             and the sheet numbers run with them.
+
+               02  SMALL          the room, established
+               03  LARGE          the first pass
+               04  RESET          a photograph, not a mark
+               05  PAIR           it and 06 legible at once
+               06  VERY LARGE     the camera goes through it
+               07  LARGE          the second pass
+               08  CLOSING        it lands, then it is crushed
+
+             WHAT CHANGED AND WHY. In 2.3 four of the seven plates were "far
+             marks" released at or below 1.06x — they never approached, and
+             they were there to buy emptiness between the three passes. The
+             arithmetic of that was wrong: a plate released at 1.06x is about
+             10vw, three of the seven beats had nothing bigger than that on
+             the screen, and between .28 and .56 of the run — a third of the
+             section, the better part of three viewports — the largest
+             photograph anywhere covered a fifth of the frame. The field's
+             subject had become the black.
+
+             There are no far marks any more. Every plate is a photograph
+             that comes to at least a third of the width, and the emptiness
+             is what it always should have been: the SHORT breath between one
+             plate leaving and the next arriving, carried by the datum
+             plane. Same seven photographs, same travel, same rig. -->
+
+        <!-- 02 · the room, established. -->
+        <figure class="fld__pl" data-run=".05" data-dx="26" data-dy="-6" data-w="24" data-h="58"
+                data-near="460" data-cull="780" data-no="02">
           <span class="fld__img"><img src="terep-elokeszites-halo-thumb.jpg"
-               srcset="terep-elokeszites-halo-thumb.jpg 800w, terep-elokeszites-halo.jpg 1600w" sizes="20vw"
+               srcset="terep-elokeszites-halo-thumb.jpg 800w, terep-elokeszites-halo.jpg 1600w" sizes="40vw"
                alt="Terep-előkészítés: elterített termőréteg gyomgátló hálóval" width="800" height="1066"
                loading="lazy" decoding="async" style="object-position:52% 66%"></span>
           <figcaption class="fld__cap"><span>Terep · előkészítés</span><i>Győr</i></figcaption>
         </figure>
 
-        <!-- 03 · THE FIRST PASS. 25vw at its station, 89vw when it goes by. -->
-        <figure class="fld__pl fld__pl--near" data-run=".21" data-dx="13" data-dy="2" data-w="25" data-h="64"
-                data-near="1090" data-cull="1275" data-no="03">
+        <!-- 03 · THE FIRST PASS. 32vw at its station, ~80vw when it goes by. -->
+        <figure class="fld__pl fld__pl--near" data-run=".185" data-dx="12" data-dy="2" data-w="32" data-h="64"
+                data-near="880" data-cull="1060" data-no="03">
           <span class="fld__img"><img src="kertepites-elokeszites-thumb.jpg"
-               srcset="kertepites-elokeszites-thumb.jpg 800w, kertepites-elokeszites.jpg 1600w" sizes="95vw"
+               srcset="kertepites-elokeszites-thumb.jpg 800w, kertepites-elokeszites.jpg 1600w" sizes="90vw"
                alt="Kertépítés előkészítő fázisa a kivitelezés alatt" width="800" height="1066"
                loading="lazy" decoding="async" style="object-position:50% 58%"></span>
           <figcaption class="fld__cap"><span>Kertépítés</span><i>Győr</i></figcaption>
         </figure>
 
-        <!-- 04 · the quiet. Released before it can grow, so what follows the
-             first pass is a nearly empty space with one small mark in it. -->
-        <figure class="fld__pl" data-run=".40" data-dx="-34" data-dy="-8" data-w="11" data-h="44"
-                data-near="-200" data-cull="80" data-no="04">
-          <span class="fld__img"><img src="novenytelepites-agyas-thumb.jpg"
-               srcset="novenytelepites-agyas-thumb.jpg 800w, novenytelepites-agyas.jpg 1600w" sizes="14vw"
-               alt="Növénytelepítés ágyásba, frissen kialakított ültetőfelületen" width="800" height="1066"
-               loading="lazy" decoding="async" style="object-position:50% 62%"></span>
-          <figcaption class="fld__cap"><span>Növénytelepítés</span><i>Győr környéke</i></figcaption>
-        </figure>
-
-        <!-- 05 · THE CROSSING. The one landscape frame in the library, and
-             the plate the camera goes THROUGH: 42vw becomes ~150vw and both
-             edges leave the viewport before it is released. -->
-        <figure class="fld__pl fld__pl--band fld__pl--near" data-run=".53" data-dx="11" data-dy="0" data-w="42" data-h="38"
-                data-near="1150" data-cull="1330" data-no="05">
-          <span class="fld__img"><img src="kesz-kert-panorama-thumb.jpg"
-               srcset="kesz-kert-panorama-thumb.jpg 800w, kesz-kert-panorama.jpg 1600w" sizes="150vw"
-               alt="Panoráma a telekről a kertépítés megkezdése előtt" width="800" height="1066"
-               loading="lazy" decoding="async" style="object-position:50% 50%"></span>
-          <figcaption class="fld__cap"><span>Kiindulási állapot</span><i>Győr környéke</i></figcaption>
-        </figure>
-
-        <!-- 06 · the second pass, off centre — it goes by on the right. -->
-        <figure class="fld__pl fld__pl--near" data-run=".71" data-dx="16" data-dy="-4" data-w="23" data-h="72"
-                data-near="1090" data-cull="1275" data-no="06">
-          <span class="fld__img"><img src="terburkolat-osveny-thumb.jpg"
-               srcset="terburkolat-osveny-thumb.jpg 800w, terburkolat-osveny.jpg 1600w" sizes="90vw"
-               alt="Térburkolt kerti ösvény nyírt sövénnyel keretezve" width="800" height="1066"
-               loading="lazy" decoding="async" style="object-position:50% 74%"></span>
-          <figcaption class="fld__cap"><span>Térburkolat</span><i>Győr környéke</i></figcaption>
-        </figure>
-
-        <!-- 07 · the last far mark before the section resolves. -->
-        <figure class="fld__pl" data-run=".82" data-dx="-30" data-dy="9" data-w="10" data-h="38"
-                data-near="-380" data-cull="-40" data-no="07">
+        <!-- 04 · THE RESET, and it is still a photograph. Left of the axis,
+             so the composition breathes the other way after the first pass. -->
+        <figure class="fld__pl" data-run=".335" data-dx="-18" data-dy="8" data-w="32" data-h="60"
+                data-near="520" data-cull="820" data-no="04">
           <span class="fld__img"><img src="kerti-osveny-sedum-thumb.jpg"
-               srcset="kerti-osveny-sedum-thumb.jpg 800w, kerti-osveny-sedum.jpg 1600w" sizes="12vw"
+               srcset="kerti-osveny-sedum-thumb.jpg 800w, kerti-osveny-sedum.jpg 1600w" sizes="62vw"
                alt="Járólapos kerti ösvény sedum-ágyásba fektetve" width="800" height="1066"
                loading="lazy" decoding="async" style="object-position:50% 60%"></span>
           <figcaption class="fld__cap"><span>Ösvény · sedum</span><i>Győr</i></figcaption>
         </figure>
 
-        <!-- 08 · dy = 0 IS A CONTRACT. This plate is not released: it is
-             crushed onto the datum plane, and the line it leaves has to
-             land on --datum exactly, because that line is the ground the
-             first service is built on. See rk.css §32.2 THE SURVIVOR. -->
-        <figure class="fld__pl fld__pl--last" data-run=".845" data-dx="4" data-dy="0" data-w="28" data-h="60"
+        <!-- 05 · THE PAIR. It is released while the landscape band behind it
+             is already a third of the width, so for one beat there are two
+             sheets standing in the space at legible size — which is the one
+             thing that says "room" rather than "slideshow". -->
+        <figure class="fld__pl" data-run=".455" data-dx="16" data-dy="-8" data-w="32" data-h="62"
+                data-near="480" data-cull="860" data-no="05">
+          <span class="fld__img"><img src="novenytelepites-agyas-thumb.jpg"
+               srcset="novenytelepites-agyas-thumb.jpg 800w, novenytelepites-agyas.jpg 1600w" sizes="62vw"
+               alt="Növénytelepítés ágyásba, frissen kialakított ültetőfelületen" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 62%"></span>
+          <figcaption class="fld__cap"><span>Növénytelepítés</span><i>Győr környéke</i></figcaption>
+        </figure>
+
+        <!-- 06 · THE CROSSING. The one landscape frame in the library, and
+             the plate the camera goes THROUGH: 48vw becomes ~190vw and both
+             edges leave the viewport before it is released. -->
+        <figure class="fld__pl fld__pl--band fld__pl--near" data-run=".59" data-dx="-6" data-dy="0" data-w="48" data-h="46"
+                data-near="1120" data-cull="1300" data-no="06">
+          <span class="fld__img"><img src="kesz-kert-panorama-thumb.jpg"
+               srcset="kesz-kert-panorama-thumb.jpg 800w, kesz-kert-panorama.jpg 1600w" sizes="190vw"
+               alt="Panoráma a telekről a kertépítés megkezdése előtt" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 50%"></span>
+          <figcaption class="fld__cap"><span>Kiindulási állapot</span><i>Győr környéke</i></figcaption>
+        </figure>
+
+        <!-- 07 · the second pass, off centre — it goes by on the right. -->
+        <figure class="fld__pl fld__pl--near" data-run=".745" data-dx="12" data-dy="-4" data-w="30" data-h="70"
+                data-near="940" data-cull="1120" data-no="07">
+          <span class="fld__img"><img src="terburkolat-osveny-thumb.jpg"
+               srcset="terburkolat-osveny-thumb.jpg 800w, terburkolat-osveny.jpg 1600w" sizes="85vw"
+               alt="Térburkolt kerti ösvény nyírt sövénnyel keretezve" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 74%"></span>
+          <figcaption class="fld__cap"><span>Térburkolat</span><i>Győr környéke</i></figcaption>
+        </figure>
+
+        <!-- 08 · THE CLOSING PLATE. It LANDS before it transforms.
+                                                                [PHASE 2.4]
+             dy = 0 IS A CONTRACT. This plate is not released: it is crushed
+             onto the datum plane, and the line it leaves has to land on
+             --datum exactly, because that line is the ground the first
+             service is built on. See rk.css §32.2 THE SURVIVOR.
+
+             dx = 0 is now a contract too. A closing plate is a landing, and
+             a landing is square-on: the offset was multiplied by the plate's
+             own perspective scale, so at the size this plate now reaches it
+             threw the last photograph of the section a fifth of a screen
+             sideways on its way past.
+
+             44 x 70, and the station moved from .845 to .87 to .90. In 2.3
+             the plate reached its station at .845 and the crush began at
+             .84 — it started leaving before it had arrived, which is why
+             the closing beat read as "arrive, immediately leave" and why
+             the last four seconds of the section had no subject in them.
+
+             .90 IS ALSO ARITHMETIC, NOT TASTE.             [PHASE 2.4.1]
+             The plate's optical scale is P/(P - B(q - run)), so the station
+             sets how large it is when the pinned run ENDS — and the closing
+             beat now continues past that point, into the stage's own exit,
+             where q is clamped and the scale is therefore frozen at
+             whatever this station makes it. At .87 that value was 21x: a
+             35000px composited layer, and a photograph that had to be
+             disposed of before q reached 1 for no reason except that the
+             arithmetic ran away. At .90 it is 3.75x — 165vw, both edges
+             comfortably off the screen — and it holds there, still, for the
+             whole second half of the crush. See THE CLOSING BEAT in rk.js
+             §12.2. It grows from about 31vw at .85 to full bleed at .945
+             with nothing else on the screen, and only then is it crushed. -->
+        <figure class="fld__pl fld__pl--near fld__pl--last" data-run=".90" data-dx="0" data-dy="0" data-w="44" data-h="70"
                 data-near="4000" data-cull="4400" data-no="08">
           <span class="fld__img"><img src="gyep-elokeszites-burkolat-thumb.jpg"
-               srcset="gyep-elokeszites-burkolat-thumb.jpg 800w, gyep-elokeszites-burkolat.jpg 1600w" sizes="60vw"
+               srcset="gyep-elokeszites-burkolat-thumb.jpg 800w, gyep-elokeszites-burkolat.jpg 1600w" sizes="100vw"
                alt="Gyepfelület előkészítése a kész burkolat mellett" width="800" height="1066"
                loading="lazy" decoding="async" style="object-position:50% 64%"></span>
           <figcaption class="fld__cap"><span>Gyep · burkolat</span><i>Győr</i></figcaption>
@@ -820,6 +882,32 @@
          soil, and one working day crossing the finished surface. -->
     <div class="prf__world" data-prf-world aria-hidden="true"></div>
 
+    <!-- ══ THE SURVIVOR ═════════════════════════════════ [PHASE 2.4]
+         The one object that leaves this section alive.
+
+         The instrument's last state flattens back to a level line with
+         station marks on it. This IS that line — it arrives lying along
+         the world's own level, at the height the camera puts it, in the
+         same ink — and then it TURNS. By the time the section boundary
+         arrives it is standing in the page gutter, running down past the
+         bottom of the viewport, carrying its stations with it.
+
+         The specification sheet's index rail starts at the first pixel of
+         its own section, in the same gutter, at the same weight, with the
+         same 12px clay station mark against every item. Nothing is faded
+         out and nothing is drawn to replace it: the measurement baseline
+         of the proof section stands up and becomes the rail the questions
+         are indexed against.
+
+         In 2.3 this was a claim in a stylesheet comment — the rail existed
+         and it was the right rail, but it began 12vh into a section whose
+         previous section had already resolved to nothing, so what the
+         visitor actually saw was one line ending and a similar line
+         starting further down the page. -->
+    <div class="prf__rail" data-prf-rail aria-hidden="true">
+      <i><b></b><b></b><b></b><b></b><b></b><b></b></i>
+    </div>
+
     <div class="shell prf__rig" aria-hidden="true">
       <!-- The rule the claim stands on is the WORLD's grade line now, not
            a second rule drawn on top of it at a different height. That is
@@ -841,7 +929,11 @@
           Töltéstava, Kisbajcs, Vámosszabadi, Gyirmót, Ménfőcsanak.</p>
       </div>
       <div class="shell prf__slot" data-s="2">
-        <p class="prf__big"><span>70</span><small>%</small></p>
+        <!-- "Akár" is the site's own qualifier — the third service's copy
+             reads "akár 70% vízmegtakarítással" — and the claim is weaker
+             and truer with it than without. The drawing behind this
+             statement shows the MECHANISM and measures nothing. -->
+        <p class="prf__big"><i class="prf__upto">Akár</i><span>70</span><small>%</small></p>
         <p class="prf__d">Vízmegtakarításig, felszín alatti öntözéssel, a szórófejes locsoláshoz
           képest. A pontos mérték a talajtól, a növényzettől és a klímától függ.</p>
       </div>
@@ -973,8 +1065,21 @@
      system and the call to action sits exactly ON the line. Below it is
      soil, and the soil does not stop at the footer — it IS the footer.
      ══════════════════════════════════════════════════════════════════ -->
-<section class="grd" id="kezdjuk" data-tone="dark" aria-labelledby="endTitle">
+<section class="grd" id="kezdjuk" data-tone="dark" aria-labelledby="endTitle" data-grd>
   <div class="grd__sky" aria-hidden="true"></div>
+
+  <!-- THE RAIL, STILL STANDING.                            [PHASE 2.4]
+       The specification sheet's index rail does not stop at the section
+       edge: it descends the same gutter through the darkening sky and
+       stops exactly ON grade — where it TURNS, and the turn is the grade
+       line drawing out from its foot to both edges of the page.
+
+       That is the third and last time this one hairline changes state.
+       It was the proof section's measurement baseline, it stood up to
+       become the sheet's index, and here it lies back down and becomes
+       the surface. The page has been below that surface since the first
+       line of the hero. -->
+  <div class="grd__rail" aria-hidden="true"><i></i></div>
 
   <div class="shell grd__above">
     <span class="grd__no">13 — Kezdjük el</span>
