@@ -2030,6 +2030,13 @@ function track(stops) {
 const T = {
   /* STRUCTURE (.650–.768): the section comes apart, then reassembles */
   explode:  track([[0, 0], [0.600, 0], [0.700, 1], [0.752, 1], [0.782, 0], [1, 0]]),
+  /* The WATER close-up window (see apply()). Opens after GROUND's copy has
+     gone (.396) and shuts before STRUCTURE's arrives (.650), so the two
+     chapters either side of it are solved exactly as they were. The ramps
+     are wide — 52 and 46 thousandths, roughly a second and a half of
+     reading each — because a dolly that snaps on reads as a zoom, and a
+     dolly that eases on reads as the camera moving in to look. */
+  waterIn:  track([[0, 0], [0.400, 0], [0.452, 1], [0.578, 1], [0.624, 0], [1, 0]]),
   /* WATER (.424–.584) charges the network; VÍZ (.812–.840) charges it again */
   flow:     track([[0, 0], [0.418, 0], [0.452, 1], [0.578, 1], [0.612, 0],
                    [0.802, 0], [0.818, 0.90], [0.848, 0.25], [1, 0.18]]),
@@ -2198,7 +2205,7 @@ function pulseAt(p, t) {
    half so the copy owns the lower half.
    ========================================================================== */
 
-const layout = { dist: 1, panX: 1, panY: 0, fov: 27, elev: 0 };
+const layout = { dist: 1, panX: 1, panY: 0, fov: 27, elev: 0, tight: 0 };
 
 function measureLayout() {
   frameLayout();
@@ -2216,8 +2223,19 @@ function frameLayout() {
   const w = innerWidth, h = innerHeight;
   const ar = Math.max(w / h, 0.30);
 
+  /* HOW PORTRAIT IS THIS VIEWPORT, 0..1.                        [PHASE 3.1]
+     Not "is this a phone". The framing problem this drives is a consequence
+     of aspect ratio alone: the narrower the frame relative to its height,
+     the further back the solver below has to stand to fit the block's WIDTH,
+     and the more of that height is then spent on terrain either side of
+     whatever the chapter is actually about. A 768x1024 tablet has the same
+     problem as a 390x844 phone, four fifths as badly, and gets four fifths
+     of the correction — which is why this is a ratio and not a breakpoint. */
+  layout.tight = Math.min(Math.max((0.95 - ar) / 0.25, 0), 1);
+
   if (w >= 1024) {
     layout.dist = 1.0; layout.panX = 1; layout.panY = 0; layout.fov = 27; layout.elev = 0;
+    layout.tight = 0;
     if (ar > 2.1) layout.dist *= 0.94;          // ultrawide
     if (ar < 1.05) layout.dist *= 1.14;         // portrait desktop / split screen
     return;
@@ -2413,6 +2431,7 @@ function updateSection(ex, w, h) {
 }
 
 function updateAnnotations(p, w, h) {
+  const live = [];
   for (const l of labels) {
     const from = +l.dataset.from, to = +l.dataset.to;
     const on = p >= from && p <= to;
@@ -2465,11 +2484,73 @@ function updateAnnotations(p, w, h) {
     if (side === 1 && sx > w * 0.60) side = -1;
     else if (side === -1 && sx < w * 0.32) side = 1;
 
+    /* data-off is NOT slack to be scaled down on a small screen. WATER's two
+       anchors sit at the same depth and project within 38px of each other;
+       -34 and +40 are what hold ZÓNA · OLDALÁG and CSEPEGTETŐ apart. Scaled
+       to 0.55 for a phone they closed to 3px and the two labels printed over
+       each other. The offsets stay authored; clearance is handled below. */
     const off = parseFloat(l.dataset.off || '0');
     const gap = w < 700 ? 46 : 108;
     const lx = sx + side * gap;
-    const ly = sy + off;
+    let ly = sy + off;
 
+    live.push({ l, lx, ly, sx, sy, side, fade, lh: l.offsetHeight || 22 });
+  }
+
+  /* THE LEADERS STOP AT THE COPY.                               [PHASE 3.1]
+     Measured at 320x568 on WATER — and on the Phase 3 baseline too, so this
+     is an old defect the close-up only made easier to see: the CSEPEGTETŐ
+     label sat at y 254-276 with the chapter's eyebrow at 248-259 and the
+     headline opening at 272. Three pieces of type in the same 28 pixels,
+     one of them a leader line.
+
+     On a narrow viewport the copy is a band across the foot of the stage
+     rather than a column beside the model, so a label has no lateral escape
+     the way it does on a desktop — it walks straight into the headline.
+
+     Placement is a second pass rather than a nudge inside the first,
+     because the two things being fixed pull in opposite directions and a
+     per-label rule cannot see both. Resolving collisions in place pushed
+     GROUND's 02 TERMŐTALAJ above its own 01 FELSZÍN — five labels that are
+     a numbered list read top to bottom, inverted to clear a 1px overlap.
+
+     Two ordered passes instead. Down first, in anchor order, which is the
+     order the strata are numbered in. Then up from the bottom, each label
+     yielding to the copy and then to the one below it — so only the labels
+     that actually violate the floor move at all. Shifting the whole group
+     by the worst offender's excess was the first attempt and it cost more
+     than it fixed: at 320 it lifted EXPLODED's six letters 32px as a block
+     to rescue F ALAP, and landed C ÖNTÖZÉS on the ±0,00 FELSZÍN datum
+     caption, which had been clear. The DOTS never move in either pass, so
+     every leader still points at the real thing. */
+  if (layout.tight > 0 && live.length) {
+    let bottom = -Infinity;
+    for (const s of live) {
+      if (s.ly < bottom + 6) s.ly = bottom + 6;
+      bottom = s.ly + s.lh;
+    }
+    if (annoFloor < Infinity) {
+      let ceil = annoFloor - 8;
+      for (let i = live.length - 1; i >= 0; i--) {
+        const s = live[i];
+        if (s.ly + s.lh > ceil) s.ly = ceil - s.lh;
+        ceil = s.ly - 6;
+      }
+    }
+  }
+
+  for (const s of live) {
+    const { l, lx, sx, sy, side, fade, lh } = s;
+    /* Pushed off the top of the stage, or pushed so far from its own anchor
+       that the leader has stopped being a leader. Either way it is a line
+       to nowhere, and the drawing is better without it — the deepest strata
+       are the ones this drops, which is the same set §31.8 already lets
+       descend into the scrim on a phone. */
+    if (layout.tight > 0 && (s.ly < 6 || s.ly + lh > h - 4)) {
+      l.style.opacity = '0'; l.__line.style.opacity = '0'; l.__dot.style.opacity = '0';
+      continue;
+    }
+    const ly = s.ly;
     const o = String(Math.max(0, Math.min(1, fade)));
     l.style.opacity = o;
     l.__line.style.opacity = o;
@@ -2509,6 +2590,26 @@ const CH_RANGE = chapters.map(c => {
 });
 const chState = chapters.map(() => -1);
 
+/* WHERE THE COPY STARTS, PER CHAPTER.                           [PHASE 3.1]
+   Stage-relative, so it is in the same space as the projected label
+   positions in updateAnnotations. Measured on resize rather than per frame:
+   the copy block's height is a layout fact, and the only thing that moves it
+   between frames is the chapter's own fade transform — which is subtracted
+   here by taking the inner's top RELATIVE to its chapter, since both carry
+   it. Infinity means "this chapter has no copy to protect". */
+const chCopyTop = chapters.map(() => Infinity);
+let annoFloor = Infinity;
+
+function measureChapterTops() {
+  for (let i = 0; i < chapters.length; i++) {
+    const inner = chapters[i].querySelector('.gd__inner');
+    const r = inner && inner.getBoundingClientRect();
+    chCopyTop[i] = (r && r.height > 1)
+      ? r.top - chapters[i].getBoundingClientRect().top
+      : Infinity;
+  }
+}
+
 function updateChapters(p) {
   for (let i = 0; i < chapters.length; i++) {
     const [from, to, fade, openStart, openEnd] = CH_RANGE[i];
@@ -2533,6 +2634,17 @@ function updateChapters(p) {
       el.setAttribute('aria-hidden', vis ? 'false' : 'true');
     }
   }
+
+  /* The highest copy block currently on screen. Taken over everything
+     visible rather than over the chapter that owns p, because chapters
+     cross-fade: for ~30 thousandths of the timeline two copy blocks are
+     both painted, and a label that clears the incoming one can still be
+     sitting on the outgoing one. The stricter of the two wins. */
+  let f = Infinity;
+  for (let i = 0; i < chapters.length; i++) {
+    if (chState[i] > 0.05 && chCopyTop[i] < f) f = chCopyTop[i];
+  }
+  annoFloor = f;
 }
 
 /* -- the workflow rail ---------------------------------------------------- */
@@ -2747,10 +2859,16 @@ function resize() {
   camera.updateProjectionMatrix();
   if (annoSvg) annoSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   measureDatum();
+  measureChapterTops();
   return true;
 }
 
 const _pos = new THREE.Vector3(), _tgt = new THREE.Vector3();
+/* Midway between the labelled emitter (ANCHORS.emit, x=3.05) and the wetted
+   lens carried on the cut wall by the x=1.15 dripline, dropped a little below
+   the pipe line because the bulb spreads down and out from it — an oblate
+   lens, not a sphere. The WATER close-up aims here. */
+const WATER_FOCUS = new THREE.Vector3(2.35, -2.66, 1.55);
 const _right = new THREE.Vector3(), _up = new THREE.Vector3(0, 1, 0), _dir = new THREE.Vector3();
 const _pan = new THREE.Vector2();
 
@@ -2771,6 +2889,40 @@ function apply(now) {
      keeps its left half clear for the headline without ever rotating the
      model away from its best angle. */
   _pos.multiplyScalar(layout.dist);
+
+  /* WATER IS A CLOSE-UP ON A NARROW SCREEN.                     [PHASE 3.1]
+     Measured at 390x844: the emitter, the lateral running out of it and the
+     wetted lens together occupied about 90x60 CSS px inside an 844px-tall
+     frame, with ~110px of empty black above the block and a featureless
+     aggregate mass filling the lower left. The visitor could see the whole
+     specimen and still not see the irrigation event — which is the one
+     thing this chapter exists to show.
+
+     The correction is deliberately NOT a global phone offset: the brief
+     that produced this scene protected HERO's datum solve and EXPLODED's
+     silhouette from exactly that. It is a dolly along the chapter's own
+     view axis, gated by the WATER window and scaled by layout.tight, so
+     nothing outside .400-.624 and nothing on a landscape or desktop frame
+     can feel it. Lerping toward _tgt rather than scaling _pos keeps the
+     authored angle — the emitter stays in the left two thirds and the copy
+     keeps its column, per the Phase 2.2 recomposition — and only shortens
+     the distance, which is the variable that was actually wrong.
+
+     Peripheral terrain is lost. That trade is the point: the mechanism
+     beats the complete-object silhouette here, and the silhouette is
+     already established twice, in GROUND before this and in EXPLODED
+     after it. */
+  const wz = T.waterIn(p) * layout.tight;
+  if (wz > 0.0005) {
+    /* Aim between the two things that have to be in one glance before
+       magnifying, or magnification pushes them apart: the labelled emitter
+       at x=3.05 and the wetted lens on the cut wall by the x=1.15 dripline.
+       A dolly alone drove the emitter off the right edge by 0.56 — the pair
+       spreads as the frame tightens, and this is the ceiling on how hard
+       WATER can be cropped before cause and evidence stop sharing a shot. */
+    _tgt.lerp(WATER_FOCUS, 0.38 * wz);
+    _pos.lerp(_tgt, 0.46 * wz);
+  }
 
   /* The responsive lift and pan are quoted against the HERO's viewing
      distance, so they have to be scaled by how far the camera actually is
@@ -3018,7 +3170,7 @@ addEventListener('resize', () => { resize(); if (!running) { apply(performance.n
    face has actually rendered — measured against the fallback it can be most
    of a line out, and the specimen would sit visibly off the headline. */
 if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(() => { measureDatum(); if (!running) { apply(performance.now()); renderer.render(scene, camera); } });
+  document.fonts.ready.then(() => { measureDatum(); measureChapterTops(); if (!running) { apply(performance.now()); renderer.render(scene, camera); } });
 }
 addEventListener('orientationchange', () => setTimeout(() => { vw = 0; resize(); }, 260));
 addEventListener('pageshow', () => { vw = 0; resize(); start(); });

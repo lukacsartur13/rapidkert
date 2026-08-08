@@ -238,7 +238,14 @@
       <!-- 01 · SURFACE ------------------------------------------------ -->
       <div class="gd__ch gd__ch--hero" data-ch data-from="0" data-to=".105">
         <div class="shell gd__inner">
-          <p class="label label--clay">Rapidkert Kft. — Győr és környéke</p>
+          <!-- The company half of the eyebrow is a SPAN because on a 320
+               screen it is printed 8px under a header logo that already
+               reads "Rapidkert Kft." at the same x. It is dropped there
+               (rk.css §31.86) so the line stops wrapping — the locator is
+               the half that is doing work, and the name is not lost. -->
+          <p class="label label--clay gd__eyebrow">
+            <span class="gd__eyebrow-co">Rapidkert Kft. — </span>Győr és környéke
+          </p>
 
           <!-- THE DATUM.
                The headline is deliberately broken across the ground plane:

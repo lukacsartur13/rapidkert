@@ -9,6 +9,14 @@
         ".claude/tools/serve.sh"
       ],
       "port": 8811
+    },
+    {
+      "name": "rapidkert-p31",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": [
+        "/private/tmp/rk-serve.sh"
+      ],
+      "port": 8817
     }
   ]
 }

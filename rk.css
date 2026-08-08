@@ -2394,13 +2394,114 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .gd-on .gd__ch .btn{margin-top:1rem}
 }
 
-/* 320-class phones. Removing the stats row recovers 109px of the 139px
-   overflow; the specimen's band gives up the remaining 40 rather than the
-   headline giving up a line. The band is still 120px of section — the
-   object stays an object, which is the thing that must not collapse. */
-@media (max-width:360px){
-  .gd-on .gd__ch--hero .gd__datum{height:clamp(120px,21vh,168px)}
-  .gd-on .gd__ch--hero .gd__inner{padding-top:clamp(64px,10vh,96px)}
+/* --------------------------------------------------------------------------
+   31.86 — THE 320 HERO IS A COMPOSITION, NOT A REDUCTION      [PHASE 3.1]
+   --------------------------------------------------------------------------
+   Phase 3 got this screen to fit: 707px of hero into 568px of viewport, and
+   the grade plane back onto the type it shares a datum with (86px -> 4px).
+   Fitting is not composing. Measured at 320x568 afterwards, three things
+   were still being decided by the browser rather than by anyone:
+
+     · the eyebrow wrapped, leaving "KORNYEKE" alone on a second line;
+     · "kezdodik." landed at y 266-304, which is 74px BELOW the grade plane
+       and squarely in the lit soil face — and the scrim happened to be
+       ramping from .32 to .62 straight THROUGH the word, so it read as a
+       half-veiled accident rather than as type on a surface;
+     · the button pair finished at x=317 in a 320 frame, 3px of slack, at
+       35px tall — under the 44px this phase is holding everywhere else.
+
+   None of that is solved by scaling things down further. What follows is a
+   different composition for this width, keeping the three things that are
+   not negotiable: the SURFACE concept, the datum contract (rk-ground.js
+   reads --anchor and the band's height back out of here), and the headline
+   breaking across the model's own grade plane.
+
+   Aspect-guarded, not width-only — see the §15 lesson in 31.85. A 360-wide
+   landscape phone must keep the landscape composition, not this one.
+   -------------------------------------------------------------------------- */
+@media (max-width:360px) and (max-aspect-ratio:7/5){
+  /* ONE LINE, AND THE HALF THAT IS WORKING.
+     The header logo reads "Rapidkert Kft." at x=20; the eyebrow repeated it
+     at x=20, 8px lower, and that repetition is what pushed the locator onto
+     a second line. Tracking it down to fit would have made the one piece of
+     geographic copy in the hero the smallest thing on the screen. So the
+     company name is dropped from the VISUAL treatment only — it is still in
+     the markup, still in the logo's alt text, and still the first line of
+     the footer. The eyebrow keeps its size and its tracking and says the
+     thing the logo cannot. */
+  .gd__eyebrow-co{display:none}
+
+  /* The band grows 120 -> 138. It is paid for by the eyebrow's second line
+     and by the lede's leading, not by the headline, which stays at its
+     authored 2rem. --anchor drops .30 -> .20 so the plane sits nearer the
+     band's top: the same band then holds more SECTION and less sky, which
+     is what the lower anchor is for at a width where the strata are the
+     only thing proving the model is a solid. */
+  .gd-on .gd__ch--hero .gd__datum{height:clamp(138px,24vh,176px);--anchor:.20}
+  .gd-on .gd__ch--hero .gd__inner{padding-top:clamp(56px,9.4vh,88px)}
+
+  /* THE RAMP STOPS RUNNING THROUGH THE HEADLINE.
+     Same idea as §31.8 — the section descends into darkness rather than
+     being veiled — with the stops moved to where the composition actually
+     is at 568px tall. Clear through the strata under the datum, then hard
+     over about 50px so that the band's foot IS the edge, and "kezdodik."
+     opens on a controlled dark field instead of on lit soil. The word is
+     not printed on the model any more; it is printed under it. */
+  .gd-on .gd__ch--hero::before{
+    background:linear-gradient(180deg,rgba(10,11,8,.55) 0%,rgba(10,11,8,0) 9%,
+                               rgba(10,11,8,0) 38%,rgba(10,11,8,.45) 42%,
+                               rgba(10,11,8,.85) 46%,rgba(10,11,8,.95) 50%,
+                               rgba(10,11,8,.96) 100%) !important;
+  }
+
+  /* Five lines either way; the smaller leading gives the band its 18px. */
+  .gd-on .gd__ch--hero .gd__lede{font-size:.86rem;line-height:1.45}
+
+  /* THE CTA STOPS PRETENDING TO BE A DESKTOP PAIR.
+     Two 35px buttons in a 320 frame is not a pair, it is a pair that fits.
+     The primary becomes the full measure — the widest, most deliberate
+     element on the screen, and unmistakably the action — and the secondary
+     becomes what it always was semantically: a link to the reference work,
+     set in the site's own underline language rather than in a box competing
+     with the box above it. Both clear 44px. */
+  .gd-on .gd__ch--hero .gd__cta{
+    flex-direction:column;align-items:stretch;gap:.55rem;width:100%;
+  }
+  /* .gd__ch .btn carries margin-top:1.1rem for the ROW layout, where it is
+     the gap between the lede and a single line of buttons. In a column it
+     is applied to both and becomes a second, larger gap inside the stack —
+     24px measured between the two, against the 8px the flex gap asked for,
+     and the hero finished with 6px of slack in a 568px frame. The column
+     owns its own spacing; only the first child keeps the lede's gap. */
+  .gd-on .gd__ch--hero .gd__cta .btn{margin-top:0}
+  .gd-on .gd__ch--hero .gd__cta .btn--light{
+    width:100%;min-height:46px;justify-content:center;
+    padding:.9em 1em;font-size:.68rem;letter-spacing:.12em;
+  }
+  .gd-on .gd__ch--hero .gd__cta .btn--line{
+    align-self:flex-start;min-height:44px;
+    padding:.6em 0;border-color:transparent;background:none;
+    font-size:.64rem;letter-spacing:.12em;
+    text-decoration:underline;text-underline-offset:.5em;
+    text-decoration-thickness:1px;
+  }
+
+  /* THE DRAWING'S CAPTION TAKES ITS OWN ADVICE.
+     §31.55 authored the rule for this element: "if this ever competes with
+     the chapter headline, it is the thing that gets quieter." At 320x568 it
+     does — measured on the Phase 3 baseline as well as after this phase's
+     work, both lines of it printed straight through "A LÁTVÁNY ALATT /
+     SZILÁRD ALAP." There is nowhere to move it to: the drawing frame's foot
+     lands at y~390 and the copy opens at 368, so the two want the same
+     forty pixels and the copy has the better claim.
+
+     What it disclaims is also already gone here. §31.8 drops .gd__mark on a
+     phone, so at this width the drawing carries a rule and its ticks and no
+     dimension figures at all — and the ticks were authored to carry letters
+     rather than depths for exactly this reason. A note saying the figures
+     are not construction dimensions has no figures left to qualify. The
+     drawing keeps its apparatus; it stops annotating annotations. */
+  .gd__dim-cap{display:none}
 }
 
 /* --------------------------------------------------------------------------
