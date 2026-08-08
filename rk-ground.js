@@ -2205,7 +2205,7 @@ function pulseAt(p, t) {
    half so the copy owns the lower half.
    ========================================================================== */
 
-const layout = { dist: 1, panX: 1, panY: 0, fov: 27, elev: 0, tight: 0 };
+const layout = { dist: 1, panX: 1, panY: 0, fov: 27, elev: 0, tight: 0, banded: 0 };
 
 function measureLayout() {
   frameLayout();
@@ -2223,15 +2223,12 @@ function frameLayout() {
   const w = innerWidth, h = innerHeight;
   const ar = Math.max(w / h, 0.30);
 
-  /* HOW PORTRAIT IS THIS VIEWPORT, 0..1.                        [PHASE 3.1]
-     Not "is this a phone". The framing problem this drives is a consequence
-     of aspect ratio alone: the narrower the frame relative to its height,
-     the further back the solver below has to stand to fit the block's WIDTH,
-     and the more of that height is then spent on terrain either side of
-     whatever the chapter is actually about. A 768x1024 tablet has the same
-     problem as a 390x844 phone, four fifths as badly, and gets four fifths
-     of the correction — which is why this is a ratio and not a breakpoint. */
-  layout.tight = Math.min(Math.max((0.95 - ar) / 0.25, 0), 1);
+  /* IS THE COPY A BAND UNDER THE MODEL?                         [PHASE 3.1]
+     True for the stacked portrait layout rk.css opens below 860 — and false
+     in landscape, where §31.85 gives the copy a column beside the specimen
+     and there is lateral room for a label again. 1.4 is 7/5, the same ratio
+     that rule is written against. This gates the annotation floor. */
+  layout.banded = (w < 1024 && ar < 1.4) ? 1 : 0;
 
   if (w >= 1024) {
     layout.dist = 1.0; layout.panX = 1; layout.panY = 0; layout.fov = 27; layout.elev = 0;
@@ -2265,6 +2262,27 @@ function frameLayout() {
      cut faces, and on a phone the section IS the subject — there is no room
      to show both it and a wide top surface. */
   layout.elev = Math.min(3.0 / ar - 0.6, 7);
+
+  /* HOW STARVED IS THIS FRAME, 0..1.                            [PHASE 3.1]
+     Quoted against layout.dist — how far back the solver above actually had
+     to stand to fit the block's width — rather than against aspect ratio
+     directly. The first version of this used the ratio, and gave a 768x1024
+     tablet four fifths of a correction calibrated for a 390x844 phone. Seen
+     at that size it was plainly wrong: WATER lost its silhouette and its
+     grade reference completely and became a wall of soil with a pipe in it.
+
+     Distance is the honest variable. The dead air and the shrunken emitter
+     this corrects are both consequences of standing back, so the correction
+     should be a function of standing back:
+
+         390x844  dist 1.75 -> 1.00      320x568  dist 1.44 -> 1.00
+         768x1024 dist 1.12 -> 0.00      844x390  dist 0.95 -> 0.00
+
+     Tablet portrait is at the floor, which is the right answer: at 0.75 it
+     is not a starved frame, and the brief for this phase is explicit that
+     it wants an intermediate composition rather than the phone's rules. A
+     600x900 tablet lands near 0.43 and gets a proportionate share. */
+  layout.tight = Math.min(Math.max((layout.dist - 1.12) / 0.32, 0), 1);
 }
 
 /* ==========================================================================
@@ -2523,7 +2541,7 @@ function updateAnnotations(p, w, h) {
      to rescue F ALAP, and landed C ÖNTÖZÉS on the ±0,00 FELSZÍN datum
      caption, which had been clear. The DOTS never move in either pass, so
      every leader still points at the real thing. */
-  if (layout.tight > 0 && live.length) {
+  if (layout.banded && live.length) {
     let bottom = -Infinity;
     for (const s of live) {
       if (s.ly < bottom + 6) s.ly = bottom + 6;
@@ -2546,7 +2564,7 @@ function updateAnnotations(p, w, h) {
        to nowhere, and the drawing is better without it — the deepest strata
        are the ones this drops, which is the same set §31.8 already lets
        descend into the scrim on a phone. */
-    if (layout.tight > 0 && (s.ly < 6 || s.ly + lh > h - 4)) {
+    if (layout.banded && (s.ly < 6 || s.ly + lh > h - 4)) {
       l.style.opacity = '0'; l.__line.style.opacity = '0'; l.__dot.style.opacity = '0';
       continue;
     }
