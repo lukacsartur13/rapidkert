@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "rapidkert",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": [
+        ".claude/tools/serve.sh"
+      ],
+      "port": 8811
+    }
+  ]
+}

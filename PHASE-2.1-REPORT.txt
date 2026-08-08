@@ -1,0 +1,365 @@
+================================================================================
+RAPIDKERT — PHASE 2.1
+ART DIRECTION PASS — VISUAL QUALITY REPORT
+================================================================================
+
+Scope respected: no new sections, pages, scenes, post-processing or loaders.
+One asset swap inside the existing frozen media library, made because the
+previous photograph actively contradicted the copy above it (see REALITY
+HANDOFF).
+
+Files touched: rk-ground.js, rk.css, index.html.
+
+
+--------------------------------------------------------------------------------
+0 — THE ONE THING THAT MATTERED MOST
+--------------------------------------------------------------------------------
+
+The single highest-leverage find was a BUG, not a taste call.
+
+The grass blades carried a skyward shading normal but were drawn double-sided,
+so for every back-facing blade Three.js flipped that normal to point at the
+ground — where the only light is the hemisphere's dark soil term. Roughly half
+the sward rendered black. That is why the lawn read as "coarse stippling" at
+every range, in every chapter.
+
+Cancelling the flip is one multiply. Combined with the new shell sward it fixed
+the hero, KÉSZ KERT and the handoff frame at once.
+
+
+--------------------------------------------------------------------------------
+1 — HERO
+--------------------------------------------------------------------------------
+
+COMPOSITION
+Rebuilt, not tuned. An empty element inside the h1 opens a measured band
+between "NEM A FELSZÍNEN" and "KEZDŐDIK.", and the camera is SOLVED every frame
+so the specimen's grade plane projects onto exactly that band. Two headline
+lines sit above ground, one below, and the rule between them is the model's
+actual surface. Type and object no longer share a rectangle — they share one
+horizontal system.
+
+MATERIALS
+The lawn holds at hero scale: mown bands, clumping, contact fringes at the
+paving. Stepping stones read as cut stone — chamfered arris, embedded body,
+per-slab grain and dimensions.
+
+LIGHTING
+Unchanged and still correct: warm key, plus the frontal section fill that keeps
+the near-vertical strata legible.
+
+TYPOGRAPHY RELATIONSHIP
+The former collision is gone — the FELSZÍN marker used to sit inside the word
+FELSZÍNEN. Both horizon markers now sit below the rule, in the band the datum
+opens. The scrim dropped from a full-height 90% wash across the left half to a
+single soft pool under the lower-left copy, roughly a third of its former
+strength. Nothing in the hero overlaps the specimen any more.
+
+REMAINING WEAKNESS
+At exactly 1280x800 the "MEGÉPÍTETT KERTEK" button's right border crosses about
+ten pixels onto the block's near corner. It survives, but it is tolerated, not
+designed. The lede column and the block edge are within ~60px at that width and
+the composition has no slack there.
+
+
+--------------------------------------------------------------------------------
+2 — GROUND
+--------------------------------------------------------------------------------
+
+COMPOSITION
+This was the worst frame in the piece: the block bled off all four edges, so
+there was no silhouette and no obvious subject inside a wall of soil. The camera
+is now pulled back far enough to close the object's outline and pushed right so
+the copy owns a real column instead of a scrim over the model.
+
+MATERIAL READABILITY
+Five strata separate cleanly. The drainage course is the strongest read; the
+sub-base now carries compression lifts, two aggregate grades and occasional
+oversize inclusions without becoming loud enough to compete with the root zone.
+
+ROOTS
+Improved, with real hierarchy: per-system vigour, and a third order of fine
+roots at a third the diameter of the laterals. Roots are now clipped by the
+excavation volume, so they end flush with the cut walls and stand proud of them
+by about 22cm — severed roots in a trench wall, rather than the metre of pale
+spaghetti hanging in open air that seeding them near the trench used to produce.
+
+REMAINING WEAKNESS
+Honest assessment: roots still barely register in GROUND. They live inside
+opaque soil, so the only place they can be seen is the trench, and from this
+camera that is a small part of the frame. They read WELL in EXPLODED and
+ADEQUATELY in WATER. Making them genuinely strong in GROUND would require
+drawing root cross-sections into the cut faces themselves — a new system, and
+out of scope for this phase.
+
+
+--------------------------------------------------------------------------------
+3 — WATER
+--------------------------------------------------------------------------------
+
+PIPE READABILITY
+Good. The polymer stays matte and dark. Two new lights do the work: a low
+bounce sitting near the trench floor that lifts the base of the cut walls, and
+a narrow warm source above the excavation's inside corner that separates the
+cut edge — the line that says "this ground has been opened" — from the wall
+behind it. The ambient was not raised; the light was shaped.
+
+PULSE
+Rebuilt. The head is roughly five times wider and about 40% dimmer, with a soft
+leading edge and a much shorter luminance range. The colour lost nearly all
+remaining chroma, because additive blending compounds any saturation into the
+neon worm the brief asked to remove. The pipe's own wall now lifts slightly
+from the inside as the charge passes, which is what stops the water reading as
+a light travelling ALONGSIDE a pipe rather than pressure travelling THROUGH one.
+
+Timing was also wrong and is fixed: the soil used to finish wetting BEFORE the
+water reached the emitters. Cause now precedes effect, and the bulb opens over
+roughly a second of reading time.
+
+MOISTURE
+The real fix was structural, not cosmetic. Point bulbs around the six emitters
+were physically reasonable and compositionally useless: the emitters hang in
+the OPEN TRENCH, where the soil that would show the wetting has been dug away.
+The only evidence was a partial disc on a wall a metre and a half behind them.
+
+Wetting is now measured from the lateral's AXIS — a continuous band, which is
+what subsurface drip actually produces — and is deliberately SHORTER than the
+root zone is thick, so dry earth remains above and below it and the shape
+between them reads as water spreading. The boundary is warped by noise so it is
+never an ellipse. Half the read comes from roughness rather than albedo: wet
+soil is smoother, so the wetted field separates under any light instead of only
+a bright one. No droplets, no blue, no glow.
+
+LIGHTING
+The underground stays darker than the surface. Both new lights are off above
+grade and off again once the section comes apart.
+
+REMAINING WEAKNESS
+The wetted lenses read most strongly on the far-left cut face, while the labels
+point at the emitter on the right. Cause and evidence are in different parts of
+the frame.
+
+
+--------------------------------------------------------------------------------
+4 — EXPLODED
+--------------------------------------------------------------------------------
+
+LAYER HIERARCHY
+Vertical steps are now unequal and each stratum drifts a few centimetres
+sideways — an assembly eased apart by hand rather than a stack of cards. The
+drift is under 3% of the block's width, so the object still plainly aligns on
+one vertical axis. The irrigation network was resting ON the root slab's top
+face; it now separates into its own open gap and reads as a part in its own
+right.
+
+TECHNICAL DRAWING QUALITY
+A dimension string with closed end ticks down the left of the object, a tick to
+every stratum boundary, stratum letters, a ±0,00 FELSZÍN datum drawn at TRUE
+grade, and a caption. Everything is projected from the real layer groups, so
+when the section eases apart the drawing eases apart with it.
+
+The marks carry LETTERS, NOT DEPTHS. A figure such as "−0,45" would read as a
+Rapidkert construction specification; this is a diagram of an order of layers,
+and the caption says so in as many words ("Elvi rétegrend — séma, nem
+kivitelezési méret"). ±0,00 is the only figure used, and it is definitionally
+the surface rather than a fabricated dimension.
+
+DEPTH
+The fix that mattered most here: every stratum's soffit faces straight down, and
+in a scene lit entirely from above that meant five black rectangles the moment
+the section separated. The parts had no thickness because you could not see the
+bottom of any of them. A bounce light tied directly to the explode value gives
+them solidity. The camera also now sits ABOVE the top slab — it was below it,
+which is precisely why the lawn was the darkest layer in the drawing.
+
+REMAINING WEAKNESS
+The body copy's last word sits about fifteen pixels from the dimension string's
+"D" tick. It clears, but only just, and a longer translation of that paragraph
+would collide.
+
+
+--------------------------------------------------------------------------------
+5 — FINISHED (KÉSZ KERT)
+--------------------------------------------------------------------------------
+
+SURFACE QUALITY
+Transformed. The sward is now built the way fur is: ten shells lifted off the
+surface along its normal, each discarding every fragment not inside a blade's
+cross-section at that height, over two lattices at unrelated scales so the
+sward never resolves into the grid it is built on. About 34k triangles for a
+density no instanced field could reach, in ONE draw call. A few thousand real
+blades remain, weighted hard toward the block's edges, where a shell stack has
+nothing left to draw.
+
+LANDSCAPE DETAIL
+Stepping stones have individual dimensions, settlement and rotation. The
+terrace is a 3x2 large-format joint grid on a bedding course that oversails it
+on every side. An analytic footprint SDF — one source of truth, consumed by the
+geometry, by the sowing and by the shader — stops grass under the slabs, adds a
+contact occlusion gradient and a thin bright lip at the joint. No SSAO pass.
+
+LIGHTING
+Warm final grade; the paving casts a real shadow onto the sward.
+
+REMAINING WEAKNESS
+The mowing stripes are almost too subtle to survive at this camera distance —
+they read at the handoff frame and barely here. The lawn is also still on the
+dark, olive side of where I would ideally put it. That is consistent with the
+scene's palette, but it is a compromise with the dark page, not an optimum.
+
+
+--------------------------------------------------------------------------------
+6 — REALITY HANDOFF
+--------------------------------------------------------------------------------
+
+ALIGNMENT
+The biggest change in this section is that THE PHOTOGRAPH WAS WRONG.
+kesz-kert-panorama.jpg is a bare-earth plot under an open sky. It matched
+neither the top-down lawn it was growing out of nor the sentence above it
+("Nem látványterv. Megépített kert.").
+
+Swapped for kesz-gyep-terasz.jpg, from the same frozen library: a finished mown
+lawn seen from a high oblique, paving down the right edge, a terrace plate, and
+an irrigation valve cover sitting in the grass — the same objects the model
+has. The final camera then moved off plan view to roughly the photographer's
+own position, about forty degrees above the lawn. A plan view clipped more
+neatly to the top face, but a neat clip is not the point; the point is the half
+second in which the visitor cannot tell which of the two they are looking at,
+and that only happens if both frames were shot from the same place.
+
+TIMING
+The plate no longer fades in — a cross-dissolve advertises that the frames
+never matched. It takes the frame at near-full opacity, and the GRADE resolves
+afterwards. That lag is the ambiguous moment. The render is also held crisp
+underneath it much later than before, instead of dissolving out from under a
+growing photo.
+
+COLOUR MATCH
+The photograph arrives desaturated, cooler and darker — inside the render's
+palette — and resolves to the site's normal photo grade. Its vignette comes UP
+with the grade rather than down: while the plate is pretending to be the render
+it has to be as evenly lit as the render is.
+
+The REALITY chapter's centred radial scrim had to go. Multiplied with the
+photo's own vignette it took the finished garden to nearly black at the exact
+moment it was supposed to be revealed. It is now left-biased and no heavier
+than the hero's, and the copy column was narrowed so the photograph gets the
+rest of the frame.
+
+REMAINING WEAKNESS
+The rhyme is now genuinely close, but not seamless. The photograph has a house
+and a fence above the lawn where the render has empty background, so the top of
+the frame gives the game away a beat earlier than the bottom does.
+
+
+--------------------------------------------------------------------------------
+7 — MOBILE
+--------------------------------------------------------------------------------
+
+HERO
+Recomposed rather than scaled. A phone has no left and right to divide, so the
+headline divides vertically and the specimen drops into the gap: "A jó kert /
+nem a felszínen" above the grade line, the section itself in the band below it,
+"kezdődik." underneath. The object becomes punctuation inside the headline
+system — the same composition as desktop, stacked.
+
+Also fixed a real bug here: the exponential fog is a function of ABSOLUTE
+distance from the camera, and portrait viewports pull the camera back by up to
+2.45x to fit the block. The fog was eating half the specimen and the phone hero
+rendered as a grey ghost of itself. Density is now relative to the framing
+distance, which keeps the same depth cue ACROSS the object on every viewport.
+
+UNDERGROUND
+Legible. Labels reduced, subject scaled up, less elevation so the cut faces do
+not foreshorten. A phone cannot hold all five strata AND the copy, so it does
+not try: the surface, topsoil and root zone stay clear above the fold and the
+drainage and sub-base descend into the scrim the copy sits on. The section
+reads as continuing into darkness rather than being veiled.
+
+EXPLODED
+The drawing keeps its apparatus but not its duplicates. The dimension rule and
+its ticks stay — they are what make the object read as a measured drawing — and
+the lettering is dropped, because on a phone it repeated the stratum labels
+thirty millimetres away and ran off the left edge doing it. The datum label
+moves back to the dimension string, where there is clear space.
+
+REMAINING WEAKNESS
+On mobile GROUND the specimen occupies only about a third of the screen height,
+with dead space above it. It follows the intended split but it is under-scaled,
+and I stopped short of retuning the narrow-viewport framing constants further
+because doing so would have put the newly settled mobile hero back at risk.
+
+
+--------------------------------------------------------------------------------
+8 — PERFORMANCE
+--------------------------------------------------------------------------------
+
+                      BEFORE            NOW
+  Draw calls          34–38             24–28
+  Triangles           129k              126k (EXPLODED) / 139k (worst: KÉSZ)
+  DPR                 2                 2
+  Programs            —                 21
+  Console errors      —                 none across the timeline
+
+Blades dropped from 9,000 to 2,800 and were re-weighted toward the silhouette,
+which paid for the shell stack. Nothing was solved by brute force: the sward is
+one merged geometry and one draw call, the paving merges to two, and the
+contact shading is analytic rather than a post-process.
+
+LOW tier maintained: four shells, one lattice, no shadow map, no third-order
+roots.
+
+All eleven reduced-motion SNAP stops still land inside authored chapters —
+verified programmatically, no misses.
+
+
+--------------------------------------------------------------------------------
+9 — AGAINST THE TWELVE SUCCESS CRITERIA
+--------------------------------------------------------------------------------
+
+  1  Hero no longer depends on a heavy scrim                    MET
+  2  Typography and object compositionally integrated           MET
+  3  Grass holds up at close range                              MET
+  4  Terrace and stepping stones no longer placeholder          MET
+  5  WATER understandable without bright-blue gimmicks          MET
+  6  Moisture clearly reaches the root zone                     MET
+  7  Exploded section resembles an architectural drawing        MET
+  8  Surface and underground equally authored                   MET
+  9  REALITY handoff visually convincing                        MET
+ 10  Mobile preserves the same art direction                    MET
+ 11  Performance remains strong                                 MET
+ 12  HERO, WATER, EXPLODED strong enough to submit              PARTIAL
+
+On 12: I would use HERO and EXPLODED as submission screenshots without
+hesitation. WATER is much stronger than it was but I would not lead with it —
+the moisture and the labelled emitter sit in different halves of the frame, and
+that is a composition problem I have named rather than solved.
+
+
+--------------------------------------------------------------------------------
+10 — TWO CONTRACTS THAT ARE SILENT WHEN BROKEN
+--------------------------------------------------------------------------------
+
+Anyone editing this next needs to know:
+
+1. THE HERO DATUM
+   .gd__datum is an empty element inside the h1, between headline lines two and
+   three. Its band height and its --anchor value are authored in rk.css;
+   rk-ground.js reads both back and SOLVES the hero camera so the specimen's
+   grade plane projects onto it. Change the headline markup, the band height or
+   --anchor, and the model silently stops landing on the type. The lock
+   releases by p ≈ 0.09.
+
+2. THE PAVED FOOTPRINT
+   PAVERS / TERRACE in rk-ground.js are consumed three times: by the paver
+   geometry, by paveSD() when sowing the sward, and by rkPaveSD() in GLSL for
+   the grass keep-out and the contact shading. All three must agree to the
+   centimetre or grass grows through the slabs.
+
+Debug: ?scene=hero|descent|ground|water|exploded|terep|viz|struktura|noveny|
+kesz|photo and ?tier=low|med|high. ?scene= also exposes window.RK_GROUND —
+.bare() strips DOM overlays for screenshots, .U is the live uniform table.
+To hold a value for A/B comparison, override the track (e.g. T.moist = () => 0);
+the p setter and .hold() are both overwritten by the next frame.
+
+================================================================================

@@ -1,0 +1,638 @@
+================================================================================
+RAPIDKERT — PHASE 2.2
+ONE CONTINUOUS WORLD
+Homepage choreography, transitions and the project experience
+================================================================================
+
+Scope respected: the Living Ground was not rebuilt, no second WebGL scene was
+added, no new media entered the library, no cards, no glassmorphism, no stock
+imagery, and the commercial content is unchanged except where a section's
+presentation demanded a different arrangement of the same sentences.
+
+Files touched: index.html, rk.css, rk.js, rk-ground.js.
+
+New review tooling, in the spirit of the existing ?scene=:
+
+    ?stage=fld:.30              freeze one DOM stage at one point of its run
+    ?stage=lyr:.5,asm:.8        several at once
+    window.RK_STAGE.set(k, q)   live, from the console — k is
+                                brg | fld | lyr | asm | prf
+    window.RK_STAGE.free()      hand them all back to the scroll
+
+Dead code without the parameter. It exists because a choreographed stage can
+only be judged at a KNOWN point in its run, and reproducing that point by
+scrolling is neither exact nor repeatable.
+
+
+--------------------------------------------------------------------------------
+0 — THE ONE THING THAT MATTERED MOST
+--------------------------------------------------------------------------------
+
+The REALITY handover was never actually seamless. It LOOKED seamless inside
+the Living Ground, and then the Living Ground's section ended and the next
+one began underneath it — so the visitor saw the bottom of the photograph
+followed immediately by the top of the photograph again. A repeat. That was
+the hardest cut on the page and it was sitting on the hinge of the whole
+piece.
+
+It is now three separate fixes stacked:
+
+  1. THE OVERLAP. The projects section is pulled up by exactly one viewport
+     (.fld { margin-top: -100svh }), so its first frame is pinned at the top
+     of the screen at the same instant the Living Ground's sticky stage lets
+     go. For one viewport of scroll the two are the same photograph, at the
+     same crop, the same size and the same grade.
+
+  2. THE OVERLAY MATCH. Two identical pictures only look identical if what is
+     laid over them is identical too. The Living Ground's frame carried a
+     vertical vignette on the photo, a vertical scrim on the stage and a
+     bottom band; read against a copy offset by four hundred pixels, every
+     one of those was a horizontal step across the picture. A new track,
+     T.out, resolves all three to a FLAT rgba(11,12,9,.34) over the last
+     chapter — and the plate underneath opens on exactly that value.
+
+  3. THE SWAP. Matching the tone was not enough: two copies of one picture,
+     offset, still show the picture starting again. So at the one frame where
+     the two rectangles coincide exactly, rk-ground.js sets .is-handed and
+     this frame stops drawing its own copy. Same pixels, same rectangle,
+     nothing to see. What keeps travelling up is the REALITY copy — which is
+     the thing that should leave.
+
+Verified: at the join the photograph is now one continuous image across the
+whole viewport, with only the REALITY chapter's own left-biased copy scrim
+travelling up over it.
+
+
+--------------------------------------------------------------------------------
+1 — WHICH SECTION BOUNDARIES PREVIOUSLY HARD-CUT
+--------------------------------------------------------------------------------
+
+Every one of them except the model-to-photograph dissolve inside the Living
+Ground. Specifically:
+
+  LIVING GROUND -> PROJECTS   photograph ended, dark section began, and the
+                              photograph then restarted (see §0)
+  PROJECTS -> SERVICES        dark section ended, cream section began
+  SERVICES -> PROCESS         list ended, five columns began
+  PROCESS -> TRUST            columns ended, dark stat table began
+  TRUST -> FAQ                dark ended, cream accordion began
+  FAQ -> CTA                  accordion ended, dark CTA began
+  CTA -> FOOTER               1px border-top, then the footer
+
+The pattern was identical at all seven: the outgoing composition finished,
+the background colour changed at the <section> edge, and the next composition
+faded up on its own IntersectionObserver.
+
+
+--------------------------------------------------------------------------------
+2 — WHAT SURVIVES EACH BOUNDARY NOW
+--------------------------------------------------------------------------------
+
+For each: what survives / what changes form / what introduces the next.
+
+LIVING GROUND -> REALITY  (unchanged, preserved, and given 2.2x the scroll)
+    survives    the rendered surface's screen rectangle
+    changes     it becomes the photograph's clip rectangle, then full bleed
+    introduces  the grade resolving after the clip has opened
+
+REALITY -> PROJECTS
+    survives    the photograph itself, pixel for pixel
+    changes     its EDGES — full bleed closes to a plate; the picture never
+                moves, the sheet closes around it
+    introduces  the field marks, then the eyebrow and title, then the
+                specification row along the foot
+
+PROJECTS -> SERVICES
+    survives    the last plate
+    changes     it is CRUSHED — its height goes to nothing while it spreads
+                sideways, and what is left of it is a rule
+    introduces  that rule, full bleed, as the line the first service is
+                written under
+
+SERVICES -> PROCESS
+    survives    the horizontal cut the third service opened under its
+                typography
+    changes     it stops being a cut and becomes a datum
+    introduces  the travelling head that walks the datum, and the soil
+                register the third service left the page in
+
+PROCESS -> TRUST
+    survives    the finished surface line from station 05
+    changes     it becomes the rule the first proof statement stands on
+    introduces  the limestone-to-paper tone the assembly finished in
+
+TRUST -> FAQ
+    survives    the hairline measurement grid
+    changes     it goes from one rule to an eight-column register
+    introduces  the sheet's index column
+
+FAQ -> CTA
+    survives    the sheet's last rule
+    changes     it descends and becomes GRADE — the ground line
+    introduces  soil below it, open air above it, and the call to action
+                standing exactly on it
+
+CTA -> FOOTER
+    survives    the soil
+    changes     nothing — there is no border, no padding step and no colour
+                change; the footer is the next layer down of the same block
+    introduces  the site markings surfacing out of it
+
+None of these is "everything fades and the next section appears".
+
+
+--------------------------------------------------------------------------------
+3 — HOW PROJECTS WAS REBUILT
+--------------------------------------------------------------------------------
+
+The old section was a staggered twelve-column photo grid: four figures, up to
+150px of dead margin above each, and a near-invisible mega headline over an
+empty black half-page. It is gone.
+
+THE BRIDGE (§32.1). The photograph the model resolved into is the first
+element of the section, and its edges close into a sheet while the metadata
+writes itself into the space that opens. The contraction is a clip-path, so
+the picture is genuinely being CROPPED into a plate rather than replaced by a
+smaller copy of itself.
+
+THE FIELD (§32.2). Seven sheets hung at authored positions on a receding
+diagonal, in real CSS perspective. ONE transform on ONE element moves the
+whole field laterally (260vw) and forward (8000px) through them; the plates
+carry only their own depth. So travelling the entire section costs a single
+transform write and seven opacity writes per frame — which is the reason this
+is DOM and not a second WebGL scene: at this fidelity a canvas would buy
+nothing and cost a permanent render loop.
+
+The forward travel is deliberately large. At the first value I tried the
+stations sat a few hundred pixels apart in depth, five plates were within a
+stop of each other's size, and the field read as OVERLAP rather than as
+depth — which is the exact failure a masonry grid has. At 8000 a plate grows
+nearly four times across its approach and what is near is never in question.
+
+Rhythm, as authored: 01 the bridge, full bleed closing to a plate; 02 narrow
+and far; 03/04 a pair, one large and near, one small and deep; 05 the single
+landscape interruption at 78vw; 06 a large close crop; 07/08 an architectural
+pair, the last of which is crushed into the rule that enters SERVICES.
+
+Restraint: captions carry a category and a place and nothing else, the sheet
+number lives on the rig rather than being printed twice, and nothing is
+claimed about any project that is not visible in the frame.
+
+Photography treatment: the site's standard plate wash was authored to hold
+type on a light page and took every frame to mud on this near-black field.
+The darkening is roughly halved, and the two plates the run actually stops on
+get a flatter grade still — a composition needs one frame that is simply a
+good photograph.
+
+
+--------------------------------------------------------------------------------
+4 — HOW SERVICES INHERIT THE LIVING GROUND
+--------------------------------------------------------------------------------
+
+Not a three-row accordion any more. One service owns the viewport at a time
+at display scale, and the outgoing state is PUSHED off by the incoming one —
+the type is the transition.
+
+Each state carries a drawing derived directly from the model:
+
+  01 KERTÉPÍTÉS            a survey contour set, with the grade line in moss
+                           and clay levelling pins
+  02 ÖNTÖZŐRENDSZER        a fragment of the irrigation network in the
+                           Living Ground's own vocabulary: dashed water main,
+                           laterals dropping to emitters, and one charge
+                           travelling the line
+  03 FELSZÍN ALATTI        a CUT — two rules separating under the typography,
+                           opening a root zone with driplines and wetted
+                           lenses underneath
+
+And the third state takes the whole page under grade with it: the limestone
+fill cross-fades to soil and the entire type register inverts. That colour
+change is scheduled into the gap between states 02 and 03, when every line on
+screen is already at its lowest opacity — so it is something the visitor
+feels rather than something they watch happen to a paragraph they are reading.
+
+A narrow field plate sits at the outer edge of each state with only the tail
+of the name crossing it. Below grade it carries its own scrim, because cream
+type over a phone photograph of a bright driveway is not type.
+
+Nothing was cut from the copy: the three links, the three names, the three
+taglines and the three descriptions are all still real, indexable anchor text.
+
+
+--------------------------------------------------------------------------------
+5 — HOW PROCESS RECONSTRUCTS THE GARDEN
+--------------------------------------------------------------------------------
+
+One horizontal technical datum across the stage with the five stations set on
+it and a clay head travelling between them. Underneath, a section drawing that
+GAINS a component per station and never replaces one:
+
+  01 FELMÉRÉS             the site line alone
+  02 TERV ÉS AJÁNLAT      dimension ticks, a level line, an overall run
+  03 TEREP ÉS TALAJMUNKA  the ground section — three strata, cut edges, grit
+  04 KIVITELEZÉS          the irrigation main, emitters and root systems
+  05 ÁTADÁS               the finished surface: turf line, blades, two slabs
+
+Because every group that has been reached stays on the drawing, the section
+is assembled rather than switched — which is the difference between an
+assembly and five slides.
+
+The section also comes back up into the light as it completes: it starts on
+the soil the third service left the page in and crosses to limestone as the
+finished surface goes on, scheduled into the gap between stations 04 and 05.
+The colour is telling the same story as the drawing.
+
+Layout: title left, current stage right, datum across both, drawing beneath.
+Stacking the written stage under the title put a 3rem h3 and a 3rem h2 in the
+same 200px of an 800px stage and they collided outright.
+
+On a phone the datum runs VERTICALLY down the gutter with the stations on it
+and the drawing to its right — re-choreographed, not rotated.
+
+
+--------------------------------------------------------------------------------
+6 — HOW THE CTA CLOSES THE OPENING SURFACE CONCEPT
+--------------------------------------------------------------------------------
+
+The page opens with "A jó kert nem a felszínen kezdődik." and the visitor has
+been under the surface ever since. The closing section is the surface again.
+
+One rule across the page in moss, with grass ticks on it, a ±0,00 FELSZÍN
+mark on the left and a site mark on the right — the same datum apparatus the
+exploded section uses. Above it: open air, warm, empty. Below it: soil. The
+headline sits above the line and the call to action stands on it. Underneath,
+two hairline strata and one dashed irrigation line with a charge running along
+it: the system, invisible, exactly where the whole piece said it belongs.
+
+Then the soil does not stop. There is no border, no padding step and no colour
+change between that block and the footer — the footer is the last stratum of
+the same composition.
+
+
+--------------------------------------------------------------------------------
+7 — WHICH GENERIC REVEAL ANIMATIONS WERE REMOVED
+--------------------------------------------------------------------------------
+
+All of them. index.html now contains ZERO instances of .rise, .mask,
+[data-reveal] and [data-stagger] — it had 26.
+
+Removed by name:
+    .rise            projTitle, svcTitle, procTitle, the process lede,
+                     trustTitle, the trust lede, four trust facts, faqTitle,
+                     the CTA lede, the CTA buttons, the CTA label
+    .mask            four project figures
+    [data-reveal]    the process section, the CTA headline
+    [data-stagger]   every occurrence
+    .revline         the CTA headline's line-by-line reveal
+    .proc__path      the 2.2s stroke-dashoffset draw on the topographic path
+
+Nothing below the Living Ground now enters because an IntersectionObserver
+fired. Everything enters because the composition it belongs to moved: a plate
+is large because it is near, a service state takes the screen because the one
+before it gave it up, a component appears on the section because the datum
+reached its station.
+
+The observer itself is untouched — the five inner pages still use it, and
+they were not in scope.
+
+
+--------------------------------------------------------------------------------
+8 — HOW LAND -> LIFE PACING CHANGED
+--------------------------------------------------------------------------------
+
+SCROLL TIME IS NOT SCENE TIME.
+
+The camera keys, every track, every chapter's data-from and the eleven
+reduced-motion stops are all authored in SCENE time, and that authoring is
+correct. What was wrong was the SHARE OF SCROLL each scene segment was given:
+LAND -> LIFE ran five complete transformations of the object in 0.028 of the
+timeline each, while six quiet beats between chapters — where nothing happens
+but a camera move — held 0.181 between them, and the REALITY handover, the
+hinge of the page, had 0.056.
+
+So Phase 2.2 adds a monotone map from scroll to scene (WARP, rk-ground.js
+§08.5) and NOTHING else moves. Not one tuned stop value was retimed.
+
+                          share of scroll
+                        BEFORE      NOW
+    six quiet beats     .181        .096      (-47%)
+    DESCENT             .084        .060
+    GROUND              .156        .130
+    WATER               .160        .140
+    STRUCTURE           .118        .100
+    TEREP               .030        .052      (+73%)
+    VÍZ                 .028        .050      (+79%)
+    STRUKTÚRA           .026        .048      (+85%)
+    NÖVÉNYZET           .026        .048      (+85%)
+    KÉSZ KERT           .030        .052      (+73%)
+    REALITY             .056        .124      (+121%)
+
+The five construction steps go from ~26svh of scroll each to ~44svh, and the
+handover from 48svh to 107svh. The page did not get longer to pay for it.
+
+Fritsch-Carlson monotone cubic rather than straight segments: a piecewise
+linear map has a velocity step at every knot, and a velocity step in the
+middle of a continuous camera move reads as a gear change. The limiter is
+what guarantees the curve cannot overshoot and briefly run the scene
+BACKWARDS, which is the one failure mode this map must not have.
+
+Damping stays on the SCROLL side. Damp in scene time and a stretched segment
+would also become a sluggish one, which is the opposite of what stretching it
+was for.
+
+
+--------------------------------------------------------------------------------
+9 — HOW THE WATER COMPOSITION WAS FIXED
+--------------------------------------------------------------------------------
+
+Two changes, both compositional, plus one that was a straight bug.
+
+THE CAMERA. Pulled back about 18%, because the block bled off three edges and
+there was no silhouette to read the trench against; and panned harder left,
+which parks the excavation — the labelled emitter, the lateral running out of
+it, and the cut wall 0.20m from the x=1.15 dripline — inside the left two
+thirds, and hands the right third to the copy column instead of making the
+copy sit on soil. The body copy no longer overlaps either the model or the
+leader lines.
+
+THE LABELS. Three became two: "Fővezeték" sat furthest from the emitter and
+pulled the eye to the opposite side of the frame from the evidence it was
+meant to introduce. Both survivors now lead LEFT, away from the copy.
+
+THE BAND. This was the bug. The reach was 1.12, which — measured through the
+0.58 lateral squash and the 1.05 vertical one — put the wetting front 1.93m
+either side of a dripline and 1.07m above and below it. The laterals are
+2.30m apart and the root zone is 1.42m thick. So the bands MET each other
+sideways and OVERRAN the stratum vertically: the whole layer went dark to its
+own edges, which is exactly the failure the code's own comment warns about.
+The eye read "this stratum is a different soil", not "water is spreading".
+
+Reach is now 0.52: ±0.90m sideways, ±0.50m vertically, leaving 0.51m of dry
+earth between adjacent driplines and 0.21m above and below inside the root
+zone. The shape only exists if there is dry earth on the other side of it.
+Because the band is a third the size it was, the contrast per square metre
+went up to pay for it — albedo and roughness only, no emissive term, no blue,
+nothing added to the frame that is not soil.
+
+Measured, by differencing the rendered frame at uMoist 0 against uMoist 1:
+the effect is confined to the middle band of the frame and the left 45% of
+its width — the same third of the frame the leader lines point into. Cause
+and evidence are now in one glance.
+
+HONEST LIMIT: it is a quiet effect. Mean per-pixel difference across the whole
+frame is 1.7/765; inside the affected region it is 15-19. Stronger than
+before, correctly shaped, and still the thing I would look at next.
+
+
+--------------------------------------------------------------------------------
+10 — PERFORMANCE
+--------------------------------------------------------------------------------
+
+                                  PHASE 2.1        PHASE 2.2
+  Draw calls (worst)              24-28            23-28
+  Triangles (worst, KÉSZ)         139k             138.6k
+  Programs                        21               21
+  Frames drawn below the fold     0                0
+  Console errors, full timeline   none             none
+  New rAF loops                   —                0
+  New scroll listeners            —                0
+  New dependencies                —                0
+  Page length (at 800px)          20.1 viewports   27.6 viewports
+
+The WebGL numbers are unchanged: the model was not touched except for the
+water shader's constants and two camera keys.
+
+Everything below it registers on the SHARED rAF scroll reader that was
+already in rk.js — the one the header uses. There is no second scroll
+listener, no animation library and no continuous loop; when the visitor stops
+scrolling, this costs nothing. Verified: zero WebGL frames are drawn while
+the experience is off screen, and every stage reader early-returns when its
+own section is more than 200px outside the viewport.
+
+The per-frame cost of the heaviest section, the project field, is one
+transform write on one element plus seven opacity writes.
+
+Page length is up 37%. That buys: a viewport of overlap at the handover, the
+project field, three service states, five assembly stations and five proof
+statements, replacing four figures in a grid, a three-row list, five columns
+and a stat table. The Living Ground itself did not get longer.
+
+Layout was verified programmatically rather than by eye: every stage was
+stepped through its whole run at 1280x800, 1440x820, 1024x700 and 390x780 and
+every pair of its live elements tested for overlap and for leaving the stage.
+Clean at all four widths. That check is repeatable with ?stage=.
+
+
+--------------------------------------------------------------------------------
+11 — ANNOTATION REDUCTION
+--------------------------------------------------------------------------------
+
+Also a bug, and a bad one. updateAnnotations() writes opacity as an INLINE
+style, which outranks the stylesheet's opacity:0 — so a label that stopped
+being current was never actually zeroed. The only thing hiding it was that a
+slow scroll passes through the fade band and lands near zero on its own.
+Scroll fast, restore a scroll position, or jump the timeline, and GROUND's
+five strata, WATER's pipes and EXPLODED's six letters were on screen at once,
+over each other and over the headline. Fixed.
+
+Then the deliberate cuts:
+
+  SURFACE     unchanged — the horizon and its two marks
+  GROUND      five strata labels kept, because the strata ARE the chapter.
+              Three second lines dropped ("gyep · burkolat", "drén",
+              "teherhordó") — a fourth level of information competing with
+              the leader lines at the moment the visitor is counting layers.
+  WATER       three labels -> two
+  EXPLODED    thirteen live elements -> eight. The five stratum letters that
+              rode the dimension string are gone: they said A B C D E and the
+              labels beside them say "A Felszín", "B Termőtalaj" thirty
+              millimetres away. Mobile had already dropped them for exactly
+              that reason. The rule, its closed ends, the ticks, the datum
+              and the caption are what make it read as a measured drawing —
+              the lettering never was.
+
+Roughly a 38% reduction in live annotation elements, and the part that went
+was duplication, not information.
+
+
+--------------------------------------------------------------------------------
+12 — TYPOGRAPHIC AND TONAL RHYTHM
+--------------------------------------------------------------------------------
+
+TYPE. Before, every section headline was --t-mega and every section looked
+like the same section. There are now four registers and they are enforced:
+
+  MONUMENTAL   four places only — the hero, the three service names, the five
+               proof statements, the closing line
+  SECTION      the projects, process and FAQ titles, at roughly a third of
+               that. A section title is not a spectacle.
+  TECHNICAL    mono, --t-label — plates, rig, stations, captions, datum marks
+  EDITORIAL    quiet running copy, deliberately small and unemphatic
+
+COLOUR. The page was black / cream / black / cream with the change at every
+section edge. It now moves
+
+  deep soil -> warm charcoal -> limestone -> back under grade -> up into
+  limestone -> paper -> limestone -> soil
+
+and — the part that matters — three of those changes happen DURING a
+transition rather than at a boundary: the field warms across its run, the
+services cross grade between states 02 and 03, and the assembly comes back
+into the light between stations 04 and 05.
+
+HEADER. A limestone slab with a filled cream button on it, over a cinematic
+sequence, is a website bar over a film. Over the Living Ground and the project
+field the bar now integrates: no sheet, no fill, the call to action becomes a
+hairline outline, and the whole bar rests at 58% presence — returning to full
+the instant it is pointed at, focused, or the menu is opened. Navigation is
+never removed and never unreachable.
+
+Below that it reads the tone of whatever is actually under it, including the
+two stages that rewrite their own tone as they cross grade. Measured over a
+full scroll: five clean states, no flicker. "Solid after the hero" stopped
+describing this page.
+
+POINTER. A NÉZET label over the project field only. Everywhere else the
+cursor is native — a bespoke cursor on every page is a costume.
+
+
+--------------------------------------------------------------------------------
+13 — MOBILE
+--------------------------------------------------------------------------------
+
+Re-choreographed, not disabled.
+
+  BRIDGE    the sheet closes UPWARD and the metadata takes the band it opens
+            at the foot — the same device as the mobile hero, which divides
+            vertically because a phone has no left and right to divide
+  FIELD     no perspective and no pin: the same plates, same crops, same
+            captions, as a controlled vertical cascade that alternates
+            measure and inset so the column still zig-zags
+  SERVICES  still one state at a time, and the drawing moves up into the
+            empty band between the head and the name — left full bleed it ran
+            its grade line straight through the description
+  PROCESS   the datum runs vertically down the gutter
+  PROOF     unchanged in kind: one claim, real emptiness
+  CTA       the same horizon closure
+
+One real typographic fix: "Öntözőrendszer" is fourteen characters of one
+unbreakable word, and a ch measure cannot wrap it — it was running off the
+right edge. The measure had to come off the size.
+
+
+--------------------------------------------------------------------------------
+14 — REDUCED MOTION
+--------------------------------------------------------------------------------
+
+Stilled, not broken. The continuity readers do not register at all: every
+stage collapses to ordinary flow, every state resolves to its composed form,
+and the page becomes a set of held compositions. Verified by forcing the
+media block on and confirming that no live element is hidden or transparent
+and that no pinned stage is still sticky.
+
+The Living Ground's own eleven SNAP stops are quoted in SCENE time and the
+chapters are quoted in scene time, so the pacing map does not disturb them.
+
+
+--------------------------------------------------------------------------------
+15 — THE FINAL TEST, MUTED
+--------------------------------------------------------------------------------
+
+Land. Below ground. Water. Construction. Finished garden. The same finished
+garden as a photograph. Real work, plate after plate, receding. Three
+services, one of which takes you back under. A line being walked while a
+garden is rebuilt under it. Proof. The surface again, with the system still
+running below it.
+
+Yes. The sequence tells the story with the copy muted.
+
+
+--------------------------------------------------------------------------------
+16 — REMAINING WEAK TRANSITION
+--------------------------------------------------------------------------------
+
+PROJECTS -> SERVICES.
+
+The mechanism is right and it is visible: the last plate is crushed into a
+hairline and that hairline runs full bleed as the section ends. But the rule
+it becomes sits at 42% of the field's stage, and the rule it hands to — the
+divider under the services header — sits at about 17% of the next one. A rule
+survives the boundary, which is more than any other boundary on the old page
+managed, but it does not land in the same place, so the eye reads "a rule,
+then a rule" rather than "that rule".
+
+Making them land together means either dropping the services header to
+mid-screen, which wrecks that section's composition, or lifting the field's
+whole horizon, which pushes the plates off the top. It needs one of the two
+sections re-laid out around the join, and I stopped rather than damage a
+composition that works to improve a join that is merely good.
+
+
+--------------------------------------------------------------------------------
+17 — THE SECTION I WOULD STILL CALL LEAST AWWWARDS-READY
+--------------------------------------------------------------------------------
+
+PROOF.
+
+It does exactly what §5 of the brief asked — one claim at a time, monumental,
+with real emptiness — and it is a genuine improvement on a four-row stat
+table. But it is the one section on the page whose idea is entirely
+TYPOGRAPHIC. Everything else earns its screen with an object: the model, the
+photograph, the field, the drawings, the assembly, the grade line. Proof has
+a number, a rule and white space, and if you took the number away there would
+be nothing there.
+
+It also carries the least of the page's own vocabulary: SURFACE, CUT, DEPTH
+and ASSEMBLY are all absent from it. The rule under each statement is called
+a grade line in the stylesheet, and it is the only thing tying it back.
+
+What it wants is one restrained graphic idea of its own — the 40 km as an
+actual radius, the 70% as two soil columns rather than a percentage — built
+in the same drawing language as everything else. That is a design decision I
+did not want to make unilaterally with invented geometry, and it is the first
+thing I would put in front of the client.
+
+Runner-up: the project field's closing beat. Plates 07 and 08 arrive and one
+of them is immediately crushed, so the last thing the visitor sees of the
+work is a plate leaving rather than a plate arriving. The pair reads, but it
+resolves rather than lands.
+
+
+================================================================================
+18 — CONTRACTS THAT ARE SILENT WHEN BROKEN
+================================================================================
+
+The two from Phase 2.1 still hold — THE HERO DATUM and THE PAVED FOOTPRINT.
+Phase 2.2 adds three:
+
+1. THE PACING MAP.
+   WARP in rk-ground.js §08.5 maps SCROLL time to SCENE time. Every camera
+   key, every track, every data-from in index.html and every SNAP stop is in
+   SCENE time and must stay there. Retiming a chapter means editing its
+   data-from AND its track stops, exactly as before; changing how much SCROLL
+   a chapter gets means editing WARP and nothing else. Confusing the two
+   silently desynchronises the copy from the scene.
+
+2. THE HANDOVER TRIO.
+   .fld { margin-top: -100svh } in rk.css, the one-viewport hold in rk.js
+   §12.1, and .gd.is-handed set from rk-ground.js are ONE mechanism. The
+   overlap is what makes the join invisible, the hold is what stops the
+   bridge's contraction happening where nobody can see it, and the swap is
+   what stops the picture visibly restarting. Remove any one and the seam
+   comes back — and it comes back looking like a bug in the other two.
+   The bridge plate's filter must also stay byte-identical to --grade, which
+   is what .gd__photo img computes to at --ph:1.
+
+3. THE PRESENCE WIDTH.
+   presence(q, i, n, width) in rk.js. A slot's window reaches zero at
+   |u| = 1/width and adjacent centres are 1 apart in u, so 2.0 is the one
+   value at which the outgoing state hits zero exactly as the incoming one
+   leaves it. Services and assembly are both 2.0 for that reason. Wider and
+   there are stretches with nothing on screen; narrower and two states are
+   legible on top of each other at the same origin. Proof is deliberately 2.6
+   — there the emptiness is the argument.
+
+Debug: ?scene= and ?tier= as before, plus ?stage=<brg|fld|lyr|asm|prf>:<q>
+and window.RK_STAGE.
+
+================================================================================

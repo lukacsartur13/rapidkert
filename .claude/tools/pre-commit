@@ -1,0 +1,35 @@
+#!/bin/sh
+# rk.css structural guard — refuses a commit that would gut the stylesheet.
+#
+# Validates the STAGED content, not the working tree, so `git add`-ing a
+# destroyed file and committing from a good working copy still fails.
+#
+# Install:  sh .claude/tools/install-hooks.sh
+# Bypass:   git commit --no-verify   (deliberately, and only deliberately)
+
+git diff --cached --name-only --diff-filter=ACM | grep -qx 'rk.css' || exit 0
+
+TMP="$(mktemp -t rkcss)" || exit 1
+trap 'rm -f "$TMP"' EXIT
+git show :rk.css > "$TMP" || exit 1
+
+if python3 .claude/tools/rkguard.py "$TMP"; then
+  echo "pre-commit: rk.css guard PASSED"
+  exit 0
+fi
+
+cat >&2 <<'MSG'
+
+pre-commit: rk.css FAILED the structural guard — commit refused.
+
+This is the check that would have caught the 2026-08-08 splice, which
+deleted ~1,470 lines while still parsing as valid CSS.
+
+  - restore from git:  git checkout -- rk.css
+  - or inspect:        python3 .claude/tools/rkguard.py rk.css
+  - if the change is genuinely intended (e.g. you removed a section on
+    purpose), update the floors/section list in .claude/tools/rkguard.py
+    in the same commit.
+
+MSG
+exit 1
