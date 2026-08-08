@@ -753,6 +753,57 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .rk-foot__bottom .ulink{display:inline-block;padding-block:.22rem}
 }
 
+/* THE NAMED CONTROLS ALL CLEAR 44.                             [PHASE 3.1]
+   Audited at 390x844 across the whole page. The burger already carries its
+   44x44 pseudo target from Phase 3 and the FAQ summary is 350x78, but every
+   other control this phase names came in short: the two closing buttons and
+   the header CTA at 36-42, the field's "Összes referencia" at 41, and the
+   standalone phone and e-mail links at 24-29.
+
+   Two techniques, chosen per element rather than uniformly. Anything that
+   is already a box gets a min-height, which costs nothing because it only
+   grows padding that was nearly there. Anything that is a WORD gets a
+   pseudo-element target instead — a 44px band centred on the text, painting
+   nothing — because growing the box would push the underline off the
+   baseline it shares with the label above it and reflow the footer lists.
+
+   Deliberately NOT applied to .ulink inside running prose ("hívj minket" in
+   PROOF sits mid-sentence): a 44px invisible band there would overlap the
+   lines above and below and hand two neighbouring paragraphs overlapping
+   hit areas, which is worse for a touch visitor than a 27px word. Those are
+   28px and clear the 24px floor. */
+@media (hover:none),(pointer:coarse){
+  /* .gd__cta unqualified: the same rule has to reach the HERO's pair, not
+     just the closing one. §31.86 stacks and sizes them at 320, but between
+     361 and 860 the hero keeps the side-by-side pair, and §31.8 sets it in
+     .66rem with .95em cheeks — 35px tall, measured at 390x844, on the
+     primary call to action of the whole site. Height only; the widths are
+     untouched, so the pair still holds one row. */
+  .gd__cta .btn,.fld__all,.rk-nav__cta,.skip{min-height:44px}
+  .gd__cta .btn,.fld__all,.rk-nav__cta{display:inline-flex;align-items:center}
+  /* The wordmark is a link home. Extended rather than grown, so the header
+     rule and the burger beside it do not move — same device as §18's
+     burger target, for the same reason. */
+  .rk-nav__logo{position:relative}
+  .rk-nav__logo::after{
+    content:"";position:absolute;left:0;right:0;top:50%;
+    height:44px;transform:translateY(-50%);
+  }
+
+  li > .ulink,.grd__contact .ulink,.sheet__call .ulink,
+  .rk-foot__bottom .ulink{position:relative}
+  li > .ulink::after,.grd__contact .ulink::after,.sheet__call .ulink::after,
+  .rk-foot__bottom .ulink::after{
+    content:"";position:absolute;left:0;right:0;top:50%;
+    height:44px;transform:translateY(-50%);
+  }
+  /* The footer's column lists are set tight enough that neighbouring 44px
+     bands would overlap and steal each other's taps. The row gap opens to
+     keep each target its own. .rk-foot__legal is a flex ROW with its own
+     1.4rem gap and its own padding from Phase 3, so it is left alone. */
+  .rk-foot__grid ul li + li{margin-top:.5rem}
+}
+
 /* --------------------------------------------------------------------------
    19 — RESPONSIVE
    --------------------------------------------------------------------------
