@@ -4511,7 +4511,30 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .sheet__a p{grid-column:1}
   .sheet__meta{display:none}
 
-  /* ---- GRADE ---------------------------------------------------------- */
+  /* ---- GRADE ------------------------------------------------------------
+     THE LAST FRAME OF THE PAGE, AND IT HAS TO BE ONE.       [PHASE 3.1C]
+
+     At 390x844 this was structurally correct and emotionally flat: a
+     40px headline — --t-mega's floor, which is what a 7.6vw expression
+     resolves to on a 390px screen — with 169px of air over it and 42px
+     of margin between it and the surface it is supposed to be standing
+     ON. The page's four monumental moments end on the smallest of them.
+
+     THE SIZE IS AN ASPECT PROBLEM, NOT A WIDTH ONE, which is why it is
+     quoted against both. min(13.6vw, 8.4svh) gives 390x844 a 53px
+     headline that fills the measure ("ITT KEZDODIK" is 12 characters at
+     -.045em and sets to within 12px of the gutter), leaves 320x568 at
+     43 — the review found that frame proportionally the stronger of the
+     two and it is not being redesigned — and hands a landscape phone
+     the floor it already had, because there 13.6vw is 115px and the
+     viewport is 390 tall. One expression, three correct answers.
+
+     And it comes DOWN onto the line. The air above is the composition;
+     the 42px gap under the headline was not, it was a margin. */
+  .grd{padding-top:clamp(96px,21svh,200px)}
+  .grd__h2{font-size:clamp(2.5rem,min(13.6vw,8.4svh),4.4rem)}
+  .grd__above{padding-bottom:clamp(.9rem,2.4svh,2.2rem)}
+  .grd__no{margin-bottom:1.2rem}
   .grd__act{grid-template-columns:1fr;align-items:start}
   .grd__mk--r{display:none}
 }
