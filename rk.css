@@ -872,828 +872,6 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .capbar__i{margin-left:0;width:100%}
 }
 
-/* Coarse pointers never get the cursor-follow preview */
-@media (hover:none),(pointer:coarse){
-  .svc__peek{display:none}
-}
-
-/* --------------------------------------------------------------------------
-   20 — REDUCED MOTION
-   --------------------------------------------------------------------------
-   Reduced motion must be beautiful, not broken: every element resolves to
-   its final, fully-composed state — nothing is left hidden or clipped.
-   -------------------------------------------------------------------------- */
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *,*::before,*::after{
-    animation-duration:.001ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:.001ms !important;
-  }
-  .mask{clip-path:none !important}
-  .mask > img,.mask > .plateimg{transform:none !important}
-  .rise{opacity:1 !important;transform:none !important}
-  .revline > span{transform:none !important}
-  .xsec .draw{stroke-dashoffset:0 !important}
-  .xsec .drop{opacity:1 !important}
-  .proc__path path{stroke-dashoffset:0 !important}
-  .cue__line::after{display:none}
-  .svc__peek{display:none !important}
-
-}
-
-/* --------------------------------------------------------------------------
-   21 — HEADER THEMING ACROSS LIGHT AND DARK PAGES
-   --------------------------------------------------------------------------
-   The header has exactly two states and one lock, so no page ever needs a
-   bespoke override:
-
-     (default)   transparent, light text — only valid over a dark opening
-     .is-solid   limestone sheet, dark text — everywhere else
-     .is-locked  the page has no dark opening, so JS must never unsolidify it
-
-   A page declares its opening by putting [data-nav-anchor] on the dark
-   section at the top (.hero on the homepage, .pin on inner pages). Pages
-   without one ship `class="rk-nav is-solid is-locked"` in the markup, so the
-   header is already correct before a single byte of JS runs.
-   -------------------------------------------------------------------------- */
-.rk-nav.is-locked{
-  background:rgba(244,242,236,.94);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-bottom-color:var(--rule);
-}
-/* Current page marker — a clay rule under the active link, never a colour
-   change alone (colour alone is not an accessible-enough signal). */
-.rk-nav__links a[aria-current="page"]{opacity:1;position:relative}
-.rk-nav__links a[aria-current="page"]::after{
-  content:"";position:absolute;left:0;right:0;bottom:-.55em;height:1px;
-  background:var(--clay);
-}
-.rk-menu__link[aria-current="page"] .rk-menu__no{color:var(--limestone)}
-.rk-menu__link[aria-current="page"] .rk-menu__txt{color:var(--moss-lift)}
-.rk-menu__link[aria-current="page"] .rk-menu__tag::after{
-  content:" ·  Jelenlegi oldal";color:var(--clay);
-}
-
-/* --------------------------------------------------------------------------
-   22 — INNER PAGE INTRO
-   --------------------------------------------------------------------------
-   Deliberately NOT a small homepage hero: no 100svh lock, no parallax, no
-   scroll cue. It is a title sheet — eyebrow, headline, positioning line, one
-   cropped plate — and it resolves in well under a screen so the reader
-   reaches the actual content immediately.
-   -------------------------------------------------------------------------- */
-.pin{
-  position:relative;background:var(--soil);color:var(--on-dark);overflow:hidden;
-  padding-top:clamp(120px,17vh,190px);
-  padding-bottom:clamp(48px,7vh,84px);
-}
-.pin__grid{
-  display:grid;grid-template-columns:1fr clamp(190px,22vw,330px);
-  gap:clamp(24px,4vw,64px);align-items:end;
-}
-.pin__eyebrow{
-  display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;
-  padding-bottom:1rem;margin-bottom:clamp(1.6rem,3.4vw,2.6rem);
-  border-bottom:1px solid var(--rule-dark);
-}
-.pin__eyebrow b{
-  font-family:var(--font-mono);font-size:var(--t-label);font-weight:400;
-  letter-spacing:.18em;text-transform:uppercase;color:var(--clay);
-}
-.pin__eyebrow span{
-  font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.18em;text-transform:uppercase;color:var(--on-dark);
-}
-.pin__eyebrow i{
-  margin-left:auto;font-style:normal;
-  font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.14em;text-transform:uppercase;color:var(--on-dark-mute);
-}
-.pin h1{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:var(--t-pin);letter-spacing:-.04em;line-height:.9;
-  max-width:16ch;margin-bottom:clamp(1.4rem,3vw,2.2rem);text-wrap:balance;
-}
-.pin h1 em{font-style:normal;color:var(--moss-lift)}
-.pin__lede{
-  font-size:var(--t-md);line-height:1.6;color:var(--on-dark-mute);max-width:48ch;
-}
-.pin__cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(1.6rem,3vw,2.4rem)}
-/* The intro plate is a narrow column crop, never a wide banner — it must
-   read as a sample of the page, not as the page's main image. */
-.pin__plate .plateimg{aspect-ratio:1/1.9;max-height:min(46svh,440px)}
-.pin__facts{
-  display:flex;flex-wrap:wrap;gap:clamp(1.4rem,3.4vw,3.4rem);
-  margin-top:clamp(2rem,4vh,3rem);padding-top:1.1rem;
-  border-top:1px solid var(--rule-dark-soft);
-}
-.pin__fact b{
-  display:block;font-family:var(--font-display);font-weight:500;
-  font-size:clamp(1.2rem,2vw,1.75rem);letter-spacing:-.02em;
-  color:var(--on-dark);line-height:1;margin-bottom:.42em;
-}
-.pin__fact span{
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.13em;
-  text-transform:uppercase;color:var(--on-dark-mute);
-}
-
-/* --------------------------------------------------------------------------
-   23 — EDITORIAL CONTENT SYSTEM
-   --------------------------------------------------------------------------
-   Replaces the legacy "wall of centred text + six identical cards". Real
-   Rapidkert copy, re-set as an asymmetric editorial spread.
-   -------------------------------------------------------------------------- */
-
-/* Two-column spread: a sticky technical aside beside a reading column. */
-.ed{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut)}
-.ed__aside{grid-column:1 / span 3;position:sticky;top:clamp(90px,12vh,130px);align-self:start}
-.ed__aside .label{display:block;margin-bottom:1rem}
-.ed__aside p{font-size:var(--t-sm);color:var(--fg-mute);max-width:26ch}
-.sec--dark .ed__aside p{color:var(--on-dark-mute)}
-.ed__body{grid-column:5 / span 8}
-/* Contact variant: a wider aside, because it carries the phone/e-mail rail
-   rather than a marginal note. Declared here as a modifier — NOT as inline
-   grid-column on the children, which would beat every media query below and
-   leave the two columns side by side on a phone. */
-.ed--contact .ed__aside{grid-column:1 / span 4}
-.ed--contact .ed__body {grid-column:6 / span 7}
-.ed__body > * + *{margin-top:1.25rem}
-.ed__body p{max-width:64ch;color:var(--fg-mute)}
-.sec--dark .ed__body p{color:var(--on-dark-mute)}
-.ed__body h3{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(1.15rem,1.9vw,1.6rem);letter-spacing:-.02em;line-height:1.05;
-  margin-top:clamp(2.2rem,4vw,3.2rem);color:var(--fg);
-}
-.sec--dark .ed__body h3{color:var(--on-dark)}
-.ed__body a:not(.btn){text-decoration:underline;text-underline-offset:.22em;
-  text-decoration-color:var(--rule-strong);transition:color var(--dur-fast) var(--ease)}
-.ed__body a:not(.btn):hover{color:var(--moss)}
-.sec--dark .ed__body a:not(.btn):hover{color:var(--moss-lift)}
-
-/* Numbered specification list — the card grid, rebuilt as a technical index.
-   Same information, no boxes, no icons. */
-.spec{border-top:1px solid var(--rule);margin-top:clamp(2rem,4vw,3rem)}
-.sec--dark .spec{border-color:var(--rule-dark)}
-.spec__it{
-  display:grid;grid-template-columns:3.4rem minmax(0,17ch) minmax(0,1fr);
-  gap:clamp(12px,2.2vw,36px);align-items:baseline;
-  padding-block:clamp(1.15rem,2.4vw,1.8rem);
-  border-bottom:1px solid var(--rule);
-}
-.sec--dark .spec__it{border-color:var(--rule-dark)}
-.spec__no{
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  color:var(--clay);
-}
-.spec__k{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(1rem,1.5vw,1.3rem);letter-spacing:-.015em;line-height:1.1;
-  color:var(--fg);
-}
-.sec--dark .spec__k{color:var(--on-dark)}
-.spec__v{font-size:var(--t-sm);color:var(--fg-mute);line-height:1.6;max-width:56ch}
-.sec--dark .spec__v{color:var(--on-dark-mute)}
-.spec__v a{text-decoration:underline;text-underline-offset:.2em}
-.spec__v a:hover{color:var(--moss)}
-.sec--dark .spec__v a:hover{color:var(--moss-lift)}
-
-/* Pull quote — a positioning line set at display size, on a rule. */
-.pullq{
-  margin-block:clamp(2.4rem,5vw,4rem);padding-top:clamp(1.4rem,2.6vw,2rem);
-  border-top:1px solid var(--rule-strong);max-width:24ch;
-}
-.sec--dark .pullq{border-color:var(--rule-dark)}
-.pullq p{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(1.4rem,3.1vw,2.6rem);letter-spacing:-.03em;line-height:1;
-  color:var(--fg);max-width:none;
-}
-.sec--dark .pullq p{color:var(--on-dark)}
-.pullq p em{font-style:normal;color:var(--moss)}
-.sec--dark .pullq p em{color:var(--moss-lift)}
-.pullq cite{
-  display:block;margin-top:1.1rem;font-style:normal;
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--fg-mute);
-}
-.sec--dark .pullq cite{color:var(--on-dark-mute)}
-
-/* Oversized figure with a technical annotation beside it. */
-.bignum{display:flex;align-items:baseline;gap:clamp(14px,2.4vw,32px)}
-.bignum b{
-  font-family:var(--font-display);font-weight:500;
-  font-size:clamp(2.6rem,7vw,6rem);letter-spacing:-.045em;line-height:.82;
-  color:var(--fg);flex:none;
-}
-.sec--dark .bignum b{color:var(--on-dark)}
-.bignum b small{font-size:.34em;letter-spacing:.02em;vertical-align:.9em;margin-left:.12em;color:var(--moss)}
-.sec--dark .bignum b small{color:var(--moss-lift)}
-.bignum span{font-size:var(--t-sm);color:var(--fg-mute);max-width:30ch;line-height:1.6}
-.sec--dark .bignum span{color:var(--on-dark-mute)}
-
-/* Service navigation strip — cross-links between the three service pages,
-   using the same large-list language as the homepage, never as cards. */
-.xnav{border-top:1px solid var(--rule)}
-.sec--dark .xnav{border-color:var(--rule-dark)}
-.xnav a{
-  display:grid;grid-template-columns:auto 1fr auto;gap:clamp(14px,2.6vw,40px);
-  align-items:center;padding-block:clamp(1.2rem,2.6vw,1.9rem);
-  border-bottom:1px solid var(--rule);
-}
-.sec--dark .xnav a{border-color:var(--rule-dark)}
-.xnav__no{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;color:var(--clay)}
-.xnav__t{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(1.2rem,2.8vw,2.2rem);letter-spacing:-.03em;line-height:1;
-  transition:transform var(--dur) var(--ease-out),color var(--dur) var(--ease);
-  transform-origin:left center;display:block;
-}
-.xnav__g{
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);flex:none;
-  display:flex;align-items:center;gap:.7em;
-}
-.sec--dark .xnav__g{color:var(--on-dark-mute)}
-.xnav a:hover .xnav__t{transform:translateX(clamp(6px,1vw,16px));color:var(--moss)}
-.sec--dark .xnav a:hover .xnav__t{color:var(--moss-lift)}
-.xnav a[aria-current="page"]{opacity:.42;pointer-events:none}
-
-/* --------------------------------------------------------------------------
-   24 — PROCEDURAL TECHNICAL DIAGRAMS
-   --------------------------------------------------------------------------
-   One family, extending the homepage cross-section. Every diagram shares the
-   same strokes, the same 7px mono labels, the same measurement ticks and the
-   same accent meaning:
-       moss  = living / surface        water = water & pipework
-       clay  = depth & annotation      rule  = strata and structure
-   Diagrams are decorative-with-a-description: role="img" + aria-label, and
-   the same facts always exist as readable text beside them.
-   -------------------------------------------------------------------------- */
-.dgm{width:100%;height:auto;display:block}
-.dgm .strata{fill:none;stroke:var(--rule-dark);stroke-width:1}
-/* Strata fills carry the whole readability of a cross-section, so they are
-   a step stronger than the homepage original — at .032/.055 the layers were
-   indistinguishable once the SVG scaled down into a half-column. */
-.dgm .fill-a{fill:rgba(232,229,218,.045)}
-.dgm .fill-b{fill:rgba(232,229,218,.085)}
-.dgm .turf {stroke:var(--moss-lift);stroke-width:1.4;fill:none}
-.dgm .pipe {stroke:var(--water);stroke-width:1.6;fill:none}
-.dgm .pipe-t{stroke:var(--water);stroke-width:1;fill:none;stroke-dasharray:2 3}
-.dgm .root {stroke:var(--clay);stroke-width:1;fill:none;opacity:.8}
-.dgm .tick {stroke:var(--rule-dark);stroke-width:1;fill:none}
-.dgm .hit  {fill:var(--water)}
-.dgm .zone {fill:none;stroke:var(--moss-lift);stroke-width:1;stroke-dasharray:4 4;opacity:.7}
-/* 8px, not 7: at the width these diagrams actually render (~590px for a
-   ~580-unit viewBox) an SVG unit is roughly a CSS pixel, and 7px annotation
-   was below comfortable reading size. The homepage cross-section is bumped
-   with it so the whole diagram family stays typographically identical. */
-.dgm text,.xsec text{
-  font-family:var(--font-mono);font-size:8px;letter-spacing:.16em;
-  text-transform:uppercase;fill:var(--on-dark-mute);
-}
-.dgm .t-accent{fill:var(--clay)}
-.dgm .t-on{fill:var(--on-dark)}
-.dgm .draw{stroke-dasharray:var(--len,600);stroke-dashoffset:var(--len,600)}
-.is-in .dgm .draw{transition:stroke-dashoffset 1.7s var(--ease-out) var(--d,0s);stroke-dashoffset:0}
-.dgm .drop{opacity:0;transition:opacity .5s var(--ease) var(--d,0s)}
-.is-in .dgm .drop{opacity:1}
-
-/* The system block: diagram on one side, the same facts as text on the other,
-   so a crawler or screen reader never depends on the drawing. */
-.sys{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--rule-dark)}
-.sys__side{padding:clamp(24px,3.4vw,52px) clamp(20px,3vw,48px)}
-.sys__side--a{border-right:1px solid var(--rule-dark)}
-.sys__head{display:flex;align-items:baseline;gap:1rem;margin-bottom:clamp(1.4rem,3vw,2.4rem)}
-.sys__head h3{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(1.15rem,2.1vw,1.75rem);letter-spacing:-.02em;
-}
-.sys__list{margin-top:1.6rem;display:grid;gap:.1rem}
-.sys__list li{
-  display:flex;gap:1rem;align-items:baseline;
-  padding-block:.62em;border-bottom:1px solid var(--rule-dark-soft);
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--on-dark-mute);
-}
-.sys__list li b{color:var(--on-dark);font-weight:400;flex:none;width:2.6em}
-.sys__note{margin-top:1.5rem;color:var(--on-dark-mute);max-width:40ch;font-size:var(--t-sm);line-height:1.6}
-
-/* --------------------------------------------------------------------------
-   25 — PHOTOGRAPHIC PLATE COMPOSITIONS
-   --------------------------------------------------------------------------
-   Named compositions, because "a row of images" is what the old template did.
-   Every one of them keeps the portrait frame intact.
-   -------------------------------------------------------------------------- */
-
-/* One large plate with a technical caption rail beside it. */
-/* 5 columns, not 6: a 6-column .ar-tall plate stands ~975px high at 1440,
-   and the short caption rail beside it left an unreadable amount of void.
-   5 columns keeps the plate dominant while the spread still balances. */
-.pl-rail{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut);align-items:end}
-.pl-rail__img{grid-column:1 / span 5}
-.pl-rail__txt{grid-column:7 / span 5;padding-bottom:clamp(.4rem,2vw,2rem)}
-.pl-rail--flip .pl-rail__img{grid-column:8 / span 5}
-.pl-rail--flip .pl-rail__txt{grid-column:1 / span 5}
-.pl-rail__txt h3{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(1.3rem,2.6vw,2.1rem);letter-spacing:-.03em;line-height:1;
-  margin-bottom:1rem;
-}
-.pl-rail__txt p{font-size:var(--t-sm);color:var(--fg-mute);max-width:34ch;line-height:1.62}
-.sec--dark .pl-rail__txt p{color:var(--on-dark-mute)}
-
-/* Two offset plates — the second always drops, never a symmetric pair. */
-.pl-pair{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut);align-items:start}
-.pl-pair > *:nth-child(1){grid-column:1 / span 5}
-.pl-pair > *:nth-child(2){grid-column:7 / span 4;margin-top:clamp(36px,8vw,120px)}
-.pl-pair--tight > *:nth-child(1){grid-column:2 / span 4}
-.pl-pair--tight > *:nth-child(2){grid-column:7 / span 5;margin-top:clamp(24px,5vw,80px)}
-
-/* Three staggered narrow plates — a study, not a gallery row. */
-.pl-trio{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut);align-items:start}
-.pl-trio > *:nth-child(1){grid-column:1 / span 4}
-.pl-trio > *:nth-child(2){grid-column:5 / span 3;margin-top:clamp(48px,10vw,150px)}
-.pl-trio > *:nth-child(3){grid-column:9 / span 4;margin-top:clamp(20px,4vw,60px)}
-
-/* One extreme vertical crop beside a big annotation — the signature move.
-   Bottom-aligned, not centred: the annotation sits on the same baseline as
-   the plate's caption rule, which is what makes it read as a drawing sheet
-   rather than as a text block floating beside a picture. */
-.pl-col{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut);align-items:end}
-.pl-col__img{grid-column:2 / span 3}
-.pl-col__txt{grid-column:6 / span 6}
-.pl-col--flip .pl-col__img{grid-column:9 / span 3}
-.pl-col--flip .pl-col__txt{grid-column:1 / span 6}
-
-/* Full-width cinematic band. Only the single landscape asset earns this. */
-.band{position:relative;overflow:hidden;background:var(--soil);color:var(--on-dark)}
-.band__media{position:absolute;inset:0;z-index:0}
-.band__media .plateimg{width:100%;height:100%}
-.band__media .plateimg::after{
-  background:linear-gradient(180deg,rgba(23,24,20,.76),rgba(23,24,20,.42) 46%,rgba(23,24,20,.86));
-  mix-blend-mode:normal;
-}
-.band__media .plateimg img{filter:saturate(.80) contrast(1.04) brightness(1.20) sepia(.08)}
-.band__inner{position:relative;z-index:2;padding-block:clamp(96px,17vh,200px)}
-
-/* --------------------------------------------------------------------------
-   26 — REFERENCES ARCHIVE + LIGHTBOX
-   --------------------------------------------------------------------------
-   Not a masonry gallery and not a filterable grid: a paginated architectural
-   index with a fixed, hand-composed rhythm — lead / pair / column / trio,
-   broken once by the landscape intermission.
-
-   The filter buttons from the legacy gallery were removed on purpose. With
-   19 curated frames, filtering only ever punched holes in a composition that
-   is doing real editorial work; the technical tag on each plate already
-   carries the same classification information, statically and for free.
-   -------------------------------------------------------------------------- */
-.arch{display:grid;gap:clamp(56px,10vw,150px)}
-.arch__row{position:relative}
-
-/* Numbered marker running down the left edge of each row. */
-.arch__mk{
-  display:flex;align-items:baseline;gap:1rem;
-  padding-bottom:.9rem;margin-bottom:clamp(1.4rem,3vw,2.4rem);
-  border-bottom:1px solid var(--rule);
-}
-.sec--dark .arch__mk{border-color:var(--rule-dark)}
-.arch__mk b{
-  font-family:var(--font-mono);font-size:var(--t-label);font-weight:400;
-  letter-spacing:.14em;color:var(--clay);
-}
-.arch__mk span{
-  font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.18em;text-transform:uppercase;color:var(--fg-mute);
-}
-.sec--dark .arch__mk span{color:var(--on-dark-mute)}
-.arch__mk i{
-  margin-left:auto;font-style:normal;font-family:var(--font-mono);
-  font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--fg-mute);
-}
-.sec--dark .arch__mk i{color:var(--on-dark-mute)}
-
-/* A single archive plate: <figure> → <button> → <span.plateimg> → <img>, with
-   the caption as a sibling <figcaption>. The button holds only phrasing
-   content, so the markup stays valid while the plate is still a real,
-   keyboard-reachable control announced by its aria-label. */
-.arch__it{position:relative}
-/* Archive plates use a quiet lift instead of the homepage clip-path wipe:
-   inner pages are deliberately less animated, and a clip mask would fight
-   the hover scale below for the same transform. */
-.arch__it[data-reveal]{
-  opacity:0;transform:translateY(22px);
-  transition:opacity .85s var(--ease-out),transform .85s var(--ease-out);
-}
-.arch__it[data-reveal].is-in{opacity:1;transform:none}
-.arch__btn{display:block;width:100%;text-align:left;cursor:pointer;padding:0}
-.arch__btn .plateimg{transition:transform .9s var(--ease-out)}
-.arch__btn:hover .plateimg,.arch__btn:focus-visible .plateimg{transform:scale(1.018)}
-.arch__btn .plateimg img{transition:transform 1.1s var(--ease-out),filter .5s var(--ease)}
-.arch__btn:hover .plateimg img,.arch__btn:focus-visible .plateimg img{
-  transform:scale(1.05);filter:saturate(.88) contrast(1.06) brightness(1.02) sepia(.05);
-}
-.arch__cap{
-  display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap;
-  padding-top:.72rem;margin-top:.72rem;border-top:1px solid var(--rule);
-  font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.13em;text-transform:uppercase;color:var(--fg-mute);
-}
-.sec--dark .arch__cap{border-color:var(--rule-dark);color:var(--on-dark-mute)}
-.arch__cap b{color:var(--fg);font-weight:400;flex:none}
-.sec--dark .arch__cap b{color:var(--on-dark)}
-.arch__cap .arch__tag{margin-left:auto;color:var(--clay);flex:none}
-/* The descriptive line is normally quiet and lifts on pointer/focus. */
-.arch__desc{
-  display:block;margin-top:.6rem;font-family:var(--font-ui);font-size:var(--t-sm);
-  width:100%;
-  letter-spacing:0;text-transform:none;color:var(--fg-mute);max-width:38ch;
-  opacity:.62;transition:opacity var(--dur) var(--ease),color var(--dur) var(--ease);
-}
-.sec--dark .arch__desc{color:var(--on-dark-mute)}
-.arch__it:hover .arch__desc,.arch__it:focus-within .arch__desc{opacity:1}
-
-/* Pointer label that replaces the cursor over the archive. Pointer devices
-   only; touch and keyboard users get the plate's own focus ring instead. */
-.arch__cursor{
-  position:fixed;top:0;left:0;z-index:70;pointer-events:none;
-  padding:.72em 1.05em;background:var(--limestone);color:var(--soil);
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.18em;
-  text-transform:uppercase;opacity:0;
-  transform:translate3d(-50%,-50%,0) scale(.7);
-  transition:opacity .26s var(--ease),transform .26s var(--ease-out);
-  will-change:transform;
-}
-.arch__cursor.is-on{opacity:1;transform:translate3d(-50%,-50%,0) scale(1)}
-@media (hover:none),(pointer:coarse){.arch__cursor{display:none}}
-
-/* --- Lightbox ------------------------------------------------------------
-   Purpose-built rather than a plugin: ~70 lines of CSS and ~90 of JS buys
-   correct portrait sizing, real focus management and no third-party weight.
-   Sized with svh/dvh so mobile browser chrome never crops the image.        */
-.lb{
-  position:fixed;inset:0;z-index:200;display:grid;
-  grid-template-rows:auto 1fr auto;
-  background:rgba(23,24,20,.97);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  color:var(--on-dark);
-  opacity:0;transition:opacity .34s var(--ease);
-}
-.lb[hidden]{display:none}
-.lb.is-on{opacity:1}
-.lb__bar{
-  display:flex;align-items:center;gap:1rem;
-  padding:clamp(14px,2.4vw,26px) var(--pad);
-  border-bottom:1px solid var(--rule-dark-soft);
-  font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.16em;text-transform:uppercase;
-}
-.lb__count{color:var(--clay)}
-.lb__ttl{color:var(--on-dark-mute)}
-.lb__x{
-  margin-left:auto;display:flex;align-items:center;gap:.7em;
-  font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark);
-  padding:.4em 0;
-}
-.lb__x i{
-  display:block;width:16px;height:16px;position:relative;flex:none;
-}
-.lb__x i::before,.lb__x i::after{
-  content:"";position:absolute;top:50%;left:0;width:100%;height:1px;
-  background:currentColor;
-}
-.lb__x i::before{transform:rotate(45deg)}
-.lb__x i::after {transform:rotate(-45deg)}
-.lb__x:hover{color:var(--moss-lift)}
-
-.lb__stage{
-  position:relative;display:grid;place-items:center;
-  padding:clamp(14px,2.6vw,32px) var(--pad);min-height:0;
-}
-.lb__fig{display:flex;flex-direction:column;align-items:center;gap:1rem;max-height:100%;min-height:0}
-.lb__fig img{
-  max-height:100%;max-width:min(100%,62vh);width:auto;height:auto;
-  object-fit:contain;background:var(--soil-2);
-  filter:var(--grade);
-}
-.lb__cap{
-  display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap;justify-content:center;
-  font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.13em;text-transform:uppercase;color:var(--on-dark-mute);
-  text-align:center;flex:none;
-}
-.lb__cap b{color:var(--on-dark);font-weight:400}
-.lb__nav{
-  position:absolute;top:50%;transform:translateY(-50%);
-  width:clamp(44px,5vw,58px);height:clamp(44px,5vw,58px);
-  display:grid;place-items:center;
-  border:1px solid var(--rule-dark);color:var(--on-dark);
-  transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);
-}
-.lb__nav:hover{background:var(--limestone);color:var(--soil)}
-.lb__nav--p{left:clamp(8px,1.6vw,20px)}
-.lb__nav--n{right:clamp(8px,1.6vw,20px)}
-.lb__nav svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.2}
-.lb__foot{
-  padding:clamp(12px,2vw,20px) var(--pad);
-  border-top:1px solid var(--rule-dark-soft);
-  font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.14em;text-transform:uppercase;color:var(--on-dark-mute);
-  display:flex;gap:1rem 2rem;flex-wrap:wrap;justify-content:space-between;
-}
-
-/* --------------------------------------------------------------------------
-   27 — CONTACT FORM
-   --------------------------------------------------------------------------
-   Web3Forms submission logic is untouched; this is presentation, labelling
-   and validation state only. Labels are always visible (never placeholder-
-   only), errors are text plus aria-describedby, never colour alone.
-   -------------------------------------------------------------------------- */
-.frm{display:grid;gap:clamp(1.1rem,2vw,1.5rem)}
-.frm__row{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.1rem,2vw,1.5rem)}
-.frm__f{display:grid;gap:.6rem;min-width:0}
-.frm__f label{
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--on-dark-mute);
-}
-.frm__f label .req{color:var(--clay)}
-.frm__f input,.frm__f select,.frm__f textarea{
-  font:inherit;font-size:var(--t-body);color:var(--on-dark);
-  background:transparent;border:0;border-bottom:1px solid var(--rule-dark);
-  border-radius:0;padding:.72em 0;width:100%;
-  transition:border-color var(--dur-fast) var(--ease);
-  -webkit-appearance:none;appearance:none;
-}
-.frm__f textarea{min-height:7.5em;resize:vertical;line-height:1.55}
-.frm__f select{
-  cursor:pointer;padding-right:1.8em;
-  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),
-                   linear-gradient(135deg,currentColor 50%,transparent 50%);
-  background-position:calc(100% - 9px) calc(50% + 1px),calc(100% - 4px) calc(50% + 1px);
-  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
-}
-.frm__f select option{background:var(--soil);color:var(--on-dark)}
-.frm__f input:focus,.frm__f select:focus,.frm__f textarea:focus{
-  outline:none;border-bottom-color:var(--moss-lift);
-}
-.frm__f input:focus-visible,.frm__f select:focus-visible,.frm__f textarea:focus-visible{
-  outline:2px solid var(--clay);outline-offset:4px;
-}
-.frm__f input::placeholder,.frm__f textarea::placeholder{color:rgba(232,229,218,.34)}
-/* Invalid state: a clay rule AND a written message — never colour alone. */
-.frm__f.is-bad input,.frm__f.is-bad select,.frm__f.is-bad textarea{border-bottom-color:var(--clay)}
-.frm__err{
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.11em;
-  text-transform:uppercase;color:var(--clay);display:none;
-}
-.frm__f.is-bad .frm__err{display:block}
-.frm__note{
-  font-size:var(--t-sm);color:var(--on-dark-mute);max-width:62ch;line-height:1.6;
-}
-.frm__note .req{color:var(--clay)}
-.frm__status{
-  display:none;padding:1.1rem 1.3rem;border-left:2px solid var(--moss-lift);
-  background:var(--soil-2);font-size:var(--t-sm);line-height:1.6;color:var(--on-dark);
-}
-.frm__status.is-on{display:block}
-.frm__status.is-bad{border-left-color:var(--clay)}
-/* Honeypot: off-screen but not display:none, so bots still fill it in. */
-.frm__hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-.frm button[type="submit"]{justify-self:start}
-.frm button[disabled]{opacity:.55;cursor:progress}
-
-/* Contact index — the "which channel" rail beside the form. */
-.cx{display:grid;gap:0;border-top:1px solid var(--rule-dark)}
-.cx__it{
-  display:grid;grid-template-columns:minmax(0,9rem) minmax(0,1fr);
-  gap:clamp(12px,2vw,28px);align-items:baseline;
-  padding-block:clamp(1.05rem,2.2vw,1.6rem);border-bottom:1px solid var(--rule-dark);
-}
-.cx__k{
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--clay);
-}
-.cx__v{font-size:var(--t-md);color:var(--on-dark);line-height:1.35}
-.cx__v small{
-  display:block;margin-top:.5rem;font-size:var(--t-sm);color:var(--on-dark-mute);
-  line-height:1.6;max-width:40ch;
-}
-
-/* --------------------------------------------------------------------------
-   28 — LEGAL / DOCUMENT PAGES
-   --------------------------------------------------------------------------
-   Same system, dialled all the way down: these pages must be readable and
-   printable, not art-directed.
-   -------------------------------------------------------------------------- */
-/* The legal pages keep their original markup and class names verbatim — the
-   text is a legal document and must not be re-typed to fit a new template.
-   These aliases map the legacy class names onto the Phase 1.5 system so the
-   pages inherit the design without a single word being touched. */
-.doc,.legal{max-width:74ch}
-.doc .eyebrow,.legal .eyebrow{
-  display:block;margin-bottom:1.4rem;
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.18em;
-  text-transform:uppercase;color:var(--clay);
-}
-.doc h1,.legal h1{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:var(--t-pin);letter-spacing:-.04em;line-height:.92;
-  margin-bottom:clamp(1.2rem,2.6vw,2rem);
-}
-.doc > .lead,.legal > .lead{
-  font-size:var(--t-md);line-height:1.62;color:var(--fg-mute);max-width:60ch;
-  margin-bottom:clamp(1.4rem,3vw,2.2rem);
-}
-.doc h2{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(1.15rem,2vw,1.6rem);letter-spacing:-.02em;line-height:1.1;
-  margin-top:clamp(2.4rem,4.6vw,3.4rem);margin-bottom:1rem;
-  padding-top:1rem;border-top:1px solid var(--rule);
-}
-.doc h3{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(.95rem,1.4vw,1.12rem);letter-spacing:-.01em;
-  margin-top:1.9rem;margin-bottom:.7rem;
-}
-.doc p,.doc li{color:var(--fg-mute);line-height:1.7}
-.doc p + p{margin-top:1rem}
-.doc ul{margin:1rem 0 0;display:grid;gap:.6rem}
-.doc ul li{padding-left:1.5rem;position:relative}
-.doc ul li::before{
-  content:"";position:absolute;left:0;top:.72em;width:.7rem;height:1px;background:var(--clay);
-}
-.doc a{text-decoration:underline;text-underline-offset:.22em}
-.doc a:hover{color:var(--moss)}
-.doc dl{
-  display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);
-  gap:.1rem 1.6rem;margin-top:1.2rem;border-top:1px solid var(--rule);
-}
-.doc dt{
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);padding-block:.85rem;
-  border-bottom:1px solid var(--rule);
-}
-.doc dd{padding-block:.85rem;border-bottom:1px solid var(--rule);color:var(--fg)}
-.doc__note{
-  margin-top:1.6rem;padding:1.2rem 1.4rem;border-left:2px solid var(--moss);
-  background:var(--limestone);font-size:var(--t-sm);line-height:1.65;color:var(--fg);
-}
-.doc__note strong{display:block;margin-bottom:.4rem}
-.doc__date{
-  margin-top:clamp(2.4rem,4vw,3.4rem);padding-top:1.2rem;border-top:1px solid var(--rule);
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);
-}
-
-/* --- Legacy legal-page class aliases -------------------------------------
-   .legal / .datalist / .notice / .legal-updated are the class names already
-   written into impresszum.html, adatkezelesi-tajekoztato.html and
-   cookie-tajekoztato.html. Rather than re-type three legal documents into
-   new markup — where a slip would change the meaning of a published GDPR
-   notice — the existing names are mapped onto the system here.            */
-.legal h2{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(1.15rem,2vw,1.6rem);letter-spacing:-.02em;line-height:1.1;
-  margin-top:clamp(2.4rem,4.6vw,3.4rem);margin-bottom:1rem;
-  padding-top:1rem;border-top:1px solid var(--rule);
-}
-.legal h3{
-  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
-  font-size:clamp(.95rem,1.4vw,1.12rem);letter-spacing:-.01em;
-  margin-top:1.9rem;margin-bottom:.7rem;
-}
-.legal p,.legal li{color:var(--fg-mute);line-height:1.7}
-.legal p + p{margin-top:1rem}
-.legal ul{margin:1rem 0 0;display:grid;gap:.6rem;list-style:none}
-.legal ul li{padding-left:1.5rem;position:relative}
-.legal ul li::before{
-  content:"";position:absolute;left:0;top:.72em;width:.7rem;height:1px;background:var(--clay);
-}
-.legal a{text-decoration:underline;text-underline-offset:.22em}
-.legal a:hover{color:var(--moss)}
-.datalist{
-  display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);
-  gap:.1rem 1.6rem;margin-top:1.2rem;border-top:1px solid var(--rule);
-}
-.datalist dt{
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);padding-block:.85rem;
-  border-bottom:1px solid var(--rule);
-}
-.datalist dd{padding-block:.85rem;border-bottom:1px solid var(--rule);color:var(--fg)}
-.notice{
-  margin-top:1.6rem;padding:1.2rem 1.4rem;border-left:2px solid var(--moss);
-  background:var(--limestone);font-size:var(--t-sm);line-height:1.65;color:var(--fg);
-}
-.notice strong{display:block;margin-bottom:.4rem}
-.legal-updated{
-  margin-top:clamp(2.4rem,4vw,3.4rem);padding-top:1.2rem;border-top:1px solid var(--rule);
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);
-}
-@media (max-width:1100px){
-  .datalist{grid-template-columns:1fr;gap:0}
-  .datalist dt{border-bottom:0;padding-bottom:0}
-}
-
-/* --------------------------------------------------------------------------
-   29 — PAGE TRANSITION
-   --------------------------------------------------------------------------
-   A 260ms limestone wipe on the way out. Deliberately minimal:
-     · links stay real <a href> elements — nothing is rewritten
-     · modifier-click, middle-click and target=_blank are never intercepted
-     · history, back/forward and bfcache are untouched
-     · reduced motion and no-JS skip it entirely
-
-   There is deliberately NO matching entry animation. An opacity keyframe on
-   <main> was tried and removed: CSS animations do not advance in a tab that
-   is not producing frames, so a page opened in a background tab — a normal
-   Cmd-click — kept <main> pinned at the animation's 0% opacity and rendered
-   blank until focused. The content layer must never depend on an animation
-   completing. The outgoing wipe is safe because it only ever covers on the
-   way out and is cleared again on pageshow.
-   -------------------------------------------------------------------------- */
-.rk-wipe{
-  position:fixed;inset:0;z-index:300;pointer-events:none;
-  background:var(--limestone);
-  transform:scaleY(0);transform-origin:bottom;
-  transition:transform .26s var(--ease);
-}
-.rk-wipe.is-out{transform:scaleY(1)}
-.rk-wipe__mk{
-  position:absolute;left:var(--pad);bottom:clamp(20px,4vh,44px);
-  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.2em;
-  text-transform:uppercase;color:var(--soil);opacity:0;transition:opacity .2s var(--ease) .1s;
-}
-.rk-wipe.is-out .rk-wipe__mk{opacity:.5}
-
-/* --------------------------------------------------------------------------
-   30 — PHASE 1.5 RESPONSIVE + MOTION
-   -------------------------------------------------------------------------- */
-@media (max-width:1100px){
-  .ed__aside,.ed--contact .ed__aside{grid-column:1 / span 12;position:static;margin-bottom:1.4rem}
-  .ed__body,.ed--contact .ed__body{grid-column:1 / span 12}
-  .pl-rail__img{grid-column:1 / span 6}
-  .pl-rail__txt{grid-column:8 / span 5}
-  .pl-rail--flip .pl-rail__img{grid-column:7 / span 6}
-  .pl-rail--flip .pl-rail__txt{grid-column:1 / span 5}
-  .pl-trio > *:nth-child(1){grid-column:1 / span 5}
-  .pl-trio > *:nth-child(2){grid-column:7 / span 4}
-  .pl-trio > *:nth-child(3){grid-column:2 / span 5}
-  .pl-col__img{grid-column:1 / span 4}
-  .pl-col__txt{grid-column:6 / span 7}
-  .pl-col--flip .pl-col__img{grid-column:9 / span 4}
-  .pl-col--flip .pl-col__txt{grid-column:1 / span 7}
-  .doc dl{grid-template-columns:1fr;gap:0}
-  .doc dt{border-bottom:0;padding-bottom:0}
-}
-
-@media (max-width:860px){
-  /* The portrait plate system must get STRONGER on a phone, not collapse
-     into stacked cards: every composition becomes a single full-bleed
-     column of tall plates with their technical captions intact. */
-  .pin__grid{grid-template-columns:1fr;gap:clamp(24px,5vw,36px)}
-  .pin__plate{order:-1}
-  /* Portrait-leaning, not 16:9. A landscape letterbox of a portrait phone
-     photograph is exactly the crop the library cannot afford, and it throws
-     away the vertical plate that is the site's photographic signature. This
-     still resolves inside the first screen because of the svh cap. */
-  .pin__plate .plateimg{aspect-ratio:1/1.08;max-height:44svh}
-  .pin h1{max-width:none}
-
-  .sys{grid-template-columns:1fr}
-  .sys__side--a{border-right:0;border-bottom:1px solid var(--rule-dark)}
-
-  .spec__it{grid-template-columns:2.8rem 1fr;row-gap:.5rem}
-  .spec__v{grid-column:2 / -1}
-
-  .pl-rail,.pl-pair,.pl-trio,.pl-col{grid-template-columns:1fr;gap:clamp(28px,6vw,44px)}
-  .pl-rail__img,.pl-rail__txt,
-  .pl-rail--flip .pl-rail__img,.pl-rail--flip .pl-rail__txt,
-  .pl-col__img,.pl-col__txt,
-  .pl-col--flip .pl-col__img,.pl-col--flip .pl-col__txt{grid-column:1 / -1}
-  .pl-pair > *,.pl-trio > *,
-  .pl-pair--tight > *:nth-child(1),.pl-pair--tight > *:nth-child(2){
-    grid-column:1 / -1;margin-top:0;
-  }
-  .pl-rail__txt{padding-bottom:0}
-  /* The extreme vertical crop is a desktop move; on a phone it would be a
-     letterbox slit, so the plate reverts to the native portrait frame. */
-  .pl-col__img .ar-column{aspect-ratio:3/4}
-
-  .arch{gap:clamp(48px,11vw,72px)}
-  .frm__row{grid-template-columns:1fr}
-  .cx__it{grid-template-columns:1fr;gap:.5rem}
-  .xnav a{grid-template-columns:auto 1fr;gap:14px}
-  .xnav__g{display:none}
-  .lb__fig img{max-width:100%}
-  .lb__nav{width:42px;height:42px}
-}
-
 @media (max-width:520px){
   .arch__cap{flex-wrap:wrap}
   .arch__cap .arch__tag{margin-left:0;width:100%}
@@ -4693,9 +3871,26 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .wrl__bk{stroke-width:2.4}
 }
 
+@media (max-width:520px){
+  .brg__spec div:nth-child(n+3){display:none}
+  /* Sized so the longest single word in the set — "Öntözőrendszer", which
+     cannot be broken — clears the gutter at 320px as well as at 520. */
+  .lyr__name{font-size:clamp(1.6rem,9.4vw,3rem)}
+  .lyr__desc{font-size:.86rem;max-width:24ch}
+  .lyr__tag{max-width:none}
+  .prf__big{font-size:clamp(2.4rem,19vw,4.4rem)}
+  .fld__hud-l,.fld__hud-r{font-size:.62rem}
+}
+
 /* --------------------------------------------------------------------------
    32.96 — 320 IS NOT A NARROW 390                              [PHASE 3.1C]
    --------------------------------------------------------------------------
+   AFTER the 520 block, and that is load-bearing: .prf__big and
+   .prf__big--word are both one class, so the later rule wins for an
+   element carrying both, and at 520 the plain .prf__big is the later
+   one. GARANCIA was therefore set at 19vw here — three lines reaching
+   y 89, with the section number at 84-101 behind the T.
+
    PROCESS composes as a copy zone at the top and a drawing under it, and
    the zone is measured, not assumed. At 320x568 the section title wraps
    to three lines and the station's paragraph to four, so the type ran to
@@ -4712,22 +3907,839 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
      lines of it is a fifth of a 568px frame standing between two pieces
      of evidence. */
   .prf__d{font-size:.8rem;max-width:34ch;margin-top:1rem}
+  /* "Teljes körű garancia." set to three lines at 320 and the claim hangs
+     from a 46% baseline, so its first line reached y 95 and the section
+     number sits at 84-101. Two lines clears it. */
+  .prf__big--word{font-size:clamp(1.7rem,13.6vw,2.6rem)}
   .asm__h2{font-size:clamp(1.35rem,6.6vw,1.9rem)}
   .asm__step h3{font-size:clamp(1.25rem,6vw,1.7rem)}
   .asm__step p{font-size:.84rem;line-height:1.55}
   .asm__steps{top:clamp(160px,29svh,210px)}
 }
 
-@media (max-width:520px){
-  .brg__spec div:nth-child(n+3){display:none}
-  /* Sized so the longest single word in the set — "Öntözőrendszer", which
-     cannot be broken — clears the gutter at 320px as well as at 520. */
-  .lyr__name{font-size:clamp(1.6rem,9.4vw,3rem)}
-  .lyr__desc{font-size:.86rem;max-width:24ch}
-  .lyr__tag{max-width:none}
-  .prf__big{font-size:clamp(2.4rem,19vw,4.4rem)}
-  .fld__hud-l,.fld__hud-r{font-size:.62rem}
+
+/* Coarse pointers never get the cursor-follow preview */
+@media (hover:none),(pointer:coarse){
+  .svc__peek{display:none}
 }
+
+/* --------------------------------------------------------------------------
+   20 — REDUCED MOTION
+   --------------------------------------------------------------------------
+   Reduced motion must be beautiful, not broken: every element resolves to
+   its final, fully-composed state — nothing is left hidden or clipped.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .mask{clip-path:none !important}
+  .mask > img,.mask > .plateimg{transform:none !important}
+  .rise{opacity:1 !important;transform:none !important}
+  .revline > span{transform:none !important}
+  .xsec .draw{stroke-dashoffset:0 !important}
+  .xsec .drop{opacity:1 !important}
+  .proc__path path{stroke-dashoffset:0 !important}
+  .cue__line::after{display:none}
+  .svc__peek{display:none !important}
+
+}
+
+/* --------------------------------------------------------------------------
+   21 — HEADER THEMING ACROSS LIGHT AND DARK PAGES
+   --------------------------------------------------------------------------
+   The header has exactly two states and one lock, so no page ever needs a
+   bespoke override:
+
+     (default)   transparent, light text — only valid over a dark opening
+     .is-solid   limestone sheet, dark text — everywhere else
+     .is-locked  the page has no dark opening, so JS must never unsolidify it
+
+   A page declares its opening by putting [data-nav-anchor] on the dark
+   section at the top (.hero on the homepage, .pin on inner pages). Pages
+   without one ship `class="rk-nav is-solid is-locked"` in the markup, so the
+   header is already correct before a single byte of JS runs.
+   -------------------------------------------------------------------------- */
+.rk-nav.is-locked{
+  background:rgba(244,242,236,.94);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--rule);
+}
+/* Current page marker — a clay rule under the active link, never a colour
+   change alone (colour alone is not an accessible-enough signal). */
+.rk-nav__links a[aria-current="page"]{opacity:1;position:relative}
+.rk-nav__links a[aria-current="page"]::after{
+  content:"";position:absolute;left:0;right:0;bottom:-.55em;height:1px;
+  background:var(--clay);
+}
+.rk-menu__link[aria-current="page"] .rk-menu__no{color:var(--limestone)}
+.rk-menu__link[aria-current="page"] .rk-menu__txt{color:var(--moss-lift)}
+.rk-menu__link[aria-current="page"] .rk-menu__tag::after{
+  content:" ·  Jelenlegi oldal";color:var(--clay);
+}
+
+/* --------------------------------------------------------------------------
+   22 — INNER PAGE INTRO
+   --------------------------------------------------------------------------
+   Deliberately NOT a small homepage hero: no 100svh lock, no parallax, no
+   scroll cue. It is a title sheet — eyebrow, headline, positioning line, one
+   cropped plate — and it resolves in well under a screen so the reader
+   reaches the actual content immediately.
+   -------------------------------------------------------------------------- */
+.pin{
+  position:relative;background:var(--soil);color:var(--on-dark);overflow:hidden;
+  padding-top:clamp(120px,17vh,190px);
+  padding-bottom:clamp(48px,7vh,84px);
+}
+.pin__grid{
+  display:grid;grid-template-columns:1fr clamp(190px,22vw,330px);
+  gap:clamp(24px,4vw,64px);align-items:end;
+}
+.pin__eyebrow{
+  display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;
+  padding-bottom:1rem;margin-bottom:clamp(1.6rem,3.4vw,2.6rem);
+  border-bottom:1px solid var(--rule-dark);
+}
+.pin__eyebrow b{
+  font-family:var(--font-mono);font-size:var(--t-label);font-weight:400;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--clay);
+}
+.pin__eyebrow span{
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--on-dark);
+}
+.pin__eyebrow i{
+  margin-left:auto;font-style:normal;
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--on-dark-mute);
+}
+.pin h1{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:var(--t-pin);letter-spacing:-.04em;line-height:.9;
+  max-width:16ch;margin-bottom:clamp(1.4rem,3vw,2.2rem);text-wrap:balance;
+}
+.pin h1 em{font-style:normal;color:var(--moss-lift)}
+.pin__lede{
+  font-size:var(--t-md);line-height:1.6;color:var(--on-dark-mute);max-width:48ch;
+}
+.pin__cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(1.6rem,3vw,2.4rem)}
+/* The intro plate is a narrow column crop, never a wide banner — it must
+   read as a sample of the page, not as the page's main image. */
+.pin__plate .plateimg{aspect-ratio:1/1.9;max-height:min(46svh,440px)}
+.pin__facts{
+  display:flex;flex-wrap:wrap;gap:clamp(1.4rem,3.4vw,3.4rem);
+  margin-top:clamp(2rem,4vh,3rem);padding-top:1.1rem;
+  border-top:1px solid var(--rule-dark-soft);
+}
+.pin__fact b{
+  display:block;font-family:var(--font-display);font-weight:500;
+  font-size:clamp(1.2rem,2vw,1.75rem);letter-spacing:-.02em;
+  color:var(--on-dark);line-height:1;margin-bottom:.42em;
+}
+.pin__fact span{
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.13em;
+  text-transform:uppercase;color:var(--on-dark-mute);
+}
+
+/* --------------------------------------------------------------------------
+   23 — EDITORIAL CONTENT SYSTEM
+   --------------------------------------------------------------------------
+   Replaces the legacy "wall of centred text + six identical cards". Real
+   Rapidkert copy, re-set as an asymmetric editorial spread.
+   -------------------------------------------------------------------------- */
+
+/* Two-column spread: a sticky technical aside beside a reading column. */
+.ed{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut)}
+.ed__aside{grid-column:1 / span 3;position:sticky;top:clamp(90px,12vh,130px);align-self:start}
+.ed__aside .label{display:block;margin-bottom:1rem}
+.ed__aside p{font-size:var(--t-sm);color:var(--fg-mute);max-width:26ch}
+.sec--dark .ed__aside p{color:var(--on-dark-mute)}
+.ed__body{grid-column:5 / span 8}
+/* Contact variant: a wider aside, because it carries the phone/e-mail rail
+   rather than a marginal note. Declared here as a modifier — NOT as inline
+   grid-column on the children, which would beat every media query below and
+   leave the two columns side by side on a phone. */
+.ed--contact .ed__aside{grid-column:1 / span 4}
+.ed--contact .ed__body {grid-column:6 / span 7}
+.ed__body > * + *{margin-top:1.25rem}
+.ed__body p{max-width:64ch;color:var(--fg-mute)}
+.sec--dark .ed__body p{color:var(--on-dark-mute)}
+.ed__body h3{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(1.15rem,1.9vw,1.6rem);letter-spacing:-.02em;line-height:1.05;
+  margin-top:clamp(2.2rem,4vw,3.2rem);color:var(--fg);
+}
+.sec--dark .ed__body h3{color:var(--on-dark)}
+.ed__body a:not(.btn){text-decoration:underline;text-underline-offset:.22em;
+  text-decoration-color:var(--rule-strong);transition:color var(--dur-fast) var(--ease)}
+.ed__body a:not(.btn):hover{color:var(--moss)}
+.sec--dark .ed__body a:not(.btn):hover{color:var(--moss-lift)}
+
+/* Numbered specification list — the card grid, rebuilt as a technical index.
+   Same information, no boxes, no icons. */
+.spec{border-top:1px solid var(--rule);margin-top:clamp(2rem,4vw,3rem)}
+.sec--dark .spec{border-color:var(--rule-dark)}
+.spec__it{
+  display:grid;grid-template-columns:3.4rem minmax(0,17ch) minmax(0,1fr);
+  gap:clamp(12px,2.2vw,36px);align-items:baseline;
+  padding-block:clamp(1.15rem,2.4vw,1.8rem);
+  border-bottom:1px solid var(--rule);
+}
+.sec--dark .spec__it{border-color:var(--rule-dark)}
+.spec__no{
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
+  color:var(--clay);
+}
+.spec__k{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(1rem,1.5vw,1.3rem);letter-spacing:-.015em;line-height:1.1;
+  color:var(--fg);
+}
+.sec--dark .spec__k{color:var(--on-dark)}
+.spec__v{font-size:var(--t-sm);color:var(--fg-mute);line-height:1.6;max-width:56ch}
+.sec--dark .spec__v{color:var(--on-dark-mute)}
+.spec__v a{text-decoration:underline;text-underline-offset:.2em}
+.spec__v a:hover{color:var(--moss)}
+.sec--dark .spec__v a:hover{color:var(--moss-lift)}
+
+/* Pull quote — a positioning line set at display size, on a rule. */
+.pullq{
+  margin-block:clamp(2.4rem,5vw,4rem);padding-top:clamp(1.4rem,2.6vw,2rem);
+  border-top:1px solid var(--rule-strong);max-width:24ch;
+}
+.sec--dark .pullq{border-color:var(--rule-dark)}
+.pullq p{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(1.4rem,3.1vw,2.6rem);letter-spacing:-.03em;line-height:1;
+  color:var(--fg);max-width:none;
+}
+.sec--dark .pullq p{color:var(--on-dark)}
+.pullq p em{font-style:normal;color:var(--moss)}
+.sec--dark .pullq p em{color:var(--moss-lift)}
+.pullq cite{
+  display:block;margin-top:1.1rem;font-style:normal;
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--fg-mute);
+}
+.sec--dark .pullq cite{color:var(--on-dark-mute)}
+
+/* Oversized figure with a technical annotation beside it. */
+.bignum{display:flex;align-items:baseline;gap:clamp(14px,2.4vw,32px)}
+.bignum b{
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(2.6rem,7vw,6rem);letter-spacing:-.045em;line-height:.82;
+  color:var(--fg);flex:none;
+}
+.sec--dark .bignum b{color:var(--on-dark)}
+.bignum b small{font-size:.34em;letter-spacing:.02em;vertical-align:.9em;margin-left:.12em;color:var(--moss)}
+.sec--dark .bignum b small{color:var(--moss-lift)}
+.bignum span{font-size:var(--t-sm);color:var(--fg-mute);max-width:30ch;line-height:1.6}
+.sec--dark .bignum span{color:var(--on-dark-mute)}
+
+/* Service navigation strip — cross-links between the three service pages,
+   using the same large-list language as the homepage, never as cards. */
+.xnav{border-top:1px solid var(--rule)}
+.sec--dark .xnav{border-color:var(--rule-dark)}
+.xnav a{
+  display:grid;grid-template-columns:auto 1fr auto;gap:clamp(14px,2.6vw,40px);
+  align-items:center;padding-block:clamp(1.2rem,2.6vw,1.9rem);
+  border-bottom:1px solid var(--rule);
+}
+.sec--dark .xnav a{border-color:var(--rule-dark)}
+.xnav__no{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;color:var(--clay)}
+.xnav__t{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(1.2rem,2.8vw,2.2rem);letter-spacing:-.03em;line-height:1;
+  transition:transform var(--dur) var(--ease-out),color var(--dur) var(--ease);
+  transform-origin:left center;display:block;
+}
+.xnav__g{
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fg-mute);flex:none;
+  display:flex;align-items:center;gap:.7em;
+}
+.sec--dark .xnav__g{color:var(--on-dark-mute)}
+.xnav a:hover .xnav__t{transform:translateX(clamp(6px,1vw,16px));color:var(--moss)}
+.sec--dark .xnav a:hover .xnav__t{color:var(--moss-lift)}
+.xnav a[aria-current="page"]{opacity:.42;pointer-events:none}
+
+/* --------------------------------------------------------------------------
+   24 — PROCEDURAL TECHNICAL DIAGRAMS
+   --------------------------------------------------------------------------
+   One family, extending the homepage cross-section. Every diagram shares the
+   same strokes, the same 7px mono labels, the same measurement ticks and the
+   same accent meaning:
+       moss  = living / surface        water = water & pipework
+       clay  = depth & annotation      rule  = strata and structure
+   Diagrams are decorative-with-a-description: role="img" + aria-label, and
+   the same facts always exist as readable text beside them.
+   -------------------------------------------------------------------------- */
+.dgm{width:100%;height:auto;display:block}
+.dgm .strata{fill:none;stroke:var(--rule-dark);stroke-width:1}
+/* Strata fills carry the whole readability of a cross-section, so they are
+   a step stronger than the homepage original — at .032/.055 the layers were
+   indistinguishable once the SVG scaled down into a half-column. */
+.dgm .fill-a{fill:rgba(232,229,218,.045)}
+.dgm .fill-b{fill:rgba(232,229,218,.085)}
+.dgm .turf {stroke:var(--moss-lift);stroke-width:1.4;fill:none}
+.dgm .pipe {stroke:var(--water);stroke-width:1.6;fill:none}
+.dgm .pipe-t{stroke:var(--water);stroke-width:1;fill:none;stroke-dasharray:2 3}
+.dgm .root {stroke:var(--clay);stroke-width:1;fill:none;opacity:.8}
+.dgm .tick {stroke:var(--rule-dark);stroke-width:1;fill:none}
+.dgm .hit  {fill:var(--water)}
+.dgm .zone {fill:none;stroke:var(--moss-lift);stroke-width:1;stroke-dasharray:4 4;opacity:.7}
+/* 8px, not 7: at the width these diagrams actually render (~590px for a
+   ~580-unit viewBox) an SVG unit is roughly a CSS pixel, and 7px annotation
+   was below comfortable reading size. The homepage cross-section is bumped
+   with it so the whole diagram family stays typographically identical. */
+.dgm text,.xsec text{
+  font-family:var(--font-mono);font-size:8px;letter-spacing:.16em;
+  text-transform:uppercase;fill:var(--on-dark-mute);
+}
+.dgm .t-accent{fill:var(--clay)}
+.dgm .t-on{fill:var(--on-dark)}
+.dgm .draw{stroke-dasharray:var(--len,600);stroke-dashoffset:var(--len,600)}
+.is-in .dgm .draw{transition:stroke-dashoffset 1.7s var(--ease-out) var(--d,0s);stroke-dashoffset:0}
+.dgm .drop{opacity:0;transition:opacity .5s var(--ease) var(--d,0s)}
+.is-in .dgm .drop{opacity:1}
+
+/* The system block: diagram on one side, the same facts as text on the other,
+   so a crawler or screen reader never depends on the drawing. */
+.sys{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--rule-dark)}
+.sys__side{padding:clamp(24px,3.4vw,52px) clamp(20px,3vw,48px)}
+.sys__side--a{border-right:1px solid var(--rule-dark)}
+.sys__head{display:flex;align-items:baseline;gap:1rem;margin-bottom:clamp(1.4rem,3vw,2.4rem)}
+.sys__head h3{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(1.15rem,2.1vw,1.75rem);letter-spacing:-.02em;
+}
+.sys__list{margin-top:1.6rem;display:grid;gap:.1rem}
+.sys__list li{
+  display:flex;gap:1rem;align-items:baseline;
+  padding-block:.62em;border-bottom:1px solid var(--rule-dark-soft);
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--on-dark-mute);
+}
+.sys__list li b{color:var(--on-dark);font-weight:400;flex:none;width:2.6em}
+.sys__note{margin-top:1.5rem;color:var(--on-dark-mute);max-width:40ch;font-size:var(--t-sm);line-height:1.6}
+
+/* --------------------------------------------------------------------------
+   25 — PHOTOGRAPHIC PLATE COMPOSITIONS
+   --------------------------------------------------------------------------
+   Named compositions, because "a row of images" is what the old template did.
+   Every one of them keeps the portrait frame intact.
+   -------------------------------------------------------------------------- */
+
+/* One large plate with a technical caption rail beside it. */
+/* 5 columns, not 6: a 6-column .ar-tall plate stands ~975px high at 1440,
+   and the short caption rail beside it left an unreadable amount of void.
+   5 columns keeps the plate dominant while the spread still balances. */
+.pl-rail{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut);align-items:end}
+.pl-rail__img{grid-column:1 / span 5}
+.pl-rail__txt{grid-column:7 / span 5;padding-bottom:clamp(.4rem,2vw,2rem)}
+.pl-rail--flip .pl-rail__img{grid-column:8 / span 5}
+.pl-rail--flip .pl-rail__txt{grid-column:1 / span 5}
+.pl-rail__txt h3{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(1.3rem,2.6vw,2.1rem);letter-spacing:-.03em;line-height:1;
+  margin-bottom:1rem;
+}
+.pl-rail__txt p{font-size:var(--t-sm);color:var(--fg-mute);max-width:34ch;line-height:1.62}
+.sec--dark .pl-rail__txt p{color:var(--on-dark-mute)}
+
+/* Two offset plates — the second always drops, never a symmetric pair. */
+.pl-pair{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut);align-items:start}
+.pl-pair > *:nth-child(1){grid-column:1 / span 5}
+.pl-pair > *:nth-child(2){grid-column:7 / span 4;margin-top:clamp(36px,8vw,120px)}
+.pl-pair--tight > *:nth-child(1){grid-column:2 / span 4}
+.pl-pair--tight > *:nth-child(2){grid-column:7 / span 5;margin-top:clamp(24px,5vw,80px)}
+
+/* Three staggered narrow plates — a study, not a gallery row. */
+.pl-trio{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut);align-items:start}
+.pl-trio > *:nth-child(1){grid-column:1 / span 4}
+.pl-trio > *:nth-child(2){grid-column:5 / span 3;margin-top:clamp(48px,10vw,150px)}
+.pl-trio > *:nth-child(3){grid-column:9 / span 4;margin-top:clamp(20px,4vw,60px)}
+
+/* One extreme vertical crop beside a big annotation — the signature move.
+   Bottom-aligned, not centred: the annotation sits on the same baseline as
+   the plate's caption rule, which is what makes it read as a drawing sheet
+   rather than as a text block floating beside a picture. */
+.pl-col{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut);align-items:end}
+.pl-col__img{grid-column:2 / span 3}
+.pl-col__txt{grid-column:6 / span 6}
+.pl-col--flip .pl-col__img{grid-column:9 / span 3}
+.pl-col--flip .pl-col__txt{grid-column:1 / span 6}
+
+/* Full-width cinematic band. Only the single landscape asset earns this. */
+.band{position:relative;overflow:hidden;background:var(--soil);color:var(--on-dark)}
+.band__media{position:absolute;inset:0;z-index:0}
+.band__media .plateimg{width:100%;height:100%}
+.band__media .plateimg::after{
+  background:linear-gradient(180deg,rgba(23,24,20,.76),rgba(23,24,20,.42) 46%,rgba(23,24,20,.86));
+  mix-blend-mode:normal;
+}
+.band__media .plateimg img{filter:saturate(.80) contrast(1.04) brightness(1.20) sepia(.08)}
+.band__inner{position:relative;z-index:2;padding-block:clamp(96px,17vh,200px)}
+
+/* --------------------------------------------------------------------------
+   26 — REFERENCES ARCHIVE + LIGHTBOX
+   --------------------------------------------------------------------------
+   Not a masonry gallery and not a filterable grid: a paginated architectural
+   index with a fixed, hand-composed rhythm — lead / pair / column / trio,
+   broken once by the landscape intermission.
+
+   The filter buttons from the legacy gallery were removed on purpose. With
+   19 curated frames, filtering only ever punched holes in a composition that
+   is doing real editorial work; the technical tag on each plate already
+   carries the same classification information, statically and for free.
+   -------------------------------------------------------------------------- */
+.arch{display:grid;gap:clamp(56px,10vw,150px)}
+.arch__row{position:relative}
+
+/* Numbered marker running down the left edge of each row. */
+.arch__mk{
+  display:flex;align-items:baseline;gap:1rem;
+  padding-bottom:.9rem;margin-bottom:clamp(1.4rem,3vw,2.4rem);
+  border-bottom:1px solid var(--rule);
+}
+.sec--dark .arch__mk{border-color:var(--rule-dark)}
+.arch__mk b{
+  font-family:var(--font-mono);font-size:var(--t-label);font-weight:400;
+  letter-spacing:.14em;color:var(--clay);
+}
+.arch__mk span{
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--fg-mute);
+}
+.sec--dark .arch__mk span{color:var(--on-dark-mute)}
+.arch__mk i{
+  margin-left:auto;font-style:normal;font-family:var(--font-mono);
+  font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--fg-mute);
+}
+.sec--dark .arch__mk i{color:var(--on-dark-mute)}
+
+/* A single archive plate: <figure> → <button> → <span.plateimg> → <img>, with
+   the caption as a sibling <figcaption>. The button holds only phrasing
+   content, so the markup stays valid while the plate is still a real,
+   keyboard-reachable control announced by its aria-label. */
+.arch__it{position:relative}
+/* Archive plates use a quiet lift instead of the homepage clip-path wipe:
+   inner pages are deliberately less animated, and a clip mask would fight
+   the hover scale below for the same transform. */
+.arch__it[data-reveal]{
+  opacity:0;transform:translateY(22px);
+  transition:opacity .85s var(--ease-out),transform .85s var(--ease-out);
+}
+.arch__it[data-reveal].is-in{opacity:1;transform:none}
+.arch__btn{display:block;width:100%;text-align:left;cursor:pointer;padding:0}
+.arch__btn .plateimg{transition:transform .9s var(--ease-out)}
+.arch__btn:hover .plateimg,.arch__btn:focus-visible .plateimg{transform:scale(1.018)}
+.arch__btn .plateimg img{transition:transform 1.1s var(--ease-out),filter .5s var(--ease)}
+.arch__btn:hover .plateimg img,.arch__btn:focus-visible .plateimg img{
+  transform:scale(1.05);filter:saturate(.88) contrast(1.06) brightness(1.02) sepia(.05);
+}
+.arch__cap{
+  display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap;
+  padding-top:.72rem;margin-top:.72rem;border-top:1px solid var(--rule);
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--fg-mute);
+}
+.sec--dark .arch__cap{border-color:var(--rule-dark);color:var(--on-dark-mute)}
+.arch__cap b{color:var(--fg);font-weight:400;flex:none}
+.sec--dark .arch__cap b{color:var(--on-dark)}
+.arch__cap .arch__tag{margin-left:auto;color:var(--clay);flex:none}
+/* The descriptive line is normally quiet and lifts on pointer/focus. */
+.arch__desc{
+  display:block;margin-top:.6rem;font-family:var(--font-ui);font-size:var(--t-sm);
+  width:100%;
+  letter-spacing:0;text-transform:none;color:var(--fg-mute);max-width:38ch;
+  opacity:.62;transition:opacity var(--dur) var(--ease),color var(--dur) var(--ease);
+}
+.sec--dark .arch__desc{color:var(--on-dark-mute)}
+.arch__it:hover .arch__desc,.arch__it:focus-within .arch__desc{opacity:1}
+
+/* Pointer label that replaces the cursor over the archive. Pointer devices
+   only; touch and keyboard users get the plate's own focus ring instead. */
+.arch__cursor{
+  position:fixed;top:0;left:0;z-index:70;pointer-events:none;
+  padding:.72em 1.05em;background:var(--limestone);color:var(--soil);
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.18em;
+  text-transform:uppercase;opacity:0;
+  transform:translate3d(-50%,-50%,0) scale(.7);
+  transition:opacity .26s var(--ease),transform .26s var(--ease-out);
+  will-change:transform;
+}
+.arch__cursor.is-on{opacity:1;transform:translate3d(-50%,-50%,0) scale(1)}
+@media (hover:none),(pointer:coarse){.arch__cursor{display:none}}
+
+/* --- Lightbox ------------------------------------------------------------
+   Purpose-built rather than a plugin: ~70 lines of CSS and ~90 of JS buys
+   correct portrait sizing, real focus management and no third-party weight.
+   Sized with svh/dvh so mobile browser chrome never crops the image.        */
+.lb{
+  position:fixed;inset:0;z-index:200;display:grid;
+  grid-template-rows:auto 1fr auto;
+  background:rgba(23,24,20,.97);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--on-dark);
+  opacity:0;transition:opacity .34s var(--ease);
+}
+.lb[hidden]{display:none}
+.lb.is-on{opacity:1}
+.lb__bar{
+  display:flex;align-items:center;gap:1rem;
+  padding:clamp(14px,2.4vw,26px) var(--pad);
+  border-bottom:1px solid var(--rule-dark-soft);
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.lb__count{color:var(--clay)}
+.lb__ttl{color:var(--on-dark-mute)}
+.lb__x{
+  margin-left:auto;display:flex;align-items:center;gap:.7em;
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark);
+  padding:.4em 0;
+}
+.lb__x i{
+  display:block;width:16px;height:16px;position:relative;flex:none;
+}
+.lb__x i::before,.lb__x i::after{
+  content:"";position:absolute;top:50%;left:0;width:100%;height:1px;
+  background:currentColor;
+}
+.lb__x i::before{transform:rotate(45deg)}
+.lb__x i::after {transform:rotate(-45deg)}
+.lb__x:hover{color:var(--moss-lift)}
+
+.lb__stage{
+  position:relative;display:grid;place-items:center;
+  padding:clamp(14px,2.6vw,32px) var(--pad);min-height:0;
+}
+.lb__fig{display:flex;flex-direction:column;align-items:center;gap:1rem;max-height:100%;min-height:0}
+.lb__fig img{
+  max-height:100%;max-width:min(100%,62vh);width:auto;height:auto;
+  object-fit:contain;background:var(--soil-2);
+  filter:var(--grade);
+}
+.lb__cap{
+  display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap;justify-content:center;
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--on-dark-mute);
+  text-align:center;flex:none;
+}
+.lb__cap b{color:var(--on-dark);font-weight:400}
+.lb__nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:clamp(44px,5vw,58px);height:clamp(44px,5vw,58px);
+  display:grid;place-items:center;
+  border:1px solid var(--rule-dark);color:var(--on-dark);
+  transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);
+}
+.lb__nav:hover{background:var(--limestone);color:var(--soil)}
+.lb__nav--p{left:clamp(8px,1.6vw,20px)}
+.lb__nav--n{right:clamp(8px,1.6vw,20px)}
+.lb__nav svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.2}
+.lb__foot{
+  padding:clamp(12px,2vw,20px) var(--pad);
+  border-top:1px solid var(--rule-dark-soft);
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--on-dark-mute);
+  display:flex;gap:1rem 2rem;flex-wrap:wrap;justify-content:space-between;
+}
+
+/* --------------------------------------------------------------------------
+   27 — CONTACT FORM
+   --------------------------------------------------------------------------
+   Web3Forms submission logic is untouched; this is presentation, labelling
+   and validation state only. Labels are always visible (never placeholder-
+   only), errors are text plus aria-describedby, never colour alone.
+   -------------------------------------------------------------------------- */
+.frm{display:grid;gap:clamp(1.1rem,2vw,1.5rem)}
+.frm__row{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.1rem,2vw,1.5rem)}
+.frm__f{display:grid;gap:.6rem;min-width:0}
+.frm__f label{
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--on-dark-mute);
+}
+.frm__f label .req{color:var(--clay)}
+.frm__f input,.frm__f select,.frm__f textarea{
+  font:inherit;font-size:var(--t-body);color:var(--on-dark);
+  background:transparent;border:0;border-bottom:1px solid var(--rule-dark);
+  border-radius:0;padding:.72em 0;width:100%;
+  transition:border-color var(--dur-fast) var(--ease);
+  -webkit-appearance:none;appearance:none;
+}
+.frm__f textarea{min-height:7.5em;resize:vertical;line-height:1.55}
+.frm__f select{
+  cursor:pointer;padding-right:1.8em;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),
+                   linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 9px) calc(50% + 1px),calc(100% - 4px) calc(50% + 1px);
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+}
+.frm__f select option{background:var(--soil);color:var(--on-dark)}
+.frm__f input:focus,.frm__f select:focus,.frm__f textarea:focus{
+  outline:none;border-bottom-color:var(--moss-lift);
+}
+.frm__f input:focus-visible,.frm__f select:focus-visible,.frm__f textarea:focus-visible{
+  outline:2px solid var(--clay);outline-offset:4px;
+}
+.frm__f input::placeholder,.frm__f textarea::placeholder{color:rgba(232,229,218,.34)}
+/* Invalid state: a clay rule AND a written message — never colour alone. */
+.frm__f.is-bad input,.frm__f.is-bad select,.frm__f.is-bad textarea{border-bottom-color:var(--clay)}
+.frm__err{
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--clay);display:none;
+}
+.frm__f.is-bad .frm__err{display:block}
+.frm__note{
+  font-size:var(--t-sm);color:var(--on-dark-mute);max-width:62ch;line-height:1.6;
+}
+.frm__note .req{color:var(--clay)}
+.frm__status{
+  display:none;padding:1.1rem 1.3rem;border-left:2px solid var(--moss-lift);
+  background:var(--soil-2);font-size:var(--t-sm);line-height:1.6;color:var(--on-dark);
+}
+.frm__status.is-on{display:block}
+.frm__status.is-bad{border-left-color:var(--clay)}
+/* Honeypot: off-screen but not display:none, so bots still fill it in. */
+.frm__hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.frm button[type="submit"]{justify-self:start}
+.frm button[disabled]{opacity:.55;cursor:progress}
+
+/* Contact index — the "which channel" rail beside the form. */
+.cx{display:grid;gap:0;border-top:1px solid var(--rule-dark)}
+.cx__it{
+  display:grid;grid-template-columns:minmax(0,9rem) minmax(0,1fr);
+  gap:clamp(12px,2vw,28px);align-items:baseline;
+  padding-block:clamp(1.05rem,2.2vw,1.6rem);border-bottom:1px solid var(--rule-dark);
+}
+.cx__k{
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--clay);
+}
+.cx__v{font-size:var(--t-md);color:var(--on-dark);line-height:1.35}
+.cx__v small{
+  display:block;margin-top:.5rem;font-size:var(--t-sm);color:var(--on-dark-mute);
+  line-height:1.6;max-width:40ch;
+}
+
+/* --------------------------------------------------------------------------
+   28 — LEGAL / DOCUMENT PAGES
+   --------------------------------------------------------------------------
+   Same system, dialled all the way down: these pages must be readable and
+   printable, not art-directed.
+   -------------------------------------------------------------------------- */
+/* The legal pages keep their original markup and class names verbatim — the
+   text is a legal document and must not be re-typed to fit a new template.
+   These aliases map the legacy class names onto the Phase 1.5 system so the
+   pages inherit the design without a single word being touched. */
+.doc,.legal{max-width:74ch}
+.doc .eyebrow,.legal .eyebrow{
+  display:block;margin-bottom:1.4rem;
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.18em;
+  text-transform:uppercase;color:var(--clay);
+}
+.doc h1,.legal h1{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:var(--t-pin);letter-spacing:-.04em;line-height:.92;
+  margin-bottom:clamp(1.2rem,2.6vw,2rem);
+}
+.doc > .lead,.legal > .lead{
+  font-size:var(--t-md);line-height:1.62;color:var(--fg-mute);max-width:60ch;
+  margin-bottom:clamp(1.4rem,3vw,2.2rem);
+}
+.doc h2{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(1.15rem,2vw,1.6rem);letter-spacing:-.02em;line-height:1.1;
+  margin-top:clamp(2.4rem,4.6vw,3.4rem);margin-bottom:1rem;
+  padding-top:1rem;border-top:1px solid var(--rule);
+}
+.doc h3{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(.95rem,1.4vw,1.12rem);letter-spacing:-.01em;
+  margin-top:1.9rem;margin-bottom:.7rem;
+}
+.doc p,.doc li{color:var(--fg-mute);line-height:1.7}
+.doc p + p{margin-top:1rem}
+.doc ul{margin:1rem 0 0;display:grid;gap:.6rem}
+.doc ul li{padding-left:1.5rem;position:relative}
+.doc ul li::before{
+  content:"";position:absolute;left:0;top:.72em;width:.7rem;height:1px;background:var(--clay);
+}
+.doc a{text-decoration:underline;text-underline-offset:.22em}
+.doc a:hover{color:var(--moss)}
+.doc dl{
+  display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);
+  gap:.1rem 1.6rem;margin-top:1.2rem;border-top:1px solid var(--rule);
+}
+.doc dt{
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fg-mute);padding-block:.85rem;
+  border-bottom:1px solid var(--rule);
+}
+.doc dd{padding-block:.85rem;border-bottom:1px solid var(--rule);color:var(--fg)}
+.doc__note{
+  margin-top:1.6rem;padding:1.2rem 1.4rem;border-left:2px solid var(--moss);
+  background:var(--limestone);font-size:var(--t-sm);line-height:1.65;color:var(--fg);
+}
+.doc__note strong{display:block;margin-bottom:.4rem}
+.doc__date{
+  margin-top:clamp(2.4rem,4vw,3.4rem);padding-top:1.2rem;border-top:1px solid var(--rule);
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fg-mute);
+}
+
+/* --- Legacy legal-page class aliases -------------------------------------
+   .legal / .datalist / .notice / .legal-updated are the class names already
+   written into impresszum.html, adatkezelesi-tajekoztato.html and
+   cookie-tajekoztato.html. Rather than re-type three legal documents into
+   new markup — where a slip would change the meaning of a published GDPR
+   notice — the existing names are mapped onto the system here.            */
+.legal h2{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(1.15rem,2vw,1.6rem);letter-spacing:-.02em;line-height:1.1;
+  margin-top:clamp(2.4rem,4.6vw,3.4rem);margin-bottom:1rem;
+  padding-top:1rem;border-top:1px solid var(--rule);
+}
+.legal h3{
+  font-family:var(--font-display);text-transform:uppercase;font-weight:600;
+  font-size:clamp(.95rem,1.4vw,1.12rem);letter-spacing:-.01em;
+  margin-top:1.9rem;margin-bottom:.7rem;
+}
+.legal p,.legal li{color:var(--fg-mute);line-height:1.7}
+.legal p + p{margin-top:1rem}
+.legal ul{margin:1rem 0 0;display:grid;gap:.6rem;list-style:none}
+.legal ul li{padding-left:1.5rem;position:relative}
+.legal ul li::before{
+  content:"";position:absolute;left:0;top:.72em;width:.7rem;height:1px;background:var(--clay);
+}
+.legal a{text-decoration:underline;text-underline-offset:.22em}
+.legal a:hover{color:var(--moss)}
+.datalist{
+  display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);
+  gap:.1rem 1.6rem;margin-top:1.2rem;border-top:1px solid var(--rule);
+}
+.datalist dt{
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fg-mute);padding-block:.85rem;
+  border-bottom:1px solid var(--rule);
+}
+.datalist dd{padding-block:.85rem;border-bottom:1px solid var(--rule);color:var(--fg)}
+.notice{
+  margin-top:1.6rem;padding:1.2rem 1.4rem;border-left:2px solid var(--moss);
+  background:var(--limestone);font-size:var(--t-sm);line-height:1.65;color:var(--fg);
+}
+.notice strong{display:block;margin-bottom:.4rem}
+.legal-updated{
+  margin-top:clamp(2.4rem,4vw,3.4rem);padding-top:1.2rem;border-top:1px solid var(--rule);
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fg-mute);
+}
+@media (max-width:1100px){
+  .datalist{grid-template-columns:1fr;gap:0}
+  .datalist dt{border-bottom:0;padding-bottom:0}
+}
+
+/* --------------------------------------------------------------------------
+   29 — PAGE TRANSITION
+   --------------------------------------------------------------------------
+   A 260ms limestone wipe on the way out. Deliberately minimal:
+     · links stay real <a href> elements — nothing is rewritten
+     · modifier-click, middle-click and target=_blank are never intercepted
+     · history, back/forward and bfcache are untouched
+     · reduced motion and no-JS skip it entirely
+
+   There is deliberately NO matching entry animation. An opacity keyframe on
+   <main> was tried and removed: CSS animations do not advance in a tab that
+   is not producing frames, so a page opened in a background tab — a normal
+   Cmd-click — kept <main> pinned at the animation's 0% opacity and rendered
+   blank until focused. The content layer must never depend on an animation
+   completing. The outgoing wipe is safe because it only ever covers on the
+   way out and is cleared again on pageshow.
+   -------------------------------------------------------------------------- */
+.rk-wipe{
+  position:fixed;inset:0;z-index:300;pointer-events:none;
+  background:var(--limestone);
+  transform:scaleY(0);transform-origin:bottom;
+  transition:transform .26s var(--ease);
+}
+.rk-wipe.is-out{transform:scaleY(1)}
+.rk-wipe__mk{
+  position:absolute;left:var(--pad);bottom:clamp(20px,4vh,44px);
+  font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.2em;
+  text-transform:uppercase;color:var(--soil);opacity:0;transition:opacity .2s var(--ease) .1s;
+}
+.rk-wipe.is-out .rk-wipe__mk{opacity:.5}
+
+/* --------------------------------------------------------------------------
+   30 — PHASE 1.5 RESPONSIVE + MOTION
+   -------------------------------------------------------------------------- */
+@media (max-width:1100px){
+  .ed__aside,.ed--contact .ed__aside{grid-column:1 / span 12;position:static;margin-bottom:1.4rem}
+  .ed__body,.ed--contact .ed__body{grid-column:1 / span 12}
+  .pl-rail__img{grid-column:1 / span 6}
+  .pl-rail__txt{grid-column:8 / span 5}
+  .pl-rail--flip .pl-rail__img{grid-column:7 / span 6}
+  .pl-rail--flip .pl-rail__txt{grid-column:1 / span 5}
+  .pl-trio > *:nth-child(1){grid-column:1 / span 5}
+  .pl-trio > *:nth-child(2){grid-column:7 / span 4}
+  .pl-trio > *:nth-child(3){grid-column:2 / span 5}
+  .pl-col__img{grid-column:1 / span 4}
+  .pl-col__txt{grid-column:6 / span 7}
+  .pl-col--flip .pl-col__img{grid-column:9 / span 4}
+  .pl-col--flip .pl-col__txt{grid-column:1 / span 7}
+  .doc dl{grid-template-columns:1fr;gap:0}
+  .doc dt{border-bottom:0;padding-bottom:0}
+}
+
+@media (max-width:860px){
+  /* The portrait plate system must get STRONGER on a phone, not collapse
+     into stacked cards: every composition becomes a single full-bleed
+     column of tall plates with their technical captions intact. */
+  .pin__grid{grid-template-columns:1fr;gap:clamp(24px,5vw,36px)}
+  .pin__plate{order:-1}
+  /* Portrait-leaning, not 16:9. A landscape letterbox of a portrait phone
+     photograph is exactly the crop the library cannot afford, and it throws
+     away the vertical plate that is the site's photographic signature. This
+     still resolves inside the first screen because of the svh cap. */
+  .pin__plate .plateimg{aspect-ratio:1/1.08;max-height:44svh}
+  .pin h1{max-width:none}
+
+  .sys{grid-template-columns:1fr}
+  .sys__side--a{border-right:0;border-bottom:1px solid var(--rule-dark)}
+
+  .spec__it{grid-template-columns:2.8rem 1fr;row-gap:.5rem}
+  .spec__v{grid-column:2 / -1}
+
+  .pl-rail,.pl-pair,.pl-trio,.pl-col{grid-template-columns:1fr;gap:clamp(28px,6vw,44px)}
+  .pl-rail__img,.pl-rail__txt,
+  .pl-rail--flip .pl-rail__img,.pl-rail--flip .pl-rail__txt,
+  .pl-col__img,.pl-col__txt,
+  .pl-col--flip .pl-col__img,.pl-col--flip .pl-col__txt{grid-column:1 / -1}
+  .pl-pair > *,.pl-trio > *,
+  .pl-pair--tight > *:nth-child(1),.pl-pair--tight > *:nth-child(2){
+    grid-column:1 / -1;margin-top:0;
+  }
+  .pl-rail__txt{padding-bottom:0}
+  /* The extreme vertical crop is a desktop move; on a phone it would be a
+     letterbox slit, so the plate reverts to the native portrait frame. */
+  .pl-col__img .ar-column{aspect-ratio:3/4}
+
+  .arch{gap:clamp(48px,11vw,72px)}
+  .frm__row{grid-template-columns:1fr}
+  .cx__it{grid-template-columns:1fr;gap:.5rem}
+  .xnav a{grid-template-columns:auto 1fr;gap:14px}
+  .xnav__g{display:none}
+  .lb__fig img{max-width:100%}
+  .lb__nav{width:42px;height:42px}
+}
+
 
 /* Coarse pointers never get the field's pointer label. */
 @media (hover:none),(pointer:coarse){
