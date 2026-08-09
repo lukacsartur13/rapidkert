@@ -3046,8 +3046,18 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
    drawing surface and the plates as the things measured on it. */
 .fld__hud{position:absolute;inset:0;z-index:5;pointer-events:none;color:var(--on-dark-mute)}
 .fld__hud span{position:absolute}
-/* The head of the sheet gives way while a plate crosses the frame. */
-.fld__hud-l,.fld__hud-r{opacity:calc(1 - var(--veil,0) * .88)}
+/* The head of the sheet gives way while a plate crosses the frame — and
+   it leaves with the sheet, on --close, exactly as the number, the label
+   and the measure do below.                               [PHASE 3.1C]
+   Until 3.1C these two were the one part of the rig quoted against the
+   veil alone, so they survived the closing beat, and the stage they are
+   absolutely positioned in is LEAVING: at 390x844, exit .15, "GYOR ES 40
+   KM-ES VONZASKORZETE" was at y -22 to 40, printed through the fixed
+   header's FELMERES. A caption cannot outlive its sheet and it certainly
+   cannot become part of the navigation. */
+.fld__hud-l,.fld__hud-r{
+  opacity:calc(clamp(0,calc(1 - var(--close,0) * 2.4),1) * (1 - var(--veil,0) * .88));
+}
 .fld__hud-l{top:clamp(84px,12vh,124px);left:var(--pad)}
 .fld__hud-r{top:clamp(84px,12vh,124px);right:var(--pad);color:var(--clay)}
 .fld__hud-n{
@@ -3078,7 +3088,7 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
    such destination and simply stand down, earlier. */
 .fld__hud-n{
   transform-origin:0 100%;
-  transform:translate3d(0,calc(var(--close,0) * -46svh),0)
+  transform:translate3d(0,calc(var(--close,0) * -46svh + var(--settle,0px)),0)
             scale(calc(1 - var(--close,0) * .66));
   opacity:clamp(0,calc((.86 - var(--close,0)) / .3),1);
 }
@@ -3130,10 +3140,16 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
    the SOLID colour rgba(232,229,218,.16) resolves to over this ground,
    and both halves of the cross-fade use that one value. Two 1px lines of
    the same solid colour at the same height are one line. */
-.fld__stage{--datum-ink:#3C3D35}
+.fld__stage{--datum-ink:#3C3D35;--settle:0px}
+/* --settle is the closing composition's descent on a portrait phone, in
+   px, published by rk.js §12.2 (see THE SETTLE there). It is 0px on every
+   screen the crush was authored for, so this reads as top:var(--datum)
+   everywhere else — and the rule, the sheet number and the crushed plate
+   all take the same number, which is what keeps them one object. */
 .fld__cut{
   position:absolute;left:0;right:0;top:var(--datum);height:1px;z-index:7;
   background:var(--datum-ink);
+  transform:translate3d(0,var(--settle,0px),0);
   opacity:0;
 }
 /* The photograph resolving to that tone as it is crushed. */

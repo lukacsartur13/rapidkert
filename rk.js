@@ -2122,7 +2122,60 @@
         return 0;
       }
 
-      var lastNo = '', lastClose = -1;
+      /* THE SETTLE: WHERE THE CRUSH HAPPENS, NOT WHEN.       [PHASE 3.1C]
+
+         The crush was authored for a landscape frame and it is correct
+         there. On a portrait phone the same geometry puts it in the wrong
+         PART OF THE SCREEN, and the reason is arithmetic that has nothing
+         to do with the crush.
+
+         Both stages carry --datum at 46%, and they sit exactly one
+         viewport apart. So the field's residue leaves the TOP edge at the
+         same instant the first service's grade line enters the BOTTOM
+         edge — one viewport apart, always, at every size. On a 1440x900
+         screen the incoming service's typography is already up in the
+         frame by then and the two share a composition. At 390x844 it is
+         not: measured, KERTEPITES does not cross the bottom edge until
+         exit .50, and the crush has been over since exit .40. Between
+         them the closing plate is a hairline at y=50 — under the header,
+         effectively invisible — and 780 of the 844 pixels are empty
+         field. The strip technically survives the boundary and dies
+         alone against the top edge doing it.
+
+         Retiming cannot fix that: the two events are one viewport apart
+         by construction, and no value of CE moves them closer. What is
+         wrong is the residue's PLACE. So on a portrait phone the closing
+         composition counter-scrolls — it descends inside the stage at
+         exactly the rate the stage is leaving — and the arithmetic of
+         that comes out at one line: settle = stageH * exit, which holds
+         the residue at --datum OF THE VIEWPORT rather than --datum of a
+         frame that is halfway out of it.
+
+           exit  .00 .. .54   the crop stays at 46% of the SCREEN, dead
+                             still, while its height collapses around it
+           exit  .54          the descent has used up the (1 - --datum)
+                             of stage below the line: the residue is now
+                             the stage's own bottom edge, which is the
+                             incoming services section's top edge
+           exit  .54 .. 1     it rides up as that section's leading edge
+
+         Measured at 390x844, exit .25: the shallow strip is 278-497 with
+         the services section at 630, instead of 64-283 with 350px of
+         black under it. Same crush, same table, same timing.
+
+         Linear on purpose: an eased ramp makes the strip drift against a
+         viewport moving at a constant rate, and drift is the one thing
+         this is removing.
+
+         Landscape phones are excluded with the same aspect test as
+         rk.css 31.85. Their problem is height, not this. */
+      var MOBP = window.matchMedia('(max-width:860px) and (max-aspect-ratio:7/5)');
+      /* Read, not assumed: --datum is the shared token four things depend
+         on (rk.css 32.2). Hard-coding 0.46 a fourth time is how a chain
+         like that silently splits. */
+      var DATUM = (parseFloat(getComputedStyle(stage).getPropertyValue('--datum')) || 46) / 100;
+
+      var lastNo = '', lastClose = -1, lastSettle = -1;
       if (still) return;
 
       onFrame(function () {
@@ -2149,6 +2202,22 @@
         var we = CE * stageH;
         var c = clamp((clamp((q - C0) / (1 - C0), 0, 1) * wq +
                        clamp(exit / CE, 0, 1) * we) / (wq + we), 0, 1);
+
+        /* The settle. 0 everywhere but a portrait phone, so every value
+           written from it below is a no-op on the screens the crush was
+           authored for. See THE SETTLE above. */
+        var settleT = MOBP.matches ? clamp(exit / (1 - DATUM), 0, 1) : 0;
+        /* Minus one: the stage is overflow:hidden (§32.0), so a 1px rule
+           whose top edge IS the clip boundary has no rows left to draw.
+           The residue stops one pixel inside and stays the last thing
+           the frame contains. */
+        var settlePx = ((1 - DATUM) * stageH - 1) * settleT;
+        /* Own guard rather than write(): that helper keeps ONE cache slot
+           per element and --close already has this element's. */
+        if (lastSettle !== settlePx) {
+          lastSettle = settlePx;
+          stage.style.setProperty('--settle', settlePx.toFixed(1) + 'px');
+        }
 
         /* The stage's own rule takes over from the crushed plate over the
            last tenth of the beat, while both are a 1px line of the same
@@ -2202,6 +2271,25 @@
              past the camera at 4x is a bar across the screen. */
           var mo = md < -5200 ? 0 : md < -3800 ? (md + 5200) / 1400 * 0.5
                  : md < 260 ? 0.5 : md < 520 ? 0.5 * (1 - (md - 260) / 260) : 0;
+          /* THE SURVEY PLANE GOES WITH THE SETTLE.            [PHASE 3.1C]
+             The far marks converge on the vanishing point AT --datum, and
+             the crushed plate covers them the whole way down — which is
+             why nobody has had to think about them. The settle moves the
+             plate off them, and what that exposes is a second faint line
+             at the height the first one just left: "one object survives
+             the boundary" told twice, in two places, at once.
+
+             So the register closes with the space it registers. It is not
+             a fade-out of the datum — .fld__cut IS the datum from here on,
+             at full weight, and a plane of dotted stations is what the
+             SPACE was measured with, not what the line is. Zero off a
+             portrait phone, where settleT is zero.
+
+             x3, so it is over by exit .18 — while the plate is still a
+             64svh crop covering the marks anyway. At the settle's own
+             rate the cluster was still at half weight once the strip had
+             moved clear of it, sitting alone in the upper black. */
+          mo *= clamp(1 - settleT * 3, 0, 1);
           if (mk.__o !== mo) {
             mk.__o = mo;
             mk.style.opacity = mo.toFixed(3);
@@ -2308,12 +2396,50 @@
              next to is a photograph, not a grey smear. */
           last.style.setProperty('--flat', ease(clamp((c - 0.80) / 0.20, 0, 1)).toFixed(4));
           last.style.setProperty('--capo', clamp(1 - c * 5, 0, 1).toFixed(3));
+          /* THE SETTLE, SOLVED BACKWARDS FROM WHAT IS SEEN. [PHASE 3.1C]
+             Same discipline as the crush table above. --settle is a
+             distance ON THE SCREEN, and the plate lives at a depth where
+             the perspective multiplies everything by s — 3.75x at the
+             station this plate closes on. So the descent authored in the
+             plate's own space is settle / s, and the projection puts it
+             back exactly where the rule and the number are going.
+             --y is in svh because that is the unit .fld__pl's transform
+             reads; data-dy for this plate is 0, so nothing is overwritten.
+
+             The plate's centre sits ON the perspective origin, which is
+             what makes the residue land on --datum in the first place —
+             so this offset is the only thing that can move it, and it
+             moves the rule, the number and the picture by one number. */
+          last.style.setProperty('--y', (settlePx / s / window.innerHeight * 100).toFixed(4));
         }
         if (cutEl) cutEl.style.opacity = hand.toFixed(4);
-        /* Once the plate is a strip rather than a picture — not after the
-           whole beat has finished, which used to leave the archive link
-           alone on the screen as the section's closing statement. */
-        if (allEl) toggle(allEl, 'is-on', c > 0.72);
+        /* THE ARCHIVE LINK BELONGS TO THE FIELD.             [PHASE 3.1C]
+
+           2.4.1 brought it on at c > .72 and never took it off, on the
+           reasoning that the archive is what the section resolves into.
+           The consequence is that it is the only piece of furniture left
+           standing during the crush and the whole exit — and it is
+           absolutely positioned in a stage that is LEAVING, so it rides
+           up with it. Measured at 390x844 at exit .75: the outline button
+           at y 49-93, the fixed header's FELMERES at y 22-112. A
+           navigation control and a content control overlapping, with the
+           section they belong to already three quarters gone.
+
+           Lowering the header's z-index is not the fix — the header is
+           navigation and it has to stay on top of the page it navigates.
+           The button is what is in the wrong place, and it is in the
+           wrong place because it is on screen at the wrong TIME.
+
+           So it belongs to the field's own run, not to its ending. It
+           arrives while the visitor is still travelling through the
+           plates (the last quarter of the run, ~700px of scroll at 390),
+           and it is gone before the frame starts to leave — the fade
+           finishes while plate 08 is still full bleed, so the crush is
+           never sharing the screen with an outline box. Nothing rides
+           into the header because nothing is there to ride, and the
+           empty closing frames lose their one piece of orphaned
+           furniture into the bargain. */
+        if (allEl) toggle(allEl, 'is-on', q > 0.72 && c < 0.26);
       });
 
       /* Contextual pointer — over the field only, desktop only. */
