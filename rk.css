@@ -4296,16 +4296,68 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
      .13em: 26ch cut "Terep - Struktura - Novenyy" after "Struktura" and
      opened the second line on a separator. It is one short line by design. */
   .lyr__tag{max-width:none;margin-top:1.1rem}
+  /* THE PROTECTED COPY ZONE.                                [PHASE 3.1C]
+     The state is anchored to the FOOT of the stage — rk.js §12.3 stops
+     carrying the desktop's -50% here, so this rule is now the whole
+     truth about where a service sits — and the drawing is composed
+     above it (CAM_M). A phone divides the frame horizontally: section
+     on top, words underneath, and nothing drawn through the words. */
   .lyr__it{top:auto;bottom:clamp(18px,4vh,40px);transform:none}
   .lyr__list{display:flex;align-items:flex-end}
   .lyr__go{margin-top:1.1rem}
   .lyr__of{display:none}
-  /* The type column's scrim covers the whole frame on a phone: there is
-     no "outer edge" for the drawing to keep when the copy runs the full
-     measure. */
-  .lyr__type::before{
-    background:linear-gradient(180deg,rgba(18,19,15,0) 22%,rgba(18,19,15,.62) 52%,
-               rgba(18,19,15,.86));
+  /* THE COPY ZONE'S OWN GROUND.                             [PHASE 3.1C]
+     The scrim covers the whole frame on a phone — there is no "outer
+     edge" for the drawing to keep when the copy runs the full measure —
+     and on a phone it is ALWAYS ON, not only under grade.
+
+     The reason is the portrait camera (rk.js §12.3 CAM_M). The drawing
+     now stands in the upper two thirds where a phone has the room,
+     which means the deepest stratum's body — which by construction runs
+     off the bottom of the world — is behind the type for the whole
+     section, in every register. Above grade that is a paragraph set on
+     flat aggregate grey; below grade it was already a paragraph set on
+     subsoil, which is what this scrim was written for.
+
+     So it follows the register instead of switching on with it: the
+     copy zone is limestone while the page is in the light and soil once
+     the page is under, and in both cases the drawing recedes INTO the
+     ground the words are set on rather than being cropped away from it.
+     Weighted to the foot, transparent across the top two thirds — the
+     grade line, the survey and all four stratum boundaries are above
+     the ramp, so nothing the frame is arguing is covered. */
+  /* THE SCRIM BELONGS TO THE STAGE HERE, NOT TO THE TYPE COLUMN.
+     .lyr__type carries opacity:var(--type), which drops to about .38 at
+     the peak of each transformation — and a scrim inside that element
+     steps back with it, so the protection dissolved at exactly the beat
+     the drawing was at its loudest. Measured at 390x844, q .83: --type
+     .48, the .94 scrim rendering at .45, three clay root curves and the
+     dashed main straight through "HAROM SZOLGALTATAS, EGY SZEMLELET."
+
+     So it is the stage's own layer, between the world (z 1) and the type
+     (z 3), and it does not move. The type may still step back; the
+     ground the type is set on may not. */
+  .lyr__type::before{display:none}
+  .lyr__stage::after{
+    content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+    /* TWO PROTECTED BANDS, ONE GRADIENT. The section head at the top and
+       the service at the foot are both type over a drawing that now
+       fills the frame, so this is opaque at both ends and open across
+       the middle — which is exactly the band CAM_M composes the drawing
+       into. The head stop is short and hard (its band is 101-134 at
+       844); the foot's is long, because the block under it is 280px
+       tall and rides as the state leaves. */
+    background:linear-gradient(180deg,
+               rgba(232,229,218,.94) 0%,rgba(232,229,218,.94) 16%,
+               rgba(232,229,218,0) 22%,rgba(232,229,218,0) 46%,
+               rgba(232,229,218,.74) 62%,rgba(232,229,218,.95) 74%);
+    transition:background .5s var(--ease);
+  }
+  .lyr__stage.is-under::after{
+    background:linear-gradient(180deg,
+               rgba(18,19,15,.94) 0%,rgba(18,19,15,.94) 16%,
+               rgba(18,19,15,0) 22%,rgba(18,19,15,0) 46%,
+               rgba(18,19,15,.74) 62%,rgba(18,19,15,.95) 74%);
   }
 
   /* ---- PROCESS: the datum runs VERTICALLY, the section stays the stage */
@@ -4361,6 +4413,60 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   /* ---- GRADE ---------------------------------------------------------- */
   .grd__act{grid-template-columns:1fr;align-items:start}
   .grd__mk--r{display:none}
+}
+
+/* --------------------------------------------------------------------------
+   32.95 — THE DRAWING'S WEIGHT ON A PORTRAIT SCREEN            [PHASE 3.1C]
+   --------------------------------------------------------------------------
+   A section drawing's line weight is a property of the DRAWING, which is
+   why every stroke in §33 is authored in device pixels and marked
+   non-scaling. That is right, and it is not the whole story: a hairline
+   hierarchy authored to be read across 1440px of frame is being read
+   across 390px here, on a screen held at arm's length, at a third of the
+   angular size. Measured at 390x844 on SERVICES 01: 197 elements on the
+   frame, almost all of them 1px at .34 alpha over near-black. Nothing in
+   that is wrong per element and the frame reads as empty.
+
+   THE ANSWER IS HIERARCHY, NOT BRIGHTNESS. Turning up all 197 lines
+   makes a bright mess of the same illegibility. What a survey drawing
+   actually does when it has to be read small is what this does: fewer
+   contours, and an INDEX CONTOUR among them carrying the weight. Three
+   lines with one of them heavy is a terrain argument. Five even
+   hairlines is a texture.
+
+   orientation:portrait, matched to rk.js §14's own portrait test
+   (stage.clientHeight > stage.clientWidth) — the same condition that
+   selects camMob and layersMob, so the framing, the schedule and the
+   weight are one decision and cannot drift apart.
+   -------------------------------------------------------------------------- */
+@media (orientation:portrait){
+  /* THE SURVEY. Five contours become three: the second and the fourth
+     go, which leaves -88, -36 and 52 — one well above grade, one just
+     above it and one below, so the set still describes a surface with a
+     thickness of information around it rather than a stack. */
+  .wrl__contour .wrl__cl:nth-child(2),
+  .wrl__contour .wrl__cl:nth-child(4){display:none}
+  .wrl__cl{stroke-opacity:.5}
+  /* THE INDEX CONTOUR. The one nearest grade from above, at the weight
+     a survey sheet gives every fifth line. It is the only contour that
+     has to be seen; the other two are the register it belongs to. */
+  .wrl__contour .wrl__cl:nth-child(3){stroke-width:1.7;stroke-opacity:.8}
+
+  /* GRADE, and the level it is measured against. These two ARE the
+     terrain argument — the line the project field handed over, and the
+     datum it is read from — so they carry the weight. */
+  .wrl__gd{stroke-width:2}
+  .wrl__lv{stroke-width:1.2;stroke-opacity:.66}
+  .wrl__tk{stroke-width:1.3;stroke-opacity:.92}
+  .wrl__run{stroke-opacity:.72}
+  /* The material that moved. One mark per station, and at 1px they were
+     the faintest thing on a frame whose subject is that earth was cut
+     and filled. */
+  .wrl__cf{stroke-width:1.5}
+  /* The strata read as four flat colour bands on a phone, because the
+     boundary between them is a .28 hairline. This is the levelling
+     information — the layers ARE the levels — and it is cheap. */
+  .wrl__bd{stroke-opacity:calc(.44 + var(--tech,0) * .46)}
 }
 
 @media (max-width:520px){

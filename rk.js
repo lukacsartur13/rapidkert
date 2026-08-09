@@ -1643,9 +1643,40 @@
          the same section, with each state's x chosen to hold the thing
          that state is about. Same world, same transformations, composed
          for the screen it is on. */
+      function portrait() { return stage.clientHeight > stage.clientWidth; }
       function keys() {
-        return (opt.camMob && stage.clientHeight > stage.clientWidth) ? opt.camMob : opt.cam;
+        return (opt.camMob && portrait()) ? opt.camMob : opt.cam;
       }
+
+      /* A PORTRAIT SCHEDULE, FOR THE SAME REASON AS A PORTRAIT CAMERA.
+                                                          [PHASE 3.1C]
+         camMob exists because the same camera numbers frame a different
+         amount of world through a portrait window. layersMob exists
+         because the same SCHEDULE puts a different amount of drawing on
+         a portrait screen — and one schedule in particular is authored
+         against a fact that is only true in landscape.
+
+         SERVICES holds its survey for the first sixth of the run and
+         then drops it, "because held longer its hairlines crossed the
+         description paragraph". On a desktop the paragraph is a 44vw
+         column and the contours cross the other half of the frame. On a
+         phone the copy runs the whole measure, so the same lines cross
+         the words — and the schedule that avoids that also takes every
+         technical line off the screen before the service is read. What
+         is left at the reading beat is a label, a void, a headline, a
+         paragraph and a link.
+
+         Overrides are MERGED over the base, so a section names only the
+         layers whose timing actually differs and the two schedules
+         cannot drift apart on the ones that do not. Resolved once at
+         mount, not per frame. */
+      var LAYERS = opt.layers, LAYERS_M = opt.layers;
+      if (opt.layersMob) {
+        LAYERS_M = {};
+        for (var lk in opt.layers) LAYERS_M[lk] = opt.layers[lk];
+        for (var mk in opt.layersMob) LAYERS_M[mk] = opt.layersMob[mk];
+      }
+      function sched() { return portrait() ? LAYERS_M : LAYERS; }
 
       function set(q) {
         camera(w, keys(), q, stage);
@@ -1669,9 +1700,10 @@
            two annotations turned up in the middle of the process
            section's technical drawing, and the symptom looked like a
            labelling bug rather than a missing default. */
+        var sch = sched();
         for (var k in groups) {
           var g = groups[k];
-          var o = band(q, opt.layers[k]);
+          var o = band(q, sch[k]);
           /* The hatch belongs to the TECHNICAL register and to its own
              schedule at the same time. Written as an inline opacity by
              this loop it silently outranked the stylesheet's
@@ -2542,17 +2574,53 @@
          forming, the paved edge, one emitter, one wetting lens. The
          transformations are identical — only the crop of the world the
          camera holds is authored differently. */
+      /* THE PHONE'S TYPE IS AT THE BOTTOM, SO THE SECTION IS AT THE TOP.
+                                                          [PHASE 3.1C]
+         The landscape table lifts the camera for the first service —
+         0.46 to 0.60 to 0.66 — because on a desktop that opens sky over
+         a type column that occupies the LEFT of the frame. On a phone
+         .lyr__it is bottom-anchored (rk.css §32.9), so the same lift
+         puts the ground exactly where the words are: measured at 390x844
+         on the 01 reading beat, grade at y 465 with the description at
+         516-627, the paragraph set over subsoil, and 250px of empty
+         limestone above it where the drawing should have been.
+
+         So on a portrait phone the camera looks DOWN instead of up. The
+         inherited line still arrives at 0.46 — that contract is with
+         PROJECTS and it is not negotiable — and from there the ground
+         opens underneath it and rises into the upper two thirds, which
+         is where a phone has the room. The type keeps the bottom third
+         and nothing is drawn through it. Same states, same
+         transformations, same order; the axis of the split follows the
+         viewport, exactly as the hero's does in rk.css §31.85. */
       var CAM_M = [
-        [0.00, 560, 620,  0, 0.46],
-        [0.10, 560, 560,  0, 0.60],
-        [0.19, 545, 470,  0, 0.66],   // 01 · terrain in the lower third
-        [0.30, 540, 380,  0, 0.52],   // 01 · the ground rises
-        [0.40, 520, 300,  0, 0.30],
+        [0.00, 560, 620,  0, 0.46],   // the rule inherited from PROJECTS
+        [0.10, 552, 690,  0, 0.40],   // the camera pulls back and looks down
+        /* 700 units, not 470. The whole argument has to be ABOVE the copy
+           zone, and the build-up is 210 units with its level reference
+           120 above grade — 330 units that all have to land between the
+           section head (134) and the top of the type block (527). At
+           this height that set occupies 155-553: level line, three
+           contours, grade, and all four stratum boundaries, in order,
+           in one frame. */
+        [0.19, 545, 700,  0, 0.355],  // 01 · the section stands in the upper frame
+        [0.30, 540, 560,  0, 0.30],   // 01 · the ground rises
+        [0.40, 520, 400,  0, 0.20],
         [0.46, 500, 260,  0, 0.10],
         [0.52, 470, 210,  0, 0.16],   // 02 · one emitter and its lateral
         [0.68, 455, 190, 24, 0.08],
-        [0.86, 445, 165, 62, 0.30],   // 03 · under grade
-        [1.00, 440, 132, 62, 0.34]    // 03 · the root zone
+        /* 0.20 / 0.24, not 0.30 / 0.34.                   [PHASE 3.1C]
+           The root cone is anchored at the SURFACE and runs 104 units
+           below it, which at this camera is 530px — so with the dripline
+           at 30% of the frame the cone reached y 563 and the third
+           service's name, riding up as it leaves, met it: measured at
+           390x844, q .92, three clay curves through "FELSZÍN ALATTI
+           ÖNTÖZÉS". Typography is the primary layer, so the system moves,
+           not the word. Dripline, lens and root zone all sit in the upper
+           frame and the cone ends around y 380 — above the copy zone at
+           every point of the state, not only on its reading beat. */
+        [0.86, 445, 165, 62, 0.20],   // 03 · under grade
+        [1.00, 440, 132, 62, 0.17]    // 03 · the root zone
       ];
 
       var world = host && RK_WORLD.mount(host, {
@@ -2602,6 +2670,32 @@
           root:    [0.62, 0.74],
           notes:   [0.82, 0.90]
         },
+        /* THE SURVEY STAYS FOR THE FIRST SERVICE.           [PHASE 3.1C]
+           contour and measure are quoted above as a beat that is over
+           before 01 is read, and the reason given is that their
+           hairlines crossed the description. That reason is a landscape
+           fact: the copy is a 44vw column there and the lines cross the
+           other half. On a phone the copy runs the full measure, the
+           lines cross the words, and the schedule that keeps them off
+           the paragraph also empties the frame — 197 technical elements
+           at 1px and .34 alpha, all of them gone by the reading beat,
+           leaving a label, a void, a headline, a paragraph and a link.
+
+           With the portrait camera above, the drawing now lives in the
+           upper two thirds and the type in the bottom third, so the
+           collision the schedule was avoiding no longer exists — and the
+           survey can do what the section says it does: be the terrain
+           information the inherited line acquires, while the visitor is
+           reading that this is what KERTEPITES means. It still leaves
+           before the ground is opened for 02, because a survey of a site
+           and an excavation of it are not the same drawing.
+
+           Weight is the other half of this; see rk.css §32.9 SERVICES 01. */
+        layersMob: {
+          contour: [0.00, 0.05, 0.26, 0.33],
+          measure: [0.005, 0.06, 0.27, 0.34],
+          cutfill: [0.08, 0.15, 0.30, 0.36]
+        },
         /* WATER TRAVELS. The five lenses do not appear together — the
            charge reaches each emitter in turn from the source end of the
            run, so what the visitor sees is pressure moving through a
@@ -2623,6 +2717,10 @@
       });
 
       var n = items.length, lastI = -1;
+      /* The breakpoint rk.css §32.9 re-anchors .lyr__it at. Live-matched
+         rather than read once, so a rotation resolves it without a
+         reload — the same reason §12.2's sheet label is. */
+      var MOBT = window.matchMedia('(max-width:860px)');
 
       /* The composed still: the ground built, the sky open, the light
          register — the one frame that says "a drawing became terrain"
@@ -2677,9 +2775,27 @@
                the frame by the one arriving from below.
                The -50% has to be carried here — an inline transform replaces
                the rule's translateY(-50%) outright, and without it the tall
-               third state hangs off the bottom of the stage. */
-            it.style.transform =
-              'translate3d(0,calc(-50% + ' + (-s.u * 24).toFixed(2) + 'svh),0)';
+               third state hangs off the bottom of the stage.
+
+               AND ON A PHONE IT MUST NOT BE.                [PHASE 3.1C]
+               rk.css §32.9 sets .lyr__it{top:auto;bottom:...;transform:none}
+               there — the state is anchored to the FOOT of the stage, not
+               centred in it, because a phone composes vertically. This
+               inline transform outranks that rule, so the -50% was still
+               being applied to a block that was no longer centred: at
+               390x844 the first service was lifted 141px off its own
+               anchor, into the band the drawing needs, and its own bottom
+               third stood empty. The displacement still applies — it is
+               how one state pushes the next out — the centring does not. */
+            /* And it travels less. 24svh is a fifth of a desktop frame
+               and a quarter of a phone's, and the phone's block is the
+               tall one — at 390x844 the third service rode 101px up into
+               the drawing while it left. 15 still reads as "pushed out"
+               and keeps the copy zone where the drawing was composed
+               around it. */
+            it.style.transform = MOBT.matches
+              ? 'translate3d(0,' + (-s.u * 15).toFixed(2) + 'svh,0)'
+              : 'translate3d(0,calc(-50% + ' + (-s.u * 24).toFixed(2) + 'svh),0)';
           }
         }
 
