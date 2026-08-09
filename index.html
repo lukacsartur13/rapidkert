@@ -40,8 +40,18 @@
      the first frame is on screen. If that module never arrives — a 404, a
      stale cache, a thrown error — the headline must not stay masked, so the
      class lands anyway. A late scene is a compromise; an invisible H1 is a
-     broken page. */
-  setTimeout(function () { h.classList.add('gd-ready'); }, 2600);
+     broken page.
+
+     The deadline is absolute — 2600ms from NAVIGATION START, not from
+     whenever this script happened to run. Measured on Slow 4G with 4x CPU
+     throttling: this script did not execute until 4.06s, because it waits
+     behind a 240KB render-blocking stylesheet. .gd-on hid the hero at that
+     instant and the old relative timer then held it hidden until 6.7s, so
+     the copy did not become readable until 7.5s — 3.2 seconds of an empty
+     dark rectangle stacked on top of an already slow start. Being late is
+     exactly when the safety net is needed soonest.               [PHASE 3.2B] */
+  setTimeout(function () { h.classList.add('gd-ready'); },
+             Math.max(0, 2600 - (performance.now ? performance.now() : 0)));
 })();
 </script>
 </head>

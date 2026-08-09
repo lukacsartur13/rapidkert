@@ -269,11 +269,23 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 .btn--line:hover{border-color:var(--soil);background:var(--soil);color:var(--limestone)}
 /* Every dark-surface container must be listed here, or an outline button
    renders dark-on-dark and disappears. */
+/* The warning above was accurate and the list was still two short. .grd is
+   the homepage's closing CTA and .pin the dark hero on the three service
+   pages; both are background:var(--soil) or darker, both arrived after this
+   rule, and only .end — the inner pages' older CTA — was ever added.
+
+   Measured across all ten pages, 31 laid-out buttons: the "+36 30 726 0024"
+   outline button was drawing ink rgb(23,24,20) on rgb(14,15,11) in .grd and
+   on rgb(23,24,20) in .pin — 1.08:1 and 1.00:1. A phone number, on the four
+   pages whose whole job is to get someone to call, laid out at 179x42 and
+   invisible at both breakpoints.                                [PHASE 3.2B] */
 .sec--dark .btn--line,.gd .btn--line,.end .btn--line,
+.grd .btn--line,.pin .btn--line,
 .rk-nav__panel .btn--line{
   border-color:var(--rule-dark);color:var(--on-dark);
 }
 .sec--dark .btn--line:hover,.gd .btn--line:hover,.end .btn--line:hover,
+.grd .btn--line:hover,.pin .btn--line:hover,
 .rk-nav__panel .btn--line:hover{
   background:var(--limestone);color:var(--soil);border-color:var(--limestone);
 }
@@ -545,8 +557,15 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
    -------------------------------------------------------------------------- */
 .hero__cta,.gd__cta{display:flex;flex-wrap:wrap;gap:12px}
 
-/* Scroll cue */
-.cue{display:inline-flex;align-items:center;gap:.8em;flex:none}
+/* Scroll cue.
+   The colour is stated here because .label resolves to --fg-mute, which is
+   the mute for text on cream, and this is the one .label on the site that
+   never sees cream: it sits on the Living Ground's canvas. Measured over the
+   rendered frame at HERO, #5C5F55 on rgb(13,14,11) came to 2.97:1 — while the
+   three stat captions beside it in the same flex row, which do use the dark
+   mute, measured 6.31:1. Not a new colour, then. The one it should always
+   have inherited.                                               [PHASE 3.2B] */
+.cue{display:inline-flex;align-items:center;gap:.8em;flex:none;color:var(--on-dark-mute)}
 .cue__line{width:1px;height:36px;background:var(--rule-dark);position:relative;overflow:hidden}
 .cue__line::after{
   content:"";position:absolute;inset:0;background:var(--moss-lift);
