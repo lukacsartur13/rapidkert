@@ -3430,6 +3430,39 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
    opposite. Still well under the wetted right-hand side. */
 .wrl__cpdryA{stroke:var(--clay);stroke-width:1.1;stroke-opacity:.38}
 
+/* ---- 70% STACKED  (portrait only) ------------------------ [PHASE 3.1C]
+   Two specimens of the same soil, one above the other, with the claim
+   in the gap. Everything here is deliberately the same material as the
+   section it is cut from — the earth colours of §33, the water's own
+   cool tone, the clay of the root register — because the moment this
+   pair acquires a palette of its own it stops being evidence and
+   becomes a comparison chart.
+
+   The two blocks are identical by construction (rk.js §14 builds both
+   from the same three helpers on the same surface). Nothing below
+   distinguishes them either: there is no --m selector anywhere in this
+   block. The only difference on the screen is where the water is. */
+.wrl__vsb{stroke:none}
+.wrl__vsb--top{fill:var(--c-top)}
+.wrl__vsb--sub{fill:var(--c-sub)}
+.wrl__vsb--str{fill:var(--c-str)}
+/* The block's own edges and its layer boundaries — a cut specimen, not
+   a stack of bands. Heavier than the world's own boundaries because
+   this drawing is read at a third the size. */
+.wrl__vsl{fill:none;stroke:var(--ink-soft);stroke-width:1.1;stroke-opacity:.6}
+.wrl__vsgd{fill:none;stroke:var(--ink);stroke-width:1.8;stroke-opacity:.9}
+/* WET EARTH, not blue water: the same darker, cooler patch of the
+   stratum §33 uses for the wetting lens, at the same alpha, so the two
+   specimens are read against each other and not against a legend. */
+.wrl__vsw{fill:#22282A;fill-opacity:.4;stroke:none}
+.wrl__vsf{fill:none;stroke:#22282A;stroke-width:1.2;stroke-opacity:.66}
+/* What leaves in one, and the line that puts it in in the other. One
+   class, because in a comparison drawing the two are the same slot. */
+.wrl__vsx{fill:none;stroke:var(--water);stroke-width:1.4;stroke-opacity:.82}
+.wrl__vsem{fill:var(--water);stroke:none;opacity:.92}
+.wrl__vsr{fill:none;stroke:var(--clay);stroke-width:1.2;stroke-opacity:.62}
+.wrl__vst{fill:var(--ink);opacity:.8}
+
 /* 1 MUNKANAP — a shadow crossing the finished surface, and a time datum
    above it. No sun, no sunrise, no colour temperature. */
 .wrl__shadow{fill:#1B1D16;fill-opacity:.30;stroke:none}
@@ -4443,7 +4476,33 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .prf__big--word{font-size:clamp(2rem,11vw,4rem)}
   .prf__d{max-width:38ch;margin-top:1.2rem}
   .prf__of{display:none}
-  .prf__stage::after{height:74%}
+  /* THE PROOF TEXT-SAFE REGION.                             [PHASE 3.1C]
+     One zone for the whole section rather than a nudge per drawing.
+     Measured at 390x844: the number at 101, the claim hanging from its
+     46% baseline to 388, the qualifier to 504. The scrim holds full
+     weight over all of it and is gone by 64%, and every camera in
+     rk.js §12.5's portrait table composes its claim's drawing into what
+     is left. The 74%-tall top-weighted ramp this replaces was washing
+     the drawing down to a third of its weight at grade while still
+     only reaching .55 over the qualifier — protecting neither. */
+  .prf__stage::after{
+    height:64%;
+    background:linear-gradient(180deg,rgba(244,242,236,.94) 0%,
+               rgba(244,242,236,.94) 80%,rgba(244,242,236,0));
+  }
+  /* AND THE STATE THAT REACHES A DIFFERENT PART OF IT. The stacked 70%
+     comparison puts one specimen above the claim and one below, so the
+     protected band is the middle of the stage and both ends are the
+     drawing's. The claim's own origin moves with it — rk.js §12.5
+     carries the matching -50%, because an inline transform replaces
+     this rule's outright. */
+  .prf__slot[data-s="2"]{top:50%}
+  .prf__stage.is-cmp::after{
+    height:100%;
+    background:linear-gradient(180deg,rgba(244,242,236,0) 0%,
+               rgba(244,242,236,0) 40%,rgba(244,242,236,.94) 45%,
+               rgba(244,242,236,.94) 66%,rgba(244,242,236,0) 70%);
+  }
 
   /* ---- SHEET ---------------------------------------------------------- */
   .sheet__row > summary{grid-template-columns:auto 1fr auto;gap:12px}
@@ -4514,6 +4573,15 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
      a 210-unit build-up — so the material inside them has to be seen. */
   .wrl__rgc,.wrl__rgf{opacity:.74}
   .wrl__ogl{stroke-width:1.3;stroke-opacity:.85}
+  /* EGY CSAPAT. Four traces at 1.1px and .62 over limestone, seen at a
+     third of the size they were drawn for, are a texture. The claim is
+     that four disciplines are one responsibility, so each of the four
+     has to be a LINE — and the node they agree at has to be the
+     heaviest mark in the frame, because it is the argument. */
+  .wrl__cv{stroke-width:1.6;stroke-opacity:.82}
+  .wrl__cvn{stroke-width:2.2}
+  /* GARANCIA. The closure is the claim, so it carries a claim's weight. */
+  .wrl__bk{stroke-width:2.4}
 }
 
 @media (max-width:520px){

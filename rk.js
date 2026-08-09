@@ -628,6 +628,13 @@
        setting-out drawing and a survey of the same site are measured from
        the same places. */
     var AXES = [40, 320, 600, 880, 1160];
+    /* THE PORTRAIT SPECIMEN (see 70% ON A PORTRAIT PHONE in build()).
+       Module scope, not build() scope: reshape() draws it and build()
+       declares it, and a span the two disagree about is two specimens.
+       360 units wide because that is what a 390px frame holds at the
+       scale two of them stack at, and 190 deep because the build-up is
+       152 and a specimen needs ground under its last boundary. */
+    var VX0 = 420, VX1 = 780, VDEEP = 190;
 
 
     /* ---- THE PROFILE --------------------------------------------------
@@ -1102,6 +1109,55 @@
       });
       svg.appendChild(gcp);
 
+      /* 70% ON A PORTRAIT PHONE — THE SAME COMPARISON, STACKED.
+                                                          [PHASE 3.1C]
+         The side-by-side above is 720 world units wide and a portrait
+         phone's frame holds about 400 of them, so the camera had to
+         travel from one half to the other — a comparison made in time.
+         Measured at 390x844 it does not survive that: the frame at the
+         claim's own reading beat shows "Szórófejes locsolás" and
+         "Párolgás" and NOTHING ELSE, with the dripline, the wetting
+         zone, the subsurface line and the root zone all outside the
+         viewport. The page prints AKÁR 70% over the inefficient half of
+         its own evidence.
+
+         A phone divides vertically, so the comparison divides
+         vertically: TWO SPECIMENS OF THE SAME SOIL, one above the
+         other, with the claim in the gap between them. They are not
+         two drawings — they are one specimen built twice, from the same
+         surface, at the same span, the same depth, the same layer
+         boundaries and the same scale. THE ONLY THING THAT DIFFERS IS
+         WHERE THE WATER IS, which is what makes it evidence rather than
+         an infographic.
+
+           m 0  surface watering  a wet band hugging grade, what leaves
+                                  going up off it, and a dry root zone
+           m 1  subsurface        the line at 62, a wetting lens around
+                                  each emitter, and roots in the wet
+
+         No cards, no panels, no icons, no bars: the two blocks are
+         sections through ground, drawn in the register the rest of this
+         world is drawn in. */
+      var gvs = grp('wrl__vs', 'vs');
+      [0, 1].forEach(function (m) {
+        var g = el('g', { 'class': 'wrl__vsg', 'data-m': m });
+        ['top', 'sub', 'str'].forEach(function (k) {
+          g.appendChild(el('path', { 'class': 'wrl__vsb wrl__vsb--' + k, d: '' }));
+        });
+        g.appendChild(el('path', { 'class': 'wrl__vsw', d: '' }));   // where the water IS
+        g.appendChild(el('path', { 'class': 'wrl__vsf', d: '' }));   // how far it reached
+        g.appendChild(el('path', { 'class': 'wrl__vsr', d: '' }));   // the root zone
+        g.appendChild(el('path', { 'class': 'wrl__vsx', d: '' }));   // what leaves / the line in
+        g.appendChild(el('path', { 'class': 'wrl__vsem', d: '' }));  // the emitters on it
+        g.appendChild(el('path', { 'class': 'wrl__vsl', d: '' }));   // the block and its layers
+        g.appendChild(el('path', { 'class': 'wrl__vsgd', d: '' }));  // grade
+        var t = el('text', { 'class': 'wrl__ntx wrl__vst' });
+        t.textContent = m ? 'Felszín alatti öntözés' : 'Szórófejes locsolás';
+        g.appendChild(t);
+        gvs.appendChild(g);
+      });
+      svg.appendChild(gvs);
+
       /* 1 MUNKANAP — one working day across the finished surface.
          A raked shadow travelling over the ground and a time datum above
          it. No sun, no sunrise, no colour temperature: a shadow moving
@@ -1355,9 +1411,21 @@
       var byT = Math.min(py(CUT0), py(600), py(CUT1)) - 74;
       var byB = Pk(CUT1, 3, form) * relief + (STRATA[3].d + 96) * depth;
       var bhw = (bx1 - bx0) / 2, bhh = (byB - byT) / 2;
+      /* THE ARMS ARE PUBLISHED, NOT ONLY DRAWN.              [PHASE 3.1C]
+         At full length these four brackets ARE one closed rectangle, and
+         until now the only thing that changed about them was opacity —
+         so the closure arrived as a rectangle fading up, which is a
+         rectangle, not a closing. Each corner now carries its own
+         geometry as data, and PROOF's after() extends the arms out of
+         the corners as the claim is read: four marks that become one
+         enclosure, which is what GARANCIA says. */
       [[bx0, byT, 1, 1], [bx1, byT, -1, 1], [bx1, byB, -1, -1], [bx0, byB, 1, -1]]
         .forEach(function (c, i) {
-          svg.querySelectorAll('.wrl__bk')[i].setAttribute('d',
+          var p = svg.querySelectorAll('.wrl__bk')[i];
+          p.dataset.cx = c[0].toFixed(1); p.dataset.cy = c[1].toFixed(1);
+          p.dataset.sx = c[2]; p.dataset.sy = c[3];
+          p.dataset.hw = bhw.toFixed(1); p.dataset.hh = bhh.toFixed(1);
+          p.setAttribute('d',
             'M' + (c[0] + c[2] * bhw).toFixed(1) + ' ' + c[1].toFixed(1) +
             'H' + c[0].toFixed(1) +
             'V' + (c[1] + c[3] * bhh).toFixed(1));
@@ -1559,6 +1627,117 @@
               'c6 ' + (h * .34).toFixed(1) + ' 18 ' + (h * .52).toFixed(1) + ' 29 ' + (h * .70).toFixed(1);
       });
       svg.querySelector('.wrl__cpdryA').setAttribute('d', dr);
+      /* THE TWO SPECIMENS. Both are built from the same three helpers on
+         the same surface, so "same width, same depth, same datum, same
+         layer boundaries, same visual scale" is not a discipline anyone
+         has to keep — it is the only thing the code can produce. The
+         240-unit offset either side of grade is what puts one above the
+         claim and one below it at 390x844; see CAM_M in rk.js §12.5. */
+      var vsRoot = svg.querySelector('.wrl__vs');
+      if (vsRoot) {
+        var vsX = function (i) { return VX0 + (VX1 - VX0) * i / 8; };
+        var vsLine = function (d) {
+          var s = '';
+          for (var i = 0; i <= 8; i++) s += (i ? 'L' : 'M') + vsX(i).toFixed(1) + ' ' + (py(vsX(i)) + d).toFixed(1);
+          return s;
+        };
+        var vsBand = function (d0, d1) {
+          var s = '', i;
+          for (i = 0; i <= 8; i++) s += (i ? 'L' : 'M') + vsX(i).toFixed(1) + ' ' + (py(vsX(i)) + d0).toFixed(1);
+          for (i = 8; i >= 0; i--) s += 'L' + vsX(i).toFixed(1) + ' ' + (py(vsX(i)) + d1).toFixed(1);
+          return s + 'Z';
+        };
+        var vsEll = function (cx, d, rx, ry) {
+          var cy = py(cx) + d;
+          return 'M' + (cx - rx) + ' ' + cy.toFixed(1) +
+                 'a' + rx + ' ' + ry + ' 0 1 0 ' + (rx * 2) + ' 0' +
+                 'a' + rx + ' ' + ry + ' 0 1 0 ' + (-rx * 2) + ' 0Z';
+        };
+        /* Inset from the block's own edges by more than the outer front's
+           radius, so no part of the wetting figure crosses the cut face —
+           a lens hanging out of the side of a specimen is a specimen with
+           a mistake in it. */
+        var VEM = [510, 600, 690];
+        vsRoot.querySelectorAll('.wrl__vsg').forEach(function (g) {
+          var m = +g.dataset.m;
+          g.setAttribute('transform', 'translate(0,' + (m ? 240 : -240) + ')');
+          var bs = g.querySelectorAll('.wrl__vsb');
+          bs[0].setAttribute('d', vsBand(0, 46));
+          bs[1].setAttribute('d', vsBand(46, 104));
+          bs[2].setAttribute('d', vsBand(104, VDEEP));
+          /* The block, its two internal boundaries and its two cut ends:
+             what makes each of these a SPECIMEN rather than a band of
+             tone — a piece of ground with edges, taken out of the same
+             section the whole page has been reading. */
+          g.querySelector('.wrl__vsl').setAttribute('d',
+            vsLine(46) + vsLine(104) + vsLine(VDEEP) +
+            'M' + VX0 + ' ' + py(VX0).toFixed(1) + 'V' + (py(VX0) + VDEEP).toFixed(1) +
+            'M' + VX1 + ' ' + py(VX1).toFixed(1) + 'V' + (py(VX1) + VDEEP).toFixed(1));
+          g.querySelector('.wrl__vsgd').setAttribute('d', vsLine(0));
+
+          var w = '', f = '', x = '', r = '', em = '';
+          if (m) {
+            /* THE WATER IS WHERE THE ROOTS ARE. A lens around each
+               emitter at 62, its front outside it, and nothing above
+               grade at all — the absence over the top of this block is
+               half of what the comparison says. */
+            VEM.forEach(function (ex) {
+              /* 38 and 46 on 90-unit spacing. The world's own lens
+                 learned this at 88/108: once adjacent fronts MEET, the
+                 stratum goes dark to its own edges and the eye reads "a
+                 different soil" instead of "water is spreading". Three
+                 separate lenses on a line of emitters is the claim; one
+                 scalloped dark band is not. */
+              w += vsEll(ex, 62, 38, 24);
+              f += vsEll(ex, 62, 46, 32);
+            });
+            x = vsLine(62);
+            VEM.forEach(function (ex) {
+              em += 'M' + (ex - 4.5) + ' ' + (py(ex) + 62).toFixed(1) + 'a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0 -9 0Z';
+              var ry = py(ex) + 62;
+              r += 'M' + ex + ' ' + ry.toFixed(1) + 'c-6 22 -16 34 -26 46' +
+                   'M' + ex + ' ' + ry.toFixed(1) + 'c7 23 19 35 30 45';
+            });
+          } else {
+            /* AND HERE IT IS WHERE THE ROOTS ARE NOT. The wet band stops
+               26 units down, what is above grade is leaving, and the
+               root zone at the same depth the other block carries its
+               lens is dry. Same band, same depth, opposite state. */
+            w = vsBand(0, 26);
+            f = vsLine(26);
+            /* The same two-tier riser field the side-by-side uses, and
+               for the same reason: five identical stubs read as a fence
+               and five stems with heads on them read as an ARROW FIELD,
+               which is the infographic this drawing exists instead of.
+               The head is the smallest tick that still points. */
+            [462, 522, 582, 642, 702].forEach(function (ex, i) {
+              var ey = py(ex), len = i % 2 ? 26 : 44;
+              x += 'M' + ex + ' ' + (ey - 8).toFixed(1) + 'v' + (-len) +
+                   'M' + (ex - 3.5) + ' ' + (ey - len + 1).toFixed(1) + 'l3.5 -7l3.5 7';
+            });
+            VEM.forEach(function (ex) {
+              var ry = py(ex) + 26;
+              r += 'M' + ex + ' ' + ry.toFixed(1) + 'c-6 26 -16 40 -26 54' +
+                   'M' + ex + ' ' + ry.toFixed(1) + 'c7 27 19 41 30 53';
+            });
+          }
+          g.querySelector('.wrl__vsw').setAttribute('d', w);
+          g.querySelector('.wrl__vsf').setAttribute('d', f);
+          g.querySelector('.wrl__vsx').setAttribute('d', x);
+          g.querySelector('.wrl__vsr').setAttribute('d', r);
+          g.querySelector('.wrl__vsem').setAttribute('d', em);
+          /* Right-aligned on the block's own edge. Left-aligned it
+             landed on the section number — measured at 390x844,
+             "SZOROFEJES LOCSOLAS" at y 120-134 across "11" at 101-118 —
+             and a specimen's identification belongs on the specimen
+             rather than in the sheet's top corner anyway. */
+          var t = g.querySelector('.wrl__vst');
+          t.setAttribute('x', VX1);
+          t.setAttribute('text-anchor', 'end');
+          t.setAttribute('y', (py(VX1) - 22).toFixed(1));
+        });
+      }
+
       svg.querySelectorAll('.wrl__cplb').forEach(function (g) {
         var x = +g.dataset.x, dy = +g.dataset.y;
         var t = g.querySelector('text');
@@ -3367,18 +3546,120 @@
          travels from one section to the other instead, which is the same
          comparison made in TIME rather than in space, and it is the one
          place on the page where a phone gets a move a desktop does not. */
+      /* THE PROOF FRAME ON A PHONE.                        [PHASE 3.1C]
+         One text-safe composition for all five claims, and each claim's
+         drawing composed into what it leaves. rk.css §32.5 puts the
+         claim's baseline at 46% of the stage with its qualifier hanging
+         under it, so at 390x844 the type occupies 84-504 and the
+         drawing has 130-300 above it and 520-844 below.
+
+         Every anchor below is chosen from that, and the 70% state
+         changes the composition rather than being nudged inside it: it
+         moves the claim to 56% (rk.css §32.9) and puts one specimen in
+         each of the two bands the claim then divides. Same framework,
+         state-specific placement inside it — which is the difference
+         between one composition and five patches. */
       var CAM_M = [
         [0.00, 560, 560,  0, 0.74],
-        [0.10, 550, 520,  0, 0.62],   // 01 · EGY CSAPAT
-        [0.22, 570, 700,  0, 0.62],
-        [0.30, 600, 900,  0, 0.56],   // 02 · 40 KM
-        [0.42, 480, 560,  0, 0.60],
-        [0.50, 400, 430,  0, 0.60],   // 03 · the surface-watered section
-        [0.58, 800, 400,  0, 0.34],   // 03 · and the one with the line in it
-        [0.70, 620, 470,  0, 0.60],   // 04 · 1 MUNKANAP
-        [0.90, 600, 800,  0, 0.58],
-        [1.00, 600, 1900, 0, 0.52]
+        /* 01 · EGY CSAPAT. The traces separate 128 units above the datum
+           and 108 below it, and their names have to be in the frame with
+           them — 900 units is the narrowest view that holds the fan and
+           all four names once the displacement is dropped for angle (see
+           after() below), and grade at 0.74 puts every one of them under
+           a claim that ends at 504. */
+        [0.10, 600, 900,  0, 0.74],
+        [0.22, 600, 820,  0, 0.70],
+        [0.30, 600, 900,  0, 0.62],   // 02 · 40 KM
+        [0.42, 600, 844,  0, 0.465],
+        /* 03 · 70%. THE CAMERA DOES NOT MOVE BETWEEN THESE TWO. A
+           comparison read from a travelling camera is not a comparison;
+           the two specimens are 480 units apart and both are on the
+           frame from the first pixel of the state to the last. */
+        [0.50, 600, 844,  0, 0.465],
+        [0.58, 600, 844,  0, 0.465],
+        [0.70, 620, 470,  0, 0.62],   // 04 · 1 MUNKANAP
+        /* 05 · GARANCIA. THE ENCLOSURE HAS TO BE IN THE FRAME.
+           The boundary stands 46 units off each end of a 1120-unit cut,
+           so it is 1212 wide — and at 800 units of frame a portrait
+           phone was holding 370 of them. Three quarters of the closure,
+           including every corner, was off the sides: what reached the
+           screen was two faint horizontal rails and no rectangle at all.
+           2850 units is the view in which the whole enclosure clears
+           both gutters, and at it the build-up is still 62px of layered
+           ground for the enclosure to close around. */
+        [0.90, 600, 2850, 0, 0.74],
+        [1.00, 600, 3600, 0, 0.52]
       ];
+
+      /* The five claims' schedules, hoisted so the portrait
+         variant below can wrap the ones it has to silence rather than
+         restate them — a second copy of ten windows is ten places for
+         the two to drift apart. */
+      var PRF_L = {
+          grade:   RK_WORLD.ALWAYS,
+          /* The ground itself is persistent, and only stands down while
+             the camera is too far away for a stratum to mean anything. */
+          strata:  function (q) { return Math.max(ST(-1, -1, 0.20, 0.26)(q), ST(0.42, 0.48, 0.86, 0.94)(q)); },
+          bounds:  function (q) { return Math.max(ST(-1, -1, 0.20, 0.26)(q), ST(0.42, 0.48, 0.86, 0.94)(q)); },
+          turf:    function (q) { return Math.max(ST(-1, -1, 0.20, 0.26)(q), ST(0.42, 0.48, 0.90, 0.97)(q)); },
+          pave:    function (q) { return Math.max(ST(-1, -1, 0.20, 0.26)(q), ST(0.44, 0.50, 0.90, 0.97)(q)); },
+          grit:    ST(0.44, 0.52, 0.86, 0.94),
+          main:    ST(0.46, 0.52, 0.82, 0.88),
+          lat:     ST(0.46, 0.52, 0.82, 0.88),
+          drip:    ST(0.46, 0.52, 0.82, 0.88),
+          wet:     ST(0.48, 0.54, 0.82, 0.88),
+          root:    ST(0.46, 0.52, 0.82, 0.88),
+          conv:    [0.02, 0.06, 0.17, 0.22],
+          radius:  [0.23, 0.29, 0.37, 0.43],
+          /* 03 · 70%. Held two beats longer than 2.3 at both ends: the
+             comparison is the one state here a visitor has to READ rather
+             than recognise, and it had less time on screen than the two
+             either side of it. */
+          compare: [0.42, 0.48, 0.62, 0.68],
+          day:     [0.63, 0.69, 0.80, 0.86],
+          /* 05 · GARANCIA. The measurement resolves, and the system
+             boundary closes around everything it has measured. */
+          measure: [0.86, 0.92],
+          /* Complete AT the claim's own reading beat, not a third of
+             the way past it: the enclosure is the claim. */
+          frame:   [0.848, 0.895]
+        };
+
+      /* A SPECIMEN IS ONLY A SPECIMEN IF NOTHING ELSE IS IN THE FRAME.
+                                                          [PHASE 3.1C]
+         On a portrait phone the 70% state is the stacked pair (see 70%
+         ON A PORTRAIT PHONE in §14), so the side-by-side stands down —
+         and so does the ground it was drawn on. The two blocks ARE the
+         ground for that beat, and the world's own section behind them
+         would be a third piece of soil in a frame whose whole argument
+         is that there are two identical ones. Everything comes back on
+         the far side of the state, on the same window the pair leaves
+         on, so the section is continuous either side of it. */
+      var PRF_M = (function () {
+        var hush = function (f, a, b, c, d) {
+          return function (q) { return f(q) * (1 - band3(q, a, b, c, d)); };
+        };
+        var m = { compare: null, vs: [0.42, 0.48, 0.62, 0.68] };
+        ['strata', 'bounds', 'turf', 'pave', 'grit', 'main', 'lat', 'drip', 'wet', 'root']
+          .forEach(function (k) { m[k] = hush(PRF_L[k], 0.41, 0.46, 0.64, 0.69); });
+        /* grade goes too: each specimen draws its own, heavier, and the
+           world's would run through the gap the claim sits in. */
+        m.grade = function (q) { return 1 - band3(q, 0.41, 0.46, 0.64, 0.69); };
+        /* AND EGY CSAPAT GETS THE SECTION AS A LINE, NOT AS EARTH.
+                                                          [PHASE 3.1C]
+           The verdict on this claim at 390x844 was that a generic ground
+           section dominates it, and that is exactly what it does: filled
+           strata, turf and paving are the loudest thing on a frame whose
+           subject is four hairlines and a node. The ground is not
+           removed — its boundaries and its grade stay, which is the
+           section the four disciplines are agreeing ON — but its
+           SUBSTANCE stands down until they have agreed. It comes back
+           on the same window the traces leave on. */
+        ['strata', 'turf', 'pave', 'grit'].forEach(function (k) {
+          m[k] = hush(m[k], -0.1, -0.05, 0.16, 0.22);
+        });
+        return m;
+      })();
 
       var world = host && RK_WORLD.mount(host, {
         cam: CAM,
@@ -3402,58 +3683,113 @@
                       - 0.24 * band3(q, 0.44, 0.50, 0.60, 0.66)
                       + 0.30 * band3(q, 0.88, 0.94, 1.02, 1.04);
         },
-        layers: {
-          grade:   RK_WORLD.ALWAYS,
-          /* The ground itself is persistent, and only stands down while
-             the camera is too far away for a stratum to mean anything. */
-          strata:  function (q) { return Math.max(ST(-1, -1, 0.20, 0.26)(q), ST(0.42, 0.48, 0.86, 0.94)(q)); },
-          bounds:  function (q) { return Math.max(ST(-1, -1, 0.20, 0.26)(q), ST(0.42, 0.48, 0.86, 0.94)(q)); },
-          turf:    function (q) { return Math.max(ST(-1, -1, 0.20, 0.26)(q), ST(0.42, 0.48, 0.90, 0.97)(q)); },
-          pave:    function (q) { return Math.max(ST(-1, -1, 0.20, 0.26)(q), ST(0.44, 0.50, 0.90, 0.97)(q)); },
-          grit:    ST(0.44, 0.52, 0.86, 0.94),
-          main:    ST(0.46, 0.52, 0.82, 0.88),
-          lat:     ST(0.46, 0.52, 0.82, 0.88),
-          drip:    ST(0.46, 0.52, 0.82, 0.88),
-          wet:     ST(0.48, 0.54, 0.82, 0.88),
-          root:    ST(0.46, 0.52, 0.82, 0.88),
-          conv:    [0.02, 0.07, 0.16, 0.21],
-          radius:  [0.23, 0.29, 0.37, 0.43],
-          /* 03 · 70%. Held two beats longer than 2.3 at both ends: the
-             comparison is the one state here a visitor has to READ rather
-             than recognise, and it had less time on screen than the two
-             either side of it. */
-          compare: [0.42, 0.48, 0.62, 0.68],
-          day:     [0.63, 0.69, 0.80, 0.86],
-          /* 05 · GARANCIA. The measurement resolves, and the system
-             boundary closes around everything it has measured. */
-          measure: [0.86, 0.92],
-          frame:   [0.865, 0.925]
-        },
+        layers: PRF_L,
+
+        /* A SPECIMEN IS ONLY A SPECIMEN IF NOTHING ELSE IS IN THE FRAME.
+                                                          [PHASE 3.1C]
+           On a portrait phone the 70% state is the stacked pair (see
+           70% ON A PORTRAIT PHONE in §14), so the side-by-side stands
+           down and so does the ground it was drawn on: the two blocks
+           ARE the ground for that beat, and the world's own section
+           behind them would be a third piece of soil in a frame whose
+           whole argument is that there are two identical ones.
+           Everything comes back on the far side of the state. */
+        layersMob: PRF_M,
         after: function (q, host, groups) {
           /* EGY CSAPAT. Four lines resolving onto one. The residual is
              the whole statement: at 1 they are four separate drawings,
              at 0 they are the section. */
-          var res = 1 - clamp((q - 0.045) / 0.075, 0, 1);
+          /* IT RESOLVES OVER THE CLAIM'S OWN WINDOW, NOT BEFORE IT.
+                                                          [PHASE 3.1C]
+             .045-.12 put the four traces back on the section before the
+             claim they belong to had finished arriving: measured at
+             390x844 on EGY CSAPAT's reading beat, residual .27 and
+             falling, the labels already at .16, the four lines within
+             a few pixels of grade and of each other. What the visitor
+             was given was a ground section and a claim about teamwork.
+             The residual now spans the reading beat — at .10 it is .57,
+             which is four distinctly separate drawings heading for one
+             node — and reaches zero at .16, while the claim is still on
+             the screen to be the thing they resolved into. */
+          var res = 1 - clamp((q - 0.055) / 0.105, 0, 1);
           var cv = groups.conv;
           if (cv && cv.style.visibility !== 'hidden' && cv.__r !== res) {
             cv.__r = res;
+            /* A PORTRAIT FRAME IS 350 WORLD UNITS WIDE, and the four
+               traces were authored to separate across 2600 of them. At
+               full residual their lateral throw alone is ±190, so both
+               the outer traces and every one of the four names left the
+               viewport sideways — the drawing that survived on a phone
+               was the part with no information in it. The names come in
+               to a third of their span and the lateral throw halves;
+               the VERTICAL separation, which is what makes four lines
+               read as four disciplines, is untouched. */
+            var mp = MOBP.matches;
+            var kx = mp ? 0.50 : 1;
             for (var i = 0; i < cv.children.length; i++) {
               var u = cv.children[i];
               /* The node is the last child and has no offset of its own:
                  it is the thing the other four arrive at, so it appears as
                  they stop being four. */
               if (u.dataset.dx === undefined) {
-                u.style.opacity = (1 - res).toFixed(3);
+                u.style.opacity = clamp(1 - res * 0.85, 0, 1).toFixed(3);
                 continue;
               }
-              u.setAttribute('transform',
-                'translate(' + (+u.dataset.dx * res).toFixed(1) + ',' +
-                               (+u.dataset.dy * res).toFixed(1) + ') rotate(' +
-                               (+u.dataset.r * res).toFixed(2) + ' 600 0)');
+              /* A FAN, NOT FOUR PARALLEL OFFSETS.           [PHASE 3.1C]
+                 On a desktop the four arrive mis-registered — displaced
+                 AND tilted — and resolve. Displacement is what reads
+                 there, because 2600 units of world are on the screen. On
+                 a phone 350 are, so the displacement throws the outer
+                 traces and every one of the four names off the sides,
+                 and what is left in the frame is four near-parallel
+                 lines: no origin, no meeting, no argument.
+
+                 So a phone gets the same event expressed as ANGLE. The
+                 displacement goes, the tilt is amplified about the node,
+                 and all four pass through that node at every point of
+                 the state — four disciplines fanning out of one
+                 agreement and closing onto it, which is the claim, and
+                 the only reading of it a 390px frame can hold. */
+              u.setAttribute('transform', mp
+                ? 'rotate(' + (+u.dataset.r * res * 5).toFixed(2) + ' 600 0)'
+                : 'translate(' + (+u.dataset.dx * res).toFixed(1) + ',' +
+                                 (+u.dataset.dy * res).toFixed(1) + ') rotate(' +
+                                 (+u.dataset.r * res).toFixed(2) + ' 600 0)');
               /* The names leave with the separation they describe. Four
                  labels on one line are four labels for the same thing. */
               var t = u.querySelector('.wrl__cvt');
-              if (t) t.style.opacity = clamp((res - 0.22) / 0.3, 0, 1).toFixed(3);
+              if (t) {
+                t.setAttribute('x', (600 + (+t.dataset.x - 600) * kx).toFixed(1));
+                t.style.opacity = clamp((res - 0.12) / 0.28, 0, 1).toFixed(3);
+              }
+            }
+          }
+
+          /* GARANCIA. THE ENCLOSURE CLOSES.                 [PHASE 3.1C]
+             Four corner marks are decoration; four corner marks whose
+             arms run out and meet are a system boundary. The arms
+             extend on the claim's own approach, so by the time the
+             visitor has read "teljes körű garancia" the rectangle
+             around the whole build-up is complete — the thing the page
+             has spent its length separating, contained.
+
+             It is not a card border. It stands 46 units off the cut at
+             both ends and 74 above the surface: an enclosure drawn
+             AROUND a section, in the section's own hand, at the
+             section's own scale. */
+          var fr = groups.frame;
+          if (fr && fr.style.visibility !== 'hidden') {
+            var ext = ease(clamp((q - 0.845) / 0.052, 0, 1));
+            if (fr.__e !== ext) {
+              fr.__e = ext;
+              for (var b = 0; b < fr.children.length; b++) {
+                var bp = fr.children[b], bd = bp.dataset;
+                if (bd.hw === undefined) continue;
+                bp.setAttribute('d',
+                  'M' + (+bd.cx + +bd.sx * +bd.hw * ext).toFixed(1) + ' ' + bd.cy +
+                  'H' + bd.cx +
+                  'V' + (+bd.cy + +bd.sy * +bd.hh * ext).toFixed(1));
+              }
             }
           }
 
@@ -3559,6 +3895,9 @@
       });
 
       var n = slots.length, lastI = -1;
+      /* The same portrait test rk.js §14 selects camMob and layersMob
+         with, and rk.css §32.95 matches with orientation:portrait. */
+      var MOBP = window.matchMedia('(orientation:portrait)');
 
       /* The composed still: the two-section comparison, which is the one
          state here that carries an argument rather than a measurement. */
@@ -3590,8 +3929,26 @@
           el.__o = s.o;
           el.style.opacity = s.o.toFixed(3);
           el.style.visibility = s.o > 0.004 ? 'visible' : 'hidden';
-          el.style.transform = 'translate3d(0,calc(-100% + ' + (-s.u * 7).toFixed(2) + 'svh),0)';
+          /* A claim hangs from its baseline at 46% — except the stacked
+             comparison, whose claim sits in the gap BETWEEN the two
+             specimens and is therefore centred on it. rk.css §32.9 puts
+             that slot's origin at 50%; this is the other half of the
+             same decision, and it has to be here because an inline
+             transform replaces the rule's outright. */
+          el.style.transform = (MOBP.matches && i === 2)
+            ? 'translate3d(0,calc(-50% + ' + (-s.u * 7).toFixed(2) + 'svh),0)'
+            : 'translate3d(0,calc(-100% + ' + (-s.u * 7).toFixed(2) + 'svh),0)';
         }
+        /* THE TEXT-SAFE COMPOSITION KNOWS WHICH CLAIM IT IS HOLDING.
+                                                          [PHASE 3.1C]
+           Four of the five claims sit at the top of the frame and their
+           drawing is composed underneath. The stacked 70% puts a
+           specimen above the claim as well as below it, so the
+           protected band moves to the middle of the stage — one
+           composition with a state that reaches a different part of it,
+           rather than five independently nudged drawings. See
+           .prf__stage.is-cmp in rk.css §32.9. */
+        toggle(stage, 'is-cmp', MOBP.matches && q > 0.425 && q < 0.665);
         /* Same discipline as the two sections above: the claim steps back
            on the one beat where the instrument is doing something worth
            watching. It is scheduled between the third and fourth
