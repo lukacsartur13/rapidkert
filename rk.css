@@ -792,8 +792,18 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 
   li > .ulink,.grd__contact .ulink,.sheet__call .ulink,
   .rk-foot__bottom .ulink{position:relative}
-  li > .ulink::after,.grd__contact .ulink::after,.sheet__call .ulink::after,
-  .rk-foot__bottom .ulink::after{
+  /* THE BAND IS ::before, AND THE REASON IS THAT ::after IS ALREADY INK.
+     .ulink::after is the underline (§05): background:currentColor, held off
+     the page by transform:scaleX(0). Hanging the touch target on that same
+     pseudo-element overrode the transform as well as the height, which
+     un-hid the paint — so the "invisible" band rendered as a 44px solid
+     block of currentColor straight over the word. Measured at 390x844 on
+     the FAQ's "Hívj minket.": a 102x44 rectangle of rgb(23,24,20) over 28px
+     of text, label unreadable, on every coarse-pointer device.
+     ::before is unused on .ulink, so the band gets its own element and the
+     underline keeps its own. */
+  li > .ulink::before,.grd__contact .ulink::before,.sheet__call .ulink::before,
+  .rk-foot__bottom .ulink::before{
     content:"";position:absolute;left:0;right:0;top:50%;
     height:44px;transform:translateY(-50%);
   }
