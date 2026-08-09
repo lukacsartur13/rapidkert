@@ -183,6 +183,26 @@
 
     var items = panel.querySelectorAll('.rk-menu__item');
 
+    /* THE TAB TRAP IS NOT THE WHOLE ROOM.                        [PHASE 3.2]
+       The keydown handler below wraps Tab and Shift+Tab inside the panel, so
+       a keyboard visitor genuinely cannot walk out of the open menu. A screen
+       reader in browse mode does not move by Tab: it walks the accessibility
+       tree, and that tree still had the whole homepage in it underneath a
+       full-screen panel with the body scroll locked — 8 reachable links in
+       <main> alone, measured at 390x844 with the menu open.
+
+       Marking the rest of the page inert takes it out of the tree AND out of
+       the tab order, which is what "modal" is supposed to mean. The header is
+       excluded because the burger lives in it and has to stay operable.
+
+       Ancestor inert wins over a descendant's own, so this does not disturb
+       the per-chapter inert that rk-ground.js maintains inside <main>: those
+       values are still there, and still correct, when the menu closes. */
+    var offstage = Array.prototype.filter.call(
+      document.body.children,
+      function (el) { return !el.contains(panel) && !el.contains(burger); }
+    );
+
     function setOpen(next) {
       open = next;
       bar.classList.toggle('is-open', open);
@@ -197,9 +217,14 @@
         items.forEach(function (li, i) {
           li.style.transitionDelay = reduced ? '0s' : (0.09 + i * 0.055) + 's';
         });
+        offstage.forEach(function (el) { el.inert = true; });
         var first = panel.querySelector('a, button');
         if (first) first.focus();
       } else {
+        /* Cleared BEFORE lastFocus.focus() below: focusing into a subtree
+           that is still inert silently does nothing, and the visitor would
+           be returned to the top of the document instead of to the burger. */
+        offstage.forEach(function (el) { el.inert = false; });
         panel.dataset.open = 'false';
         document.body.style.overflow = '';
         items.forEach(function (li) { li.style.transitionDelay = '0s'; });

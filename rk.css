@@ -730,7 +730,12 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   padding-bottom:clamp(34px,5vw,60px);
 }
 .rk-foot__logo{height:26px;width:auto;margin-bottom:1.4rem}
-.rk-foot h4{
+/* h3, not h4: these three column headings sit under the page's h2 sections
+   and an h4 skipped a level for every screen reader walking the document —
+   at 1440x900 the homepage's only outline break was h2 "Itt kezdődik a
+   kerted." straight to h4 "Szolgáltatások". The tag carries no styling of
+   its own here, so the outline changes and the footer does not. [PHASE 3.2] */
+.rk-foot h3{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
   text-transform:uppercase;color:var(--on-dark);margin-bottom:1.3rem;
 }
