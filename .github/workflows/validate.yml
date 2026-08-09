@@ -1,0 +1,38 @@
+# Structural validation, run on the server rather than on trust.
+#
+# .claude/tools/pre-commit already runs the rk.css guard, but a hook lives in
+# .git/hooks — it is not cloned, not shared, and gone the moment someone works
+# from a fresh checkout or commits with --no-verify. This runs the same
+# validators where nobody can skip them.
+#
+# The guard exists because of the 2026-08-08 splice: ~1,470 lines of rk.css
+# were deleted by a scripted edit and the result was still valid CSS. Brace
+# balance is not the check. Size floors, the numbered section headings and the
+# critical selectors are.
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # rkguard.py is stdlib-only and takes the file as its argument.
+      - name: rk.css structural guard
+        run: python3 .claude/tools/rkguard.py rk.css
+
+      # --check parses without executing, which is what we want: rk-ground.js
+      # is an ES module that would try to reach for WebGL if it ever ran.
+      - name: rk.js parses
+        run: node --check rk.js
+
+      - name: rk-ground.js parses
+        run: node --check rk-ground.js
