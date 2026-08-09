@@ -746,6 +746,7 @@
     function build(host) {
       var uid = 'w' + (++UID);
       var ID_L = uid + 'l', ID_H = uid + 'h', ID_C = uid + 'c';
+      var ID_F = uid + 'f', ID_G = uid + 'g';
       var svg = el('svg', {
         'class': 'wrl__svg', xmlns: NS,
         preserveAspectRatio: 'xMidYMid meet',
@@ -762,6 +763,29 @@
       });
       pat.appendChild(el('line', { x1: 0, y1: 0, x2: 0, y2: 14, 'class': 'wrl__hatch' }));
       defs.appendChild(pat);
+
+      /* THE REGRADE'S OWN PAIR OF RAKES.                    [PHASE 3.1C]
+         Cut and fill are opposite operations and a drawing says so with
+         opposite hatching — the oldest convention there is for "these
+         two areas are not the same material condition".
+
+         They do not borrow the strata's hatch, for two reasons. It is
+         set at 14 units, and these bodies are 20 units at their
+         thickest and taper to nothing, so most of the wedge would fall
+         between two lines and carry no material at all. And each of
+         these carries a tone behind the rake, which the technical
+         register must not: a hatched area with a tint reads as a
+         QUANTITY of something, which is exactly what a volume of moved
+         earth is, and it is the wrong thing to say about a stratum. */
+      [[ID_F, -45], [ID_G, 45]].forEach(function (p) {
+        var pt = el('pattern', {
+          id: p[0], width: 10, height: 10,
+          patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(' + p[1] + ')'
+        });
+        pt.appendChild(el('rect', { width: 10, height: 10, 'class': 'wrl__rgbg' }));
+        pt.appendChild(el('line', { x1: 0, y1: 0, x2: 0, y2: 10, 'class': 'wrl__hatch' }));
+        defs.appendChild(pt);
+      });
 
       /* The right-hand half of the 70% comparison. The system belongs to
          ONE of the two sections; the main and the dripline are single
@@ -844,6 +868,41 @@
       svg.appendChild(gs);
       svg.appendChild(gh);
       svg.appendChild(gb);
+
+      /* THE REGRADE — BEFORE AND AFTER, IN ONE FRAME.        [PHASE 3.1C]
+
+         PROCESS station 03 is the station at which earth is MOVED, and
+         until now the only evidence of it was that the surface curve
+         quietly became a different curve while nobody had the old one to
+         compare it with, plus five arrows. Judged at 390x844 the station
+         read as "more hatching" — the same profile as station 02,
+         translated about 65px — because a viewer cannot see a difference
+         between a shape and a shape they can no longer see.
+
+         So the shape they can no longer see is drawn. Three objects, in
+         the order a section drawing puts them:
+
+           .wrl__ogl   THE OLD GRADE. The surveyed profile, ghosted and
+                       dashed, held while the new one settles.
+           .wrl__rgf   FILL. Where the designed surface is ABOVE the
+                       surveyed one: material brought in.
+           .wrl__rgc   CUT. Where it is below: material taken away.
+
+         The two bodies are the region BETWEEN the two lines, so their
+         area is literally the volume moved, and they taper to nothing at
+         the crossings — which is what makes them read as earthwork
+         rather than as a band. The arrows in .wrl__cf above are the same
+         measurement taken at five stations; these are the material it
+         was taken of. */
+      var grg = grp('wrl__regrade', 'regrade');
+      var rgf = el('path', { 'class': 'wrl__rgf', d: '' });
+      rgf.style.fill = 'url(#' + ID_F + ')';
+      grg.appendChild(rgf);
+      var rgc = el('path', { 'class': 'wrl__rgc', d: '' });
+      rgc.style.fill = 'url(#' + ID_G + ')';
+      grg.appendChild(rgc);
+      grg.appendChild(el('path', { 'class': 'wrl__ogl', d: '' }));
+      svg.appendChild(grg);
 
       /* THE ENDS OF THE CUT. What makes it a section and not a stack of
          bands: the excavation has two vertical faces. */
@@ -1197,6 +1256,51 @@
         svg.querySelectorAll('.wrl__ed')[i]
            .setAttribute('d', 'M' + x + ' ' + top.toFixed(1) + 'V' + bot.toFixed(1));
       });
+
+      /* THE REGRADE BODIES.                                  [PHASE 3.1C]
+         The old surface, and the two regions between it and the current
+         one. Sampled linearly rather than through profileD's cubics:
+         these are AREAS, and 48 samples across the world is finer than
+         the 26 the curves themselves are built from, so the boundary a
+         region shares with a line is the line.
+
+         A run ends where the sign of (new - old) changes, so each body
+         is emitted as its own closed subpath and the two tapers meet at
+         the crossing. Below a quarter of a unit the two surfaces are
+         the same surface and neither body exists there — without that
+         floor every crossing grows a sliver of hatched nothing. */
+      var ogl = svg.querySelector('.wrl__ogl');
+      if (ogl) {
+        ogl.setAttribute('d', profileD(relief, false, 0, 0, 0));
+        var NR = 48, dCut = '', dFil = '', run = null, sgn = 0;
+        var flushRun = function () {
+          if (run && run.length > 1) {
+            var d2 = 'M' + run[0][0].toFixed(1) + ' ' + run[0][1].toFixed(2), i2;
+            for (i2 = 1; i2 < run.length; i2++) d2 += 'L' + run[i2][0].toFixed(1) + ' ' + run[i2][1].toFixed(2);
+            for (i2 = run.length - 1; i2 >= 0; i2--) d2 += 'L' + run[i2][0].toFixed(1) + ' ' + run[i2][2].toFixed(2);
+            d2 += 'Z';
+            if (sgn > 0) dCut += d2; else dFil += d2;
+          }
+          run = null;
+        };
+        for (var r0 = 0; r0 <= NR; r0++) {
+          var rx = X0 + (X1 - X0) * r0 / NR;
+          var wasY = P(rx) * relief, nowY = S(rx, form) * relief;
+          /* Down the screen is down into the ground, so the new surface
+             being LOWER than the old one is material taken away. */
+          var s0 = Math.abs(nowY - wasY) < 0.25 ? 0 : (nowY > wasY ? 1 : -1);
+          if (s0 !== sgn) {
+            if (run) run.push([rx, wasY, nowY]);   // close on the crossing
+            flushRun();
+            sgn = s0;
+            if (s0) run = [];
+          }
+          if (run) run.push([rx, wasY, nowY]);
+        }
+        flushRun();
+        svg.querySelector('.wrl__rgc').setAttribute('d', dCut);
+        svg.querySelector('.wrl__rgf').setAttribute('d', dFil);
+      }
 
       /* CUT AND FILL — the material that moved.               [PHASE 2.4]
          The shaft runs from the level the ground was at (relief 1, the
@@ -2916,19 +3020,56 @@
         [1.00, 610, 640,  0, 0.74]    // 05 · THE CAMERA RISES
       ];
 
+      /* THE PHONE'S TYPE IS AT THE TOP, SO THE SECTION IS UNDER IT.
+                                                          [PHASE 3.1C]
+         Same division as SERVICES, the other way up: rk.css §32.9 puts
+         the section head at 101 and the written stage at 219, so the
+         copy zone is 84-375 and the drawing gets 375-844. The landscape
+         table anchors grade at 0.48-0.56, which is inside that copy
+         zone — measured at 390x844, station 02: the setting-out's axis
+         heads, its dimension chain and both contours all printed
+         through "AZ ELSO VONALTOL A KESZ KERTIG." and the paragraph
+         under it.
+
+         Each station's anchor is now chosen from the depth its own
+         subject occupies, so the whole subject lands below 375:
+
+           01  survey        -88 to +52     the profile and its contours
+           02  setting-out  -252 to 0       the axis heads are the tallest
+                                            thing in the world, so grade
+                                            goes nearly to the foot
+           03  the ground      0 to +210    the build-up needs the depth
+           04  the network     0 to +98
+           05  the surface   -20 to +40
+
+         AND THE CAMERA STANDS STILL WHILE THE EARTH MOVES. x and the
+         frame height are held across .42-.50, because a regrade is a
+         comparison and a comparison cannot be made from a moving
+         camera: the only thing allowed to change on those frames is the
+         ground. x = 620 puts the crossing point of the two profiles in
+         the middle of the frame, so the fill wedge tapers to nothing
+         and the cut opens on the other side of it — both operations,
+         in one still frame. */
       var CAM_M = [
-        [0.00, 440, 132, 62, 0.34],   // inherited from SERVICES
-        [0.08, 480, 300, 20, 0.32],
-        [0.16, 560, 560,  0, 0.54],   // 01 · the site line
-        [0.23, 578, 580,  0, 0.55],
-        [0.30, 600, 610,  0, 0.56],   // 02 · measured, and set out
-        [0.42, 555, 470,  0, 0.50],
-        [0.50, 550, 400,  0, 0.48],   // 03 · reading
-        [0.60, 545, 280,  0, 0.28],   // 03 -> 04 · the section owns the frame
-        [0.70, 540, 300,  0, 0.32],   // 04 · assembling
-        [0.82, 545, 340,  0, 0.36],
-        [0.90, 550, 400,  0, 0.44],   // 05 · the surface completes
-        [1.00, 560, 560,  0, 0.74]    // 05 · the rise
+        [0.00, 440, 132, 62, 0.17],   // inherited from SERVICES, exactly
+        [0.08, 480, 300, 20, 0.34],
+        [0.16, 560, 560,  0, 0.72],   // 01 · the site line
+        [0.23, 590, 640,  0, 0.78],
+        [0.30, 600, 700,  0, 0.83],   // 02 · measured, and set out
+        /* x 590, 760 units in frame: the fill wedge is 17px at the left
+           edge, tapers to nothing at the crossing three quarters across,
+           and the cut opens to 7px beyond it — with the station arrow
+           that measures each of them (520 and 760) inside the frame. The
+           camera holds all three keys, so the regrade (form .44-.57)
+           happens on a still one. */
+        [0.42, 590, 760,  0, 0.50],   // the camera arrives and stops
+        [0.50, 590, 760,  0, 0.50],   // 03 · reading — THE EARTH MOVES HERE
+        [0.57, 590, 760,  0, 0.50],   // ...and the frame holds until it has
+        [0.64, 600, 520,  0, 0.44],   // 03 -> 04 · the section owns the frame
+        [0.72, 560, 300,  0, 0.50],   // 04 · assembling
+        [0.82, 550, 320,  0, 0.53],
+        [0.90, 550, 400,  0, 0.58],   // 05 · the surface completes
+        [1.00, 560, 560,  0, 0.80]    // 05 · the rise
       ];
 
       var world = host && RK_WORLD.mount(host, {
@@ -2986,6 +3127,15 @@
              taken. */
           axes:    [0.19, 0.28, 0.84, 0.91],
           cutfill: [0.30, 0.37, 0.60, 0.68],
+          /* 03 · THE EARTH MOVES, AND IT IS SHOWN MOVING. [PHASE 3.1C]
+             On before the regrade begins (form runs .44-.57), so the
+             surveyed profile is a ghost the visitor already has when
+             the surface starts to leave it, and held past the station's
+             reading beat so the two levels and the material between
+             them are all on the frame at once. It goes with the
+             station: a cut-and-fill notation over a finished garden is
+             a drawing nobody has cleaned up. */
+          regrade: [0.38, 0.44, 0.62, 0.70],
           /* 03 · TEREP ÉS TALAJMUNKA — the drawing acquires depth. */
           strata:  [0.42, 0.52],
           hatch:   [0.42, 0.52],   // multiplied by --tech; see mount()
