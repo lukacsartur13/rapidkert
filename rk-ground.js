@@ -48,7 +48,13 @@ function boot() {
    01 — ENVIRONMENT
    ========================================================================== */
 
-const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* Not a load-time constant. The preference can be switched from the OS
+   accessibility panel with this page open, and rk.css §20 already answers
+   that live through its own media query — only the timeline was still
+   reading it once and animating underneath a visitor who had just asked it
+   to stop. §10 keeps this binding current.                      [PHASE 3.2B] */
+const RMQ = matchMedia('(prefers-reduced-motion: reduce)');
+let reduced = RMQ.matches;
 const coarse = matchMedia('(pointer: coarse)').matches;
 const params = new URLSearchParams(location.search);
 
@@ -2849,7 +2855,11 @@ function updatePhoto(p, w, h) {
    ========================================================================== */
 
 let ptrX = 0, ptrY = 0, ptrTX = 0, ptrTY = 0;
-if (!coarse && !reduced) {
+/* Reduced motion is checked where the values are USED (apply(), below) rather
+   than here, because `reduced` is now live: gating the listener on it would
+   leave a visitor who switched the preference off with a dead pointer until
+   they reloaded. Tracking two floats costs nothing.             [PHASE 3.2B] */
+if (!coarse) {
   addEventListener('pointermove', (e) => {
     ptrTX = (e.clientX / innerWidth - 0.5) * 2;
     ptrTY = (e.clientY / innerHeight - 0.5) * 2;
@@ -3256,6 +3266,36 @@ if (window.visualViewport) {
     vvT = setTimeout(() => { if (resize() && !running) draw(); }, 120);
   }, { passive: true });
 }
+/* rk.js §15 re-seats the scroll after a rotation so the visitor keeps their
+   place in the story rather than their place in the document. That is a
+   teleport, and the damping in frame() must not treat it as travel: left
+   alone it would sweep the camera through every chapter between the two
+   positions at 8.5% a frame — a two-second flight nobody asked for, arriving
+   exactly where they already were.                              [PHASE 3.2B] */
+/* Switching the OS preference is a change of composition, not a journey, so
+   the scene is re-seated on the spot rather than allowed to travel there:
+   entering reduced motion snaps to the nearest authored chapter, leaving it
+   lands on the visitor's actual scroll position. Either way the transit is
+   one frame — a damped sweep would be motion introduced by the act of asking
+   for less of it.                                               [PHASE 3.2B] */
+if (RMQ.addEventListener) {
+  RMQ.addEventListener('change', (e) => {
+    if (e.matches === reduced) return;
+    reduced = e.matches;
+    pScroll = pTarget = readProgress();
+    p = frozen !== null ? frozen : (reduced ? snapProgress(warp(pTarget)) : warp(pScroll));
+    lastDrawn = -1;
+    draw();
+    start();
+  });
+}
+addEventListener('rk:reseat', () => {
+  vw = 0;
+  resize();
+  pScroll = pTarget = readProgress();
+  p = frozen !== null ? frozen : (reduced ? snapProgress(warp(pTarget)) : warp(pScroll));
+  draw();
+});
 addEventListener('pageshow', () => { vw = 0; resize(); start(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
 

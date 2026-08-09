@@ -23,7 +23,23 @@
   var root = document.documentElement;
   root.classList.remove('no-js');
 
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* The preference can be switched from the OS accessibility panel while the
+     page is open. rk.css §20 and rk-ground.js already answer that live, so
+     this binding is kept current too — every read below that happens at CALL
+     time (menu stagger, panel teardown, form reset) then follows it.
+
+     What deliberately does NOT follow it are the modules that decide their
+     whole shape at init: the reveal observer (§02), the cursor previews, the
+     page wipe and §14's still-frame worlds all return early under reduced
+     motion and have no second state to switch back into. Those stay as the
+     page loaded until it is reloaded — a documented limitation, and the
+     conservative half: nothing starts moving because a preference changed.
+                                                                [PHASE 3.2B] */
+  var rmq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var reduced = rmq.matches;
+  if (rmq.addEventListener) {
+    rmq.addEventListener('change', function (e) { reduced = e.matches; });
+  }
   var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   /* ------------------------------------------------------------------ */
@@ -4191,6 +4207,163 @@
       if (found) { wasDark = dark; wasFilm = film; }
       bar.classList.toggle('is-solid', !dark);
       bar.classList.toggle('is-film', film);
+    });
+  })();
+
+  /* ================================================================== */
+  /* 15 — NARRATIVE POSITION ACROSS A LAYOUT CHANGE       [PHASE 3.2B]  */
+  /* ------------------------------------------------------------------ */
+  /* Rotating a phone changes this document's height by more than a     */
+  /* factor of two, and every browser answers that by keeping scrollY.  */
+  /* Measured at 390x844 before this module existed: a visitor standing */
+  /* in WATER at timeline .379 was set down in EXPLODED at .730 by the  */
+  /* rotation alone. Four chapters, unasked, mid-sentence.               */
+  /*                                                                    */
+  /* Whole-document percentage is not the fix. The stages have          */
+  /* different responsive heights — the Project Field re-rigs its plate */
+  /* count at the breakpoint, the Living Ground's scroll length is      */
+  /* authored in viewports — so the same fraction of the document is a  */
+  /* different part of the story at each width.                         */
+  /*                                                                    */
+  /* What is preserved instead is WHICH CHAPTER and HOW FAR THROUGH IT. */
+  /* The chapters are the top-level sections; each owns the scroll from */
+  /* its own top to the next one's, which makes the partition monotonic */
+  /* and therefore invertible at any layout. A position is captured on  */
+  /* every scroll and tagged with the viewport it was taken in, and the */
+  /* capture replayed after a change is always one tagged with the OLD  */
+  /* viewport: a capture already carrying the new size was written      */
+  /* after the reflow and describes where the browser dropped the       */
+  /* visitor, which is the thing being corrected.                       */
+  /* ================================================================== */
+  (function narrativePosition() {
+    var main = document.querySelector('main');
+    if (!main) return;
+    var marks = Array.prototype.filter.call(main.children, function (el) {
+      return el.tagName === 'SECTION';
+    });
+    var foot = document.querySelector('footer');
+    if (foot) marks.push(foot);
+    if (marks.length < 2) return;      // nothing to be in the middle of
+
+    /* A restore is worth doing when the LAYOUT MODE changed, not when the
+       browser chrome moved. On iOS the toolbar collapsing under a thumb is a
+       ~12% height change that reflows nothing, and re-seating the scroll for
+       it would read as jitter under the visitor's own finger. Width is the
+       honest signal: an orientation flip always changes it, and so does every
+       desktop resize that can cross a breakpoint. A height-only change has to
+       be drastic before it counts as a new composition. */
+    var HEIGHT_TRIGGER = 0.30;
+
+    var lastW = window.innerWidth, lastH = window.innerHeight;
+    var held = null, prior = null, pending = false;
+    var settle = 0;
+
+    function maxScroll() {
+      return Math.max(0, (root.scrollHeight || 0) - window.innerHeight);
+    }
+
+    /* The chapter edges as absolute document offsets, clamped into the
+       scrollable range and forced non-decreasing: .fld is pulled a whole
+       viewport up over .gd by rk.css §31, and a raw read of the two tops is
+       not guaranteed to stay in document order at every width. */
+    function edges() {
+      var y = window.scrollY, max = maxScroll(), out = [], i, v;
+      for (i = 0; i < marks.length; i++) {
+        v = marks[i].getBoundingClientRect().top + y;
+        v = v < 0 ? 0 : v > max ? max : v;
+        if (i && v < out[i - 1]) v = out[i - 1];
+        out.push(v);
+      }
+      out.push(max);
+      return out;
+    }
+
+    function capture() {
+      if (pending) return;
+      var w = window.innerWidth, h = window.innerHeight;
+      if (held && (held.w !== w || held.h !== h)) prior = held;
+      var e = edges();
+      var y = clamp(window.scrollY, 0, maxScroll());
+      var i = 0;
+      while (i < e.length - 2 && e[i + 1] <= y) i++;
+      var span = e[i + 1] - e[i];
+      held = { w: w, h: h, i: i, q: span > 0 ? clamp((y - e[i]) / span, 0, 1) : 0 };
+    }
+
+    /* The most recent capture taken under a viewport that is NOT the current
+       one. Returning null — no such capture — means there is nothing to
+       correct, and the browser's own answer is left alone rather than
+       replaced with a guess. */
+    function source(w, h) {
+      if (held && (held.w !== w || held.h !== h)) return held;
+      if (prior && (prior.w !== w || prior.h !== h)) return prior;
+      return null;
+    }
+
+    function restore() {
+      var w = window.innerWidth, h = window.innerHeight;
+      var s = source(w, h);
+      lastW = w; lastH = h;
+      if (s) {
+        var e = edges();
+        var i = Math.min(s.i, e.length - 2);
+        var y = clamp(e[i] + s.q * (e[i + 1] - e[i]), 0, maxScroll());
+        if (Math.abs(y - window.scrollY) >= 2) {
+          /* 'instant' against html{scroll-behavior:smooth}: this is a
+             correction the visitor must never see travel, and smooth would
+             animate it through every chapter in between — precisely the
+             journey this module exists to prevent. */
+          window.scrollTo({ top: y, behavior: 'instant' });
+          /* The Living Ground damps scroll into scene time at 8.5% a frame.
+             A correction is a teleport, not a scroll, so the damping is told
+             to land on the new position instead of sweeping to it. */
+          window.dispatchEvent(new Event('rk:reseat'));
+          runReaders();
+        }
+      }
+      pending = false;
+      held = null; prior = null;
+      capture();
+    }
+
+    function schedule(delay) {
+      /* Captures stop the moment a change is detected, not when the restore
+         runs: a drag-resize emits a burst of events and every one of them is
+         a chance for a scroll to overwrite the only record of where the
+         visitor was standing. */
+      pending = true;
+      window.clearTimeout(settle);
+      settle = window.setTimeout(restore, delay);
+    }
+
+    window.addEventListener('scroll', capture, { passive: true });
+    capture();
+
+    window.addEventListener('resize', function () {
+      var w = window.innerWidth, h = window.innerHeight;
+      if (w === lastW && Math.abs(h - lastH) < lastH * HEIGHT_TRIGGER) {
+        lastH = h;                     // browser chrome: re-tag, never re-seat
+        return;
+      }
+      schedule(140);
+    }, { passive: true });
+
+    /* iOS reports the OLD geometry while the orientationchange handler runs
+       and settles the visual viewport a beat after that, so the restore waits
+       for the size the visitor will actually be looking at. The delay matches
+       the one rk-ground.js uses to re-size its stage. */
+    window.addEventListener('orientationchange', function () { schedule(320); });
+
+    /* Back/forward. A bfcache entry keeps this module's captures alive, so a
+       rotation that happened while the visitor was away is recoverable in
+       exactly the same way as one that happened here — and if the viewport is
+       unchanged, source() returns null and the browser's own restoration
+       stands untouched. A fresh load has no history to preserve. */
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) { schedule(80); return; }
+      lastW = window.innerWidth; lastH = window.innerHeight;
+      held = null; prior = null;
+      capture();
     });
   })();
 
