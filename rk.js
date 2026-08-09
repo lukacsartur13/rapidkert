@@ -2264,63 +2264,97 @@
       var mqRig = window.matchMedia('(max-width:860px)');
       var lastTtl = null;
 
-      var mob = mobile();
-      if (mob) A = 46;
+      /* THE RIG BELONGS TO THE BREAKPOINT, NOT TO THE FIRST FRAME. [PHASE 3.2]
+         Everything below — the travel amplitude A, each plate's release
+         depths, each plate's veil stops, and the world position written into
+         --x/--z — was solved once, at init, from one reading of the 860
+         breakpoint. Crossing that line afterwards left every one of them at
+         the other screen's answer.
 
-      plates.forEach(function (el) {
-        var run = parseFloat(el.dataset.run) || 0;
-        el.__run = run;
-        el.__no = el.dataset.no || '';
-        /* The station's name, read off the caption that carries it in the
-           markup. Narrow viewports hide that caption (rk.css §32.9 — it
-           rides with a plate crossing the frame at 2.2x and lands on the
-           sheet number) and show the name in the stationary rig instead. */
-        var capEl = el.querySelector('.fld__cap span');
-        el.__name = capEl ? capEl.textContent.trim() : '';
-        /* Authored release. The defaults are deliberately the most timid
-           pair in the file, so a plate added without the two attributes
-           stays a distant one rather than silently becoming a 190vw event.
-           Nothing in index.html uses them. */
-        el.__near = el.dataset.near !== undefined ? +el.dataset.near : 120;
-        el.__cull = el.dataset.cull !== undefined ? +el.dataset.cull : 420;
-        el.__pass = el.classList.contains('fld__pl--near');
-        /* The closing plate is a pass plate for the veil's purposes — it
-           reaches the whole frame and the rig has to stay legible over it —
-           but it is NEVER released, on any screen. Handing it the phone's
-           release depth would cull the one plate whose entire job is to
-           survive the boundary, and the section would end on nothing. */
-        if (mob && el.__pass && el !== last) { el.__near = 820; el.__cull = 980; }
-        /* THE VEIL IS ABOUT COVERAGE, NOT DEPTH.               [PHASE 3.1]
-           620 and 940 are the depths at which a 30vw plate covers about a
-           half and about four fifths of a 1440px frame. They were read as
-           universal, and they are not: the same plate is 240px wide on a
-           390px screen — 61% of the frame before it has travelled at all —
-           so it reaches full bleed at a depth of 566 and the veil, waiting
-           for 620, never opened. Measured at 390x844 on station 07 with the
-           plate at 385px of a 390px frame: veil 0.000, and "GYŐR ÉS 40 KM-ES
-           VONZÁSKÖRZETE" printed in clay straight across a bright sky.
+         Reachable from the test matrix, not just in theory: a tablet rotating
+         768x1024 to 1024x768 crosses 860, and so does any desktop window
+         dragged past it. Measured at 1440x900, reloaded, then narrowed to
+         700x900 with the field pinned: (max-width:860px) matched and the
+         plates still travelled -63.7vw, the desktop amplitude, instead of
+         the -22.5vw the phone composition is authored at. On a 700px frame
+         that is 446px of lateral drift — the near plate leaves the side of
+         the screen before it can own the frame, which is the exact failure
+         the portrait numbers exist to prevent.
 
-           So the two stops are re-derived per plate from the share of the
-           frame it actually covers, inverting cover = w * P / (P - d) at the
-           same 0.51 and 0.80 the desktop numbers encode. Desktop is left on
-           its authored constants — for a 30vw plate at 1440 this returns 618
-           and 938, which is the same veil to within two pixels of depth, but
-           there is no reason to re-solve a case that was never wrong. */
-        if (mob && el.__pass) {
-          var wf = el.offsetWidth / window.innerWidth;
-          el.__vs = P * (1 - wf / 0.51);
-          el.__ve = P * (1 - wf / 0.80);
-        } else { el.__vs = 620; el.__ve = 940; }
-        /* World position: its station along the travel axis, plus the
-           offset that gives it its own place in the composition. Depth is
-           the station alone now — a separate dz only made the same number
-           expressible two ways and the two disagreed. */
-        el.style.setProperty('--x', (A * run + (+el.dataset.dx || 0)).toFixed(2));
-        el.style.setProperty('--y', (+el.dataset.dy || 0).toFixed(2));
-        el.style.setProperty('--z', (-B * run).toFixed(1));
-        el.style.setProperty('--w', el.dataset.w || 20);
-        el.style.setProperty('--h', el.dataset.h || 60);
-      });
+         So the solve becomes a function and the breakpoint calls it. A is
+         assigned both ways now: it only ever stepped DOWN to 46 before, so
+         even a re-run could not have restored the desktop value.
+
+         Only a CROSSING re-rigs, not every resize. Plate widths are authored
+         in vw on both sides of the line (rk.css 12.2 and 32.9), so within one
+         side the coverage fraction the veil is derived from does not move. */
+      var rigMob = null;
+      function rig() {
+        var mob = rigMob = mobile();
+        A = mob ? 46 : 130;
+
+        plates.forEach(function (el) {
+          var run = parseFloat(el.dataset.run) || 0;
+          el.__run = run;
+          el.__no = el.dataset.no || '';
+          /* The station's name, read off the caption that carries it in the
+             markup. Narrow viewports hide that caption (rk.css §32.9 — it
+             rides with a plate crossing the frame at 2.2x and lands on the
+             sheet number) and show the name in the stationary rig instead. */
+          var capEl = el.querySelector('.fld__cap span');
+          el.__name = capEl ? capEl.textContent.trim() : '';
+          /* Authored release. The defaults are deliberately the most timid
+             pair in the file, so a plate added without the two attributes
+             stays a distant one rather than silently becoming a 190vw event.
+             Nothing in index.html uses them. */
+          el.__near = el.dataset.near !== undefined ? +el.dataset.near : 120;
+          el.__cull = el.dataset.cull !== undefined ? +el.dataset.cull : 420;
+          el.__pass = el.classList.contains('fld__pl--near');
+          /* The closing plate is a pass plate for the veil's purposes — it
+             reaches the whole frame and the rig has to stay legible over it —
+             but it is NEVER released, on any screen. Handing it the phone's
+             release depth would cull the one plate whose entire job is to
+             survive the boundary, and the section would end on nothing. */
+          if (mob && el.__pass && el !== last) { el.__near = 820; el.__cull = 980; }
+          /* THE VEIL IS ABOUT COVERAGE, NOT DEPTH.               [PHASE 3.1]
+             620 and 940 are the depths at which a 30vw plate covers about a
+             half and about four fifths of a 1440px frame. They were read as
+             universal, and they are not: the same plate is 240px wide on a
+             390px screen — 61% of the frame before it has travelled at all —
+             so it reaches full bleed at a depth of 566 and the veil, waiting
+             for 620, never opened. Measured at 390x844 on station 07 with the
+             plate at 385px of a 390px frame: veil 0.000, and "GYŐR ÉS 40 KM-ES
+             VONZÁSKÖRZETE" printed in clay straight across a bright sky.
+
+             So the two stops are re-derived per plate from the share of the
+             frame it actually covers, inverting cover = w * P / (P - d) at the
+             same 0.51 and 0.80 the desktop numbers encode. Desktop is left on
+             its authored constants — for a 30vw plate at 1440 this returns 618
+             and 938, which is the same veil to within two pixels of depth, but
+             there is no reason to re-solve a case that was never wrong. */
+          if (mob && el.__pass) {
+            var wf = el.offsetWidth / window.innerWidth;
+            el.__vs = P * (1 - wf / 0.51);
+            el.__ve = P * (1 - wf / 0.80);
+          } else { el.__vs = 620; el.__ve = 940; }
+          /* World position: its station along the travel axis, plus the
+             offset that gives it its own place in the composition. Depth is
+             the station alone now — a separate dz only made the same number
+             expressible two ways and the two disagreed. */
+          el.style.setProperty('--x', (A * run + (+el.dataset.dx || 0)).toFixed(2));
+          el.style.setProperty('--y', (+el.dataset.dy || 0).toFixed(2));
+          el.style.setProperty('--z', (-B * run).toFixed(1));
+          el.style.setProperty('--w', el.dataset.w || 20);
+          el.style.setProperty('--h', el.dataset.h || 60);
+        });
+      }
+      rig();
+      /* The same MediaQueryList the sheet label already listens on, so the
+         label and the geometry it labels can never disagree about which
+         composition is in force. This is the cheap path — it re-rigs once,
+         on the crossing itself, even if the field is nowhere near the
+         viewport at the time. It is NOT the authority: see the reader. */
+      mqRig.addEventListener('change', rig);
 
       /* THE DATUM PLANE.
          Stations at a constant interval of depth, from just in front of the
@@ -2503,6 +2537,15 @@
       if (still) return;
 
       onFrame(function () {
+        /* The authority on which composition is rigged, and deliberately
+           ABOVE the idle guard: a window dragged across 860 while the field
+           is off-screen must arrive re-rigged, not re-rig on the frame the
+           visitor can already see it. A MediaQueryList `matches` read is a
+           cached flag, not a media re-evaluation, so this is affordable per
+           frame — and unlike the change event above it cannot go undelivered.
+           §12.2's own sheet label and §13's .lyr__it anchor already trust
+           exactly this mechanism.                                [PHASE 3.2] */
+        if (mobile() !== rigMob) rig();
         if (idle(pin) && !forced) return;
         var q = travel(pin, stage, 'fld');
 
