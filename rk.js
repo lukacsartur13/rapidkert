@@ -631,10 +631,12 @@
     /* THE PORTRAIT SPECIMEN (see 70% ON A PORTRAIT PHONE in build()).
        Module scope, not build() scope: reshape() draws it and build()
        declares it, and a span the two disagree about is two specimens.
-       360 units wide because that is what a 390px frame holds at the
-       scale two of them stack at, and 190 deep because the build-up is
-       152 and a specimen needs ground under its last boundary. */
-    var VX0 = 420, VX1 = 780, VDEEP = 190;
+       440 units wide — at the 1050-unit frame the pair stacks in, that
+       is 91% of the measure at 390x844 and 74% at 320x568, so a
+       specimen is a specimen on both and not a chip on the second. 190
+       deep because the build-up is 152 and a specimen needs ground
+       under its last boundary. */
+    var VX0 = 380, VX1 = 820, VDEEP = 190;
 
 
     /* ---- THE PROFILE --------------------------------------------------
@@ -1660,7 +1662,14 @@
         var VEM = [510, 600, 690];
         vsRoot.querySelectorAll('.wrl__vsg').forEach(function (g) {
           var m = +g.dataset.m;
-          g.setAttribute('transform', 'translate(0,' + (m ? 240 : -240) + ')');
+          /* 540 units apart. The type between them does not shrink with
+             the viewport — claim plus qualifier is 18% of an 844px frame
+             and 27% of a 568px one — so the separation is set from the
+             SHORTER phone and has room to spare on the taller. At 320
+             the specimens end at 243 and start again at 400 with the
+             claim and its qualifier in between; at 390 the same numbers
+             give 361 and 594 against type that runs 394-568. */
+          g.setAttribute('transform', 'translate(0,' + (m ? 270 : -270) + ')');
           var bs = g.querySelectorAll('.wrl__vsb');
           bs[0].setAttribute('d', vsBand(0, 46));
           bs[1].setAttribute('d', vsBand(46, 104));
@@ -3000,10 +3009,13 @@
       });
 
       var n = items.length, lastI = -1;
-      /* The breakpoint rk.css §32.9 re-anchors .lyr__it at. Live-matched
-         rather than read once, so a rotation resolves it without a
-         reload — the same reason §12.2's sheet label is. */
-      var MOBT = window.matchMedia('(max-width:860px)');
+      /* The breakpoint rk.css §32.9 re-anchors .lyr__it at — PORTRAIT
+         phones only, because §32.97 hands a landscape one back to the
+         desktop's centred composition and this transform has to agree
+         with whichever rule is in force. Live-matched rather than read
+         once, so a rotation resolves it without a reload — the same
+         reason §12.2's sheet label is. */
+      var MOBT = window.matchMedia('(max-width:860px) and (max-aspect-ratio:7/5)');
 
       /* The composed still: the ground built, the sky open, the light
          register — the one frame that says "a drawing became terrain"
@@ -3241,13 +3253,20 @@
            that measures each of them (520 and 760) inside the frame. The
            camera holds all three keys, so the regrade (form .44-.57)
            happens on a still one. */
-        [0.42, 590, 760,  0, 0.50],   // the camera arrives and stops
-        [0.50, 590, 760,  0, 0.50],   // 03 · reading — THE EARTH MOVES HERE
-        [0.57, 590, 760,  0, 0.50],   // ...and the frame holds until it has
-        [0.64, 600, 520,  0, 0.44],   // 03 -> 04 · the section owns the frame
-        [0.72, 560, 300,  0, 0.50],   // 04 · assembling
-        [0.82, 550, 320,  0, 0.53],
-        [0.90, 550, 400,  0, 0.58],   // 05 · the surface completes
+        /* The anchors clear the copy zone at BOTH phone heights. It is
+           84-375 of an 844px frame (44%) and 84-300 of a 568px one
+           (53%) — the type does not shrink as fast as the viewport — so
+           every anchor below is chosen against the 320 fraction and has
+           room to spare at 390. Quoted at .50 they were correct at 844
+           and put grade under the scrim at 568, which is the whole of
+           station 03 invisible on the smaller phone. */
+        [0.42, 590, 760,  0, 0.58],   // the camera arrives and stops
+        [0.50, 590, 760,  0, 0.58],   // 03 · reading — THE EARTH MOVES HERE
+        [0.57, 590, 760,  0, 0.58],   // ...and the frame holds until it has
+        [0.64, 600, 520,  0, 0.52],   // 03 -> 04 · the section owns the frame
+        [0.72, 560, 300,  0, 0.58],   // 04 · assembling
+        [0.82, 550, 320,  0, 0.61],
+        [0.90, 550, 400,  0, 0.66],   // 05 · the surface completes
         [1.00, 560, 560,  0, 0.80]    // 05 · the rise
       ];
 
@@ -3570,13 +3589,13 @@
         [0.10, 600, 900,  0, 0.74],
         [0.22, 600, 820,  0, 0.70],
         [0.30, 600, 900,  0, 0.62],   // 02 · 40 KM
-        [0.42, 600, 844,  0, 0.465],
+        [0.42, 600, 1050, 0, 0.515],
         /* 03 · 70%. THE CAMERA DOES NOT MOVE BETWEEN THESE TWO. A
            comparison read from a travelling camera is not a comparison;
            the two specimens are 480 units apart and both are on the
            frame from the first pixel of the state to the last. */
-        [0.50, 600, 844,  0, 0.465],
-        [0.58, 600, 844,  0, 0.465],
+        [0.50, 600, 1050, 0, 0.515],
+        [0.58, 600, 1050, 0, 0.515],
         [0.70, 620, 470,  0, 0.62],   // 04 · 1 MUNKANAP
         /* 05 · GARANCIA. THE ENCLOSURE HAS TO BE IN THE FRAME.
            The boundary stands 46 units off each end of a 1120-unit cut,

@@ -4385,39 +4385,6 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
      Weighted to the foot, transparent across the top two thirds — the
      grade line, the survey and all four stratum boundaries are above
      the ramp, so nothing the frame is arguing is covered. */
-  /* THE SCRIM BELONGS TO THE STAGE HERE, NOT TO THE TYPE COLUMN.
-     .lyr__type carries opacity:var(--type), which drops to about .38 at
-     the peak of each transformation — and a scrim inside that element
-     steps back with it, so the protection dissolved at exactly the beat
-     the drawing was at its loudest. Measured at 390x844, q .83: --type
-     .48, the .94 scrim rendering at .45, three clay root curves and the
-     dashed main straight through "HAROM SZOLGALTATAS, EGY SZEMLELET."
-
-     So it is the stage's own layer, between the world (z 1) and the type
-     (z 3), and it does not move. The type may still step back; the
-     ground the type is set on may not. */
-  .lyr__type::before{display:none}
-  .lyr__stage::after{
-    content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-    /* TWO PROTECTED BANDS, ONE GRADIENT. The section head at the top and
-       the service at the foot are both type over a drawing that now
-       fills the frame, so this is opaque at both ends and open across
-       the middle — which is exactly the band CAM_M composes the drawing
-       into. The head stop is short and hard (its band is 101-134 at
-       844); the foot's is long, because the block under it is 280px
-       tall and rides as the state leaves. */
-    background:linear-gradient(180deg,
-               rgba(232,229,218,.94) 0%,rgba(232,229,218,.94) 16%,
-               rgba(232,229,218,0) 22%,rgba(232,229,218,0) 46%,
-               rgba(232,229,218,.74) 62%,rgba(232,229,218,.95) 74%);
-    transition:background .5s var(--ease);
-  }
-  .lyr__stage.is-under::after{
-    background:linear-gradient(180deg,
-               rgba(18,19,15,.94) 0%,rgba(18,19,15,.94) 16%,
-               rgba(18,19,15,0) 22%,rgba(18,19,15,0) 46%,
-               rgba(18,19,15,.74) 62%,rgba(18,19,15,.95) 74%);
-  }
 
   /* ---- PROCESS: the datum runs VERTICALLY, the section stays the stage */
   .asm__run{height:260svh}
@@ -4452,23 +4419,6 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   }
   .asm__step{position:absolute;left:0;right:0;top:0;width:auto}
   .asm__step h3{font-size:clamp(1.6rem,7vw,2.4rem)}
-  /* THE PROTECTED COPY ZONE.                                [PHASE 3.1C]
-     Measured at 390x844: the section head runs 101-189 and the live
-     written stage 219-375. The scrim reached 354 and was already down to
-     .22 by 300, so the second half of every station's paragraph was set
-     straight on the drawing. It now holds full weight to the foot of the
-     copy and falls away over the 70px under it, and CAM_M composes each
-     station's subject entirely below that. One zone, stable across
-     01-05, rather than five per-station offsets. */
-  .asm__stage::after{
-    height:clamp(340px,52vh,470px);
-    background:linear-gradient(180deg,rgba(25,26,21,.93) 0%,
-               rgba(25,26,21,.93) 84%,rgba(25,26,21,0));
-  }
-  .asm__stage.is-lit::after{
-    background:linear-gradient(180deg,rgba(232,229,218,.94) 0%,
-               rgba(232,229,218,.94) 84%,rgba(232,229,218,0));
-  }
 
   /* ---- PROOF ---------------------------------------------------------- */
   .prf__run{height:260svh}
@@ -4476,33 +4426,6 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .prf__big--word{font-size:clamp(2rem,11vw,4rem)}
   .prf__d{max-width:38ch;margin-top:1.2rem}
   .prf__of{display:none}
-  /* THE PROOF TEXT-SAFE REGION.                             [PHASE 3.1C]
-     One zone for the whole section rather than a nudge per drawing.
-     Measured at 390x844: the number at 101, the claim hanging from its
-     46% baseline to 388, the qualifier to 504. The scrim holds full
-     weight over all of it and is gone by 64%, and every camera in
-     rk.js §12.5's portrait table composes its claim's drawing into what
-     is left. The 74%-tall top-weighted ramp this replaces was washing
-     the drawing down to a third of its weight at grade while still
-     only reaching .55 over the qualifier — protecting neither. */
-  .prf__stage::after{
-    height:64%;
-    background:linear-gradient(180deg,rgba(244,242,236,.94) 0%,
-               rgba(244,242,236,.94) 80%,rgba(244,242,236,0));
-  }
-  /* AND THE STATE THAT REACHES A DIFFERENT PART OF IT. The stacked 70%
-     comparison puts one specimen above the claim and one below, so the
-     protected band is the middle of the stage and both ends are the
-     drawing's. The claim's own origin moves with it — rk.js §12.5
-     carries the matching -50%, because an inline transform replaces
-     this rule's outright. */
-  .prf__slot[data-s="2"]{top:50%}
-  .prf__stage.is-cmp::after{
-    height:100%;
-    background:linear-gradient(180deg,rgba(244,242,236,0) 0%,
-               rgba(244,242,236,0) 40%,rgba(244,242,236,.94) 45%,
-               rgba(244,242,236,.94) 66%,rgba(244,242,236,0) 70%);
-  }
 
   /* ---- SHEET ---------------------------------------------------------- */
   .sheet__row > summary{grid-template-columns:auto 1fr auto;gap:12px}
@@ -4537,6 +4460,169 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .grd__no{margin-bottom:1.2rem}
   .grd__act{grid-template-columns:1fr;align-items:start}
   .grd__mk--r{display:none}
+}
+
+/* --------------------------------------------------------------------------
+   32.97 — LANDSCAPE PHONES, BELOW THE FOLD                     [PHASE 3.1C]
+   --------------------------------------------------------------------------
+   §31.85 made this argument for the hero and the lower page never heard
+   it: 844x390 satisfies (max-width:860px), so it was served the portrait
+   treatment — a service anchored to the foot of the stage, a written
+   stage at 26vh, and type sized off vw on a frame that is 844 wide and
+   390 tall. Measured at 844x390: "01" at y 64 through "09 HAROM
+   SZOLGALTATAS" at 86, and KERTEPITES at 95-145 through the section
+   head's own rule.
+
+   A landscape phone is not short of width. It has a left and a right,
+   which is the desktop's composition, and the sections above already
+   compose that way — so what they need here is the desktop's ANCHORING
+   with a height-aware type size, not a portrait layout at a third of
+   the room. The drawing keeps the side of the frame the copy leaves.
+   -------------------------------------------------------------------------- */
+@media (max-width:860px) and (min-aspect-ratio:7/5){
+  /* ---- SERVICES: centred in the stage again, in a column.
+     The section head comes up to just under the header so the centred
+     block clears it — at 390 of height there is no room for a 12vh
+     offset above a 220px column. */
+  .lyr__head{top:clamp(62px,17svh,92px)}
+  .lyr__it{top:53%;bottom:auto}
+  .lyr__list{display:block}
+  .lyr__name{font-size:clamp(1.5rem,min(10.4vw,13svh),3rem)}
+  .lyr__tag{max-width:min(48vw,38ch);margin-top:.9rem}
+  .lyr__desc{max-width:min(46vw,40ch);margin-top:.8rem}
+  .lyr__go{margin-top:1rem}
+
+  /* ---- PROCESS: the written stage clears the title instead of landing
+     on it — 26vh of a 390px frame is 101, and the head ends at 110. */
+  .asm__head{top:clamp(62px,17svh,92px)}
+  .asm__steps{top:clamp(150px,40svh,210px)}
+  .asm__step{width:min(52%,46ch)}
+  .asm__step h3{font-size:clamp(1.2rem,3.6vw,1.8rem)}
+  .asm__head .asm__h2{width:min(44%,30ch);font-size:clamp(1.3rem,3vw,2rem)}
+  /* AND ITS GROUND IS A COLUMN, NOT A BAND. The type occupies the left
+     52% here, exactly as it does on a desktop, so a scrim measured down
+     from the top covers the drawing instead of the words: at 390 of
+     height a 265px band reaches 68% of the frame and grade is at 46% of
+     it. The same 100deg wash §32.3 gives the services column, in this
+     section's own ink. */
+  .asm__stage::after{
+    height:100%;
+    background:linear-gradient(100deg,rgba(25,26,21,.93) 0%,rgba(25,26,21,.8) 32%,
+               rgba(25,26,21,.22) 54%,rgba(25,26,21,0) 68%);
+  }
+  .asm__stage.is-lit::after{
+    background:linear-gradient(100deg,rgba(232,229,218,.94) 0%,rgba(232,229,218,.82) 32%,
+               rgba(232,229,218,.24) 54%,rgba(232,229,218,0) 68%);
+  }
+
+  /* ---- PROOF: the claim keeps its baseline and its measure. */
+  .prf__big{font-size:clamp(2.2rem,min(17vw,22svh),5rem)}
+  .prf__big--word{font-size:clamp(1.8rem,min(11vw,15svh),3.4rem)}
+  .prf__d{max-width:min(52vw,44ch)}
+}
+
+/* --------------------------------------------------------------------------
+   32.94 — THE PROTECTED COPY ZONES                             [PHASE 3.1C]
+   --------------------------------------------------------------------------
+   Three sections compose a drawing and a block of type into one frame, and
+   on a phone that frame divides along its LONG axis: SERVICES puts the type
+   at the foot, PROCESS at the head, PROOF at the head except for the one
+   claim that stands between two specimens. Each zone below is measured off
+   the layout that occupies it, and the portrait camera tables in rk.js
+   §§12.3-12.5 compose each state's drawing into what is left.
+
+   PORTRAIT ONLY, and the aspect test is the same one §31.85 uses. A
+   landscape phone satisfies (max-width:860px) and is served the DESKTOP
+   camera tables — its stage is wider than it is tall — so a zone measured
+   for a 844px-tall frame would land on a 390px-tall one as a 340px scrim
+   over 87% of the drawing. Its problem is height; this is not the answer
+   to it.
+   -------------------------------------------------------------------------- */
+@media (max-width:860px) and (max-aspect-ratio:7/5){
+  /* THE SCRIM BELONGS TO THE STAGE HERE, NOT TO THE TYPE COLUMN.
+     .lyr__type carries opacity:var(--type), which drops to about .38 at
+     the peak of each transformation — and a scrim inside that element
+     steps back with it, so the protection dissolved at exactly the beat
+     the drawing was at its loudest. Measured at 390x844, q .83: --type
+     .48, the .94 scrim rendering at .45, three clay root curves and the
+     dashed main straight through "HAROM SZOLGALTATAS, EGY SZEMLELET."
+
+     So it is the stage's own layer, between the world (z 1) and the type
+     (z 3), and it does not move. The type may still step back; the
+     ground the type is set on may not. */
+  .lyr__type::before{display:none}
+  .lyr__stage::after{
+    content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+    /* TWO PROTECTED BANDS, ONE GRADIENT. The section head at the top and
+       the service at the foot are both type over a drawing that now
+       fills the frame, so this is opaque at both ends and open across
+       the middle — which is exactly the band CAM_M composes the drawing
+       into.
+
+       The head's stops are in PIXELS and the foot's in per cent, and
+       that is the difference between the two things being protected.
+       The head is a fixed 84px offset plus one or two lines of a
+       clamped size — 101-134 at 390, 84-139 at 320, where the title
+       wraps — so it is a distance, not a fraction. The service block at
+       the foot is anchored to the bottom of the stage, so it is. */
+    background:linear-gradient(180deg,
+               rgba(232,229,218,.94) 0,rgba(232,229,218,.94) 148px,
+               rgba(232,229,218,0) 198px,rgba(232,229,218,0) 46%,
+               rgba(232,229,218,.74) 62%,rgba(232,229,218,.95) 74%);
+    transition:background .5s var(--ease);
+  }
+  .lyr__stage.is-under::after{
+    background:linear-gradient(180deg,
+               rgba(18,19,15,.94) 0,rgba(18,19,15,.94) 148px,
+               rgba(18,19,15,0) 198px,rgba(18,19,15,0) 46%,
+               rgba(18,19,15,.74) 62%,rgba(18,19,15,.95) 74%);
+  }
+
+  /* THE PROTECTED COPY ZONE.                                [PHASE 3.1C]
+     Measured at 390x844: the section head runs 101-189 and the live
+     written stage 219-375. The scrim reached 354 and was already down to
+     .22 by 300, so the second half of every station's paragraph was set
+     straight on the drawing. It now holds full weight to the foot of the
+     copy and falls away over the 70px under it, and CAM_M composes each
+     station's subject entirely below that. One zone, stable across
+     01-05, rather than five per-station offsets. */
+  .asm__stage::after{
+    height:clamp(340px,52vh,470px);
+    background:linear-gradient(180deg,rgba(25,26,21,.93) 0%,
+               rgba(25,26,21,.93) 88%,rgba(25,26,21,0));
+  }
+  .asm__stage.is-lit::after{
+    background:linear-gradient(180deg,rgba(232,229,218,.94) 0%,
+               rgba(232,229,218,.94) 88%,rgba(232,229,218,0));
+  }
+
+  /* THE PROOF TEXT-SAFE REGION.                             [PHASE 3.1C]
+     One zone for the whole section rather than a nudge per drawing.
+     Measured at 390x844: the number at 101, the claim hanging from its
+     46% baseline to 388, the qualifier to 504. The scrim holds full
+     weight over all of it and is gone by 64%, and every camera in
+     rk.js §12.5's portrait table composes its claim's drawing into what
+     is left. The 74%-tall top-weighted ramp this replaces was washing
+     the drawing down to a third of its weight at grade while still
+     only reaching .55 over the qualifier — protecting neither. */
+  .prf__stage::after{
+    height:64%;
+    background:linear-gradient(180deg,rgba(244,242,236,.94) 0%,
+               rgba(244,242,236,.94) 80%,rgba(244,242,236,0));
+  }
+  /* AND THE STATE THAT REACHES A DIFFERENT PART OF IT. The stacked 70%
+     comparison puts one specimen above the claim and one below, so the
+     protected band is the middle of the stage and both ends are the
+     drawing's. The claim's own origin moves with it — rk.js §12.5
+     carries the matching -50%, because an inline transform replaces
+     this rule's outright. */
+  .prf__slot[data-s="2"]{top:50%}
+  .prf__stage.is-cmp::after{
+    height:100%;
+    background:linear-gradient(180deg,rgba(244,242,236,0) 0%,
+               rgba(244,242,236,0) 40%,rgba(244,242,236,.94) 45%,
+               rgba(244,242,236,.94) 66%,rgba(244,242,236,0) 70%);
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -4607,6 +4693,31 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   .wrl__bk{stroke-width:2.4}
 }
 
+/* --------------------------------------------------------------------------
+   32.96 — 320 IS NOT A NARROW 390                              [PHASE 3.1C]
+   --------------------------------------------------------------------------
+   PROCESS composes as a copy zone at the top and a drawing under it, and
+   the zone is measured, not assumed. At 320x568 the section title wraps
+   to three lines and the station's paragraph to four, so the type ran to
+   y 350 of a 568px frame — 62% of it — and the last two lines of every
+   station were set on the drawing with 218px left for the section.
+
+   The type comes down a step. Nothing is hidden and nothing is cropped:
+   the same five stations, the same words, at the size a 320px measure
+   can hold them and still be a drawing underneath.
+   -------------------------------------------------------------------------- */
+@media (max-width:360px){
+  /* The stacked 70% puts a specimen above the claim and one below, and
+     the qualifier is the only part of that column that can give: four
+     lines of it is a fifth of a 568px frame standing between two pieces
+     of evidence. */
+  .prf__d{font-size:.8rem;max-width:34ch;margin-top:1rem}
+  .asm__h2{font-size:clamp(1.35rem,6.6vw,1.9rem)}
+  .asm__step h3{font-size:clamp(1.25rem,6vw,1.7rem)}
+  .asm__step p{font-size:.84rem;line-height:1.55}
+  .asm__steps{top:clamp(160px,29svh,210px)}
+}
+
 @media (max-width:520px){
   .brg__spec div:nth-child(n+3){display:none}
   /* Sized so the longest single word in the set — "Öntözőrendszer", which
@@ -4667,6 +4778,11 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
     opacity:1!important;visibility:visible!important;
   }
   .lyr__stage,.asm__stage,.prf__stage{position:relative;height:auto;overflow:visible}
+  /* The portrait copy zones (§32.94) are measured against a pinned frame.
+     There is no pinned frame here — the stage is ordinary flow and the
+     drawing has a height of its own between the copy it belongs to — so
+     a scrim quoted in per cent of it would cover the whole section. */
+  .lyr__stage::after{display:none}
   .lyr__run,.asm__run,.prf__run{display:none}
   .lyr__type,.prf__slots{position:relative;inset:auto;display:block;opacity:1!important}
   .lyr__type::before{display:none}
