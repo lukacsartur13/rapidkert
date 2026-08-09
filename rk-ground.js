@@ -1881,6 +1881,16 @@ scene.add(lip);
    07 — RENDERER + CAMERA
    ========================================================================== */
 
+/* -- the two failure flags -------------------------------------------------
+   Declared here, above the renderer, because fail() can be called by the
+   constructor's own catch — and a `let` read from inside its temporal dead
+   zone throws a second error on top of the first.               [PHASE 3.2]
+
+     dead  the stacked layout has taken over. Permanent, never retried.
+     lost  the GL context is gone but may still come back. Nothing may be
+           drawn, but the pinned layout stays exactly as it is.            */
+let dead = false, lost = false, restoreT = 0;
+
 let renderer;
 try {
   renderer = new THREE.WebGLRenderer({
@@ -1888,10 +1898,23 @@ try {
     stencil: false, depth: true
   });
 } catch (err) {
+  /* The head probe said WebGL was available and the constructor disagreed —
+     a driver blocklist, an exhausted context pool, a GPU process that died
+     between the two. The page has a complete layout for exactly this, so the
+     only thing left to do is hand over to it. Rethrowing here used to put an
+     uncaught error on a page that was, at that moment, working: the fallback
+     was already up.                                             [PHASE 3.2] */
+  console.warn('[rk] WebGL renderer unavailable — using the stacked layout.', err);
   fail();
-  throw err;
+  return;
 }
-if (!renderer || !renderer.getContext()) { fail(); }
+/* A constructor that returns without a context is the same failure wearing a
+   different coat. This used to fall through and call setClearColor on it. */
+if (!renderer || !renderer.getContext()) {
+  console.warn('[rk] WebGL context could not be created — using the stacked layout.');
+  fail();
+  return;
+}
 
 renderer.setClearColor(0x000000, 0);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1906,8 +1929,26 @@ const camera = new THREE.PerspectiveCamera(27, 1, 0.5, 90);
 scene.add(camera);
 
 function fail() {
+  if (dead) return;                       // one handover, never a retry loop
+  dead = true;
+  /* Dropping .gd-on collapses the pinned stage and with it the ~7½ viewports
+     of scroll that .gd__scroll contributes. At init that is free — nobody has
+     scrolled yet. After a context loss halfway down the narrative it is not:
+     the visitor would be thrown into a different part of the page, or clamped
+     to its new end, by an event that has nothing to do with them. So the
+     shrinkage is measured and subtracted.                       [PHASE 3.2] */
+  const before = section.getBoundingClientRect();
+  const inOrPast = before.top < 0;
   root.classList.remove('gd-on');
   root.classList.add('gd-off');
+  if (inOrPast) {
+    const delta = before.height - section.getBoundingClientRect().height;
+    if (delta > 0) {
+      /* html{scroll-behavior:smooth} would otherwise animate a correction
+         that is meant to be invisible. */
+      scrollTo({ top: Math.max(0, scrollY - delta), behavior: 'instant' });
+    }
+  }
 }
 
 /* ==========================================================================
@@ -3096,7 +3137,7 @@ function apply(now) {
 
 function frame(now) {
   raf = 0;
-  if (!visible) { running = false; return; }
+  if (!visible || dead || lost) { running = false; return; }
 
   const dt = now - last;
   last = now;
@@ -3164,10 +3205,18 @@ function frame(now) {
 }
 
 function start() {
-  if (running || !visible) return;
+  if (running || !visible || dead || lost) return;
   last = performance.now();
   running = true;
   raf = requestAnimationFrame(frame);
+}
+/* The single place anything outside the loop is allowed to put a frame on
+   screen. Drawing into a lost or abandoned context is how one GPU hiccup
+   becomes a console full of identical errors.                   [PHASE 3.2] */
+function draw() {
+  if (dead || lost) return;
+  apply(performance.now());
+  renderer.render(scene, camera);
 }
 function stop() {
   running = false;
@@ -3183,18 +3232,59 @@ const io = new IntersectionObserver((entries) => {
 }, { rootMargin: '10% 0px 10% 0px' });
 io.observe(section);
 
-addEventListener('resize', () => { resize(); if (!running) { apply(performance.now()); renderer.render(scene, camera); } }, { passive: true });
+addEventListener('resize', () => { resize(); if (!running) draw(); }, { passive: true });
 /* The datum is a typographic measurement, so it is only true once the display
    face has actually rendered — measured against the fallback it can be most
    of a line out, and the specimen would sit visibly off the headline. */
 if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(() => { measureDatum(); measureChapterTops(); if (!running) { apply(performance.now()); renderer.render(scene, camera); } });
+  document.fonts.ready.then(() => { measureDatum(); measureChapterTops(); if (!running) draw(); });
 }
-addEventListener('orientationchange', () => setTimeout(() => { vw = 0; resize(); }, 260));
+/* Rotation resizes in two stages on iOS: the event fires while the old
+   geometry is still reported, and the visual viewport settles a moment later.
+   vw = 0 forces resize() past its own no-op guard so the second reading is
+   always acted on. The visualViewport pass catches the third movement — the
+   browser chrome collapsing or expanding under a thumb — which emits no
+   window resize at all on iOS Safari and would otherwise leave the stage
+   sized to a viewport that no longer exists.                    [PHASE 3.2] */
+addEventListener('orientationchange', () => setTimeout(() => { vw = 0; resize(); if (!running) draw(); }, 260));
+if (window.visualViewport) {
+  let vvT = 0;
+  visualViewport.addEventListener('resize', () => {
+    /* Coalesced, not throttled: toolbar collapse fires a burst and only the
+       state it settles in is worth a projection-matrix rebuild. */
+    clearTimeout(vvT);
+    vvT = setTimeout(() => { if (resize() && !running) draw(); }, 120);
+  }, { passive: true });
+}
 addEventListener('pageshow', () => { vw = 0; resize(); start(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
 
-canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); fail(); });
+/* -- context loss ----------------------------------------------------------
+   preventDefault() is what makes a restore possible at all, so it is
+   unconditional. What must NOT be unconditional is the handover: dropping
+   .gd-on collapses the pinned stage under a visitor who may be standing in
+   the middle of it, and a GPU that is about to hand the context straight back
+   would have caused that reflow for nothing. So the loop stops at once — a
+   lost context must never be drawn into — and the page waits one beat.
+   If the restore does not come, the stacked layout does.        [PHASE 3.2] */
+canvas.addEventListener('webglcontextlost', (e) => {
+  e.preventDefault();
+  lost = true;
+  stop();
+  clearTimeout(restoreT);
+  restoreT = setTimeout(() => { if (lost) fail(); }, 1600);
+});
+canvas.addEventListener('webglcontextrestored', () => {
+  clearTimeout(restoreT);
+  if (dead) return;                 // the fallback already won; do not fight it
+  lost = false;
+  /* three re-uploads its own resources on this event. What it cannot know is
+     the size and the frame, both of which belong to this file. */
+  vw = 0;
+  resize();
+  draw();
+  start();
+});
 
 /* -- first frame -----------------------------------------------------------
    Everything is procedural, so there is nothing to preload and no loader to

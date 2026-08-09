@@ -1123,6 +1123,16 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
    typography is the actual ground plane and not a decorative hairline. */
 .gd__datum{display:block;height:0;--anchor:.5}
 .gd-on .gd__ch--hero .gd__datum{height:clamp(2.5rem,6.2vh,4.4rem)}
+/* THE FALLBACK STILL NEEDS THE BAND.                          [PHASE 3.2]
+   Without a model there is no grade plane to measure against, so the datum
+   was left at zero — and that put lines two and three of the headline
+   directly adjacent at a line-height of .86. "kezdődik" carries Ő, the one
+   glyph in the headline whose double acute reaches above the line box, and
+   it printed straight through the descenders of "felszínen". Measured in
+   the no-WebGL layout at 1440x900: line 2 bottom 376.0, line 3 top 376.0.
+   A third of the leading separates them and nothing else changes — this is
+   scoped away from .gd-on, which is composed and stays composed. */
+html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 
 /* A step below the hero on purpose: chapter headings share the screen with
    the model and with a leader-line overlay, and at hero scale they stop

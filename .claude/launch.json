@@ -25,6 +25,14 @@
         "/private/tmp/rk-serve-31c.sh"
       ],
       "port": 8823
+    },
+    {
+      "name": "rapidkert-p32",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": [
+        "/private/tmp/rk-serve-32.sh"
+      ],
+      "port": 8831
     }
   ]
 }
