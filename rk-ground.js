@@ -2011,7 +2011,45 @@ if (!renderer || !renderer.getContext()) {
   return;
 }
 
+/* IS THERE ACTUALLY A GPU BEHIND THIS CONTEXT?                  [PHASE 3.2C]
+   A WebGL context is not a promise of hardware. When Chrome cannot use the
+   driver it falls back to SwiftShader and rasterises every pixel on the CPU,
+   silently — getContext still succeeds, MAX_TEXTURE_SIZE still looks fine,
+   and the head probe still sets .gd-on.
+
+   Measured on this scene, at 412x823 with the stock mobile CPU throttle:
+
+       hardware rasteriser    main thread  1.9s    TBT     0ms    2 long tasks
+       software rasteriser    main thread 21.2s    TBT 5,400ms   20 long tasks
+
+   Startup is 1.1s in both. The entire difference is fill: 60 frames a second
+   of a full-viewport canvas, shaded by the CPU. No amount of work on the
+   startup path touches it, which is why an audit from a machine in this
+   state reported 41.7s of main-thread work against a page that measures 1.9s
+   on a machine with a working driver.
+
+   This is capability detection, in the same spirit as the hardwareConcurrency
+   and deviceMemory heuristics above it — it asks the driver what it is, not
+   who is looking. */
+const soft = (() => {
+  if (params.get('soft') === '1') return true;
+  if (params.get('soft') === '0') return false;
+  try {
+    const gl = renderer.getContext();
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : '');
+    return /swiftshader|llvmpipe|software|basic render|mesa offscreen/i.test(name);
+  } catch (e) { return false; }
+})();
+
 renderer.setClearColor(0x000000, 0);
+/* Fill cost is quadratic in DPR, so this is the one lever that matters when
+   the CPU is the rasteriser: 1.4 at 412x823 is 665k pixels a frame, 1.0 is
+   339k. Shadows go too — a second full pass over the scene is the last thing
+   a software rasteriser needs. The narrative, the geometry, the materials
+   and every chapter are untouched: this is the LOW tier's own dial, turned
+   the rest of the way down.                                     [PHASE 3.2C] */
+if (soft) Q = Object.assign({}, Q, { dpr: 1, shadow: 0 });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.12;
@@ -3018,7 +3056,7 @@ function introEase() {
 }
 let vw = 0, vh = 0, dpr = 1, lastBg = '', lastOut = '', lastHanded = false;
 let pendingResize = false;
-let last = performance.now(), slow = 0, downgraded = false, lastDrawn = -1;
+let last = performance.now(), slow = 0, downgraded = 0, lastDrawn = -1, softLast = 0;
 
 /* WHERE THE SCROLL IS, WITHOUT ASKING THE LAYOUT.                [PHASE 3.2C]
    This used to be one getBoundingClientRect() per frame. That single call was
@@ -3326,11 +3364,30 @@ function frame(now) {
   const dt = now - last;
   last = now;
 
-  /* One-shot quality guard. If the device cannot hold ~38fps over ninety
-     frames, drop DPR once. Never the narrative, never the geometry. */
-  if (!downgraded && dt > 26) {
-    if (++slow > 90) {
-      downgraded = true;
+  /* THIRTY FRAMES INSTEAD OF SIXTY, WHEN EACH ONE IS A CPU RASTER PASS.
+     Half the frames is half the fill, and at 30fps the damping and the grass
+     still read as motion rather than as steps — the timeline is driven by
+     scroll position, not by frame count, so nothing about the narrative's
+     pacing changes. Only drawing is skipped; p still advances every frame,
+     so the scene is never behind the scrollbar.                 [PHASE 3.2C] */
+  if (soft && now - softLast < 30) { raf = requestAnimationFrame(frame); return; }
+  softLast = now;
+
+  /* Adaptive quality guard. If the device cannot hold ~38fps, drop DPR.
+     Never the narrative, never the geometry.
+
+     Two steps rather than one, and after twenty-five bad frames rather than
+     ninety: at 30fps ninety frames is three seconds of a visitor watching
+     the thing struggle before anything responds, and one step of 0.72 was
+     not enough to rescue a machine that was far off the pace. [PHASE 3.2C] */
+  if (downgraded < 2 && dt > 26) {
+    if (++slow > 25) {
+      downgraded++;
+      slow = 0;
+      /* The floor stays at 1. Below it the canvas is visibly soft, and a
+         phone that stutters for a moment is not a reason to hand its owner a
+         blurry model for the rest of the visit. Only a confirmed software
+         rasteriser goes lower, and it goes there deliberately, above. */
       Q = Object.assign({}, Q, { dpr: Math.max(1, Q.dpr * 0.72) });
       dpr = Math.min(devicePixelRatio || 1, Q.dpr);
       renderer.setPixelRatio(dpr);

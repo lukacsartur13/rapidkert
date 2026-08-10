@@ -68,6 +68,15 @@
       ],
       "port": 8845,
       "url": "https://localhost:8845"
+    },
+    {
+      "name": "rapidkert-noslice",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": [
+        "/private/tmp/rk-serve-noslice.sh"
+      ],
+      "port": 8847,
+      "url": "https://localhost:8847"
     }
   ]
 }

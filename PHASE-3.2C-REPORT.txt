@@ -763,6 +763,95 @@ the SOURCE tree, because the Pages source is still "Deploy from a branch":
 
 
 ════════════════════════════════════════════════════════════════════════════
+15B — THE AUDIT MACHINE HAS NO GPU                          [ADDED AFTER 15]
+════════════════════════════════════════════════════════════════════════════
+
+An audit taken on the owner's machine after the push reported Performance 48
+with TBT 7,620ms and Speed Index 12.2s, against this machine's 99 and 0ms on
+the same commit. Section 1 attributed the gap to CPU speed. That was wrong,
+and the arithmetic should have given it away: 41.7s of main-thread work at a
+4x multiplier is 10.4s of REAL CPU, where this machine spends 0.4s. Twenty-five
+times is not a fast laptop against a slow one.
+
+Forcing Chrome onto its software rasteriser reproduces it:
+
+  | at 412x823, stock mobile profile | main thread | TBT      | long tasks |
+  | -------------------------------- | ----------- | -------- | ---------- |
+  | hardware WebGL                   |  1.9 s      |     0 ms |  2         |
+  | software WebGL (SwiftShader)     | 21.2 s      | 5,400 ms | 20         |
+
+Startup is 1.1s in both. The difference is entirely fill: sixty frames a
+second of a full-viewport canvas, shaded by the CPU. A main-thread CPU
+profile under SwiftShader is 6.4s of `(program)` — native rasteriser time —
+out of a 9s window, against 0.8s of JavaScript in total.
+
+That means the whole of sections 4 to 8 optimised the wrong axis for that
+machine. They were not wasted — they are why the hardware path is 99 and why
+the software path improved at all — but no amount of work on startup,
+transfer or task scheduling touches a CPU that is being asked to shade
+660,000 pixels sixty times a second.
+
+WHAT WAS DONE ABOUT IT
+
+  The renderer is asked what it is. WEBGL_debug_renderer_info reports the
+  unmasked renderer string; SwiftShader, llvmpipe, Mesa offscreen and
+  Microsoft Basic Render are all software. This is capability detection in
+  the same spirit as the hardwareConcurrency and deviceMemory heuristics the
+  tier system already uses — it asks the driver what it is, not who is
+  looking. `?soft=1` and `?soft=0` force it either way for testing.
+
+  On a software rasteriser the scene keeps every chapter, every material and
+  every instance, and turns the LOW tier's own dials the rest of the way
+  down: DPR 1.4 to 1.0 (fill is quadratic in DPR — 665k pixels a frame
+  becomes 339k), shadows off, and thirty frames a second instead of sixty.
+  Fill per second drops about fourfold. The timeline is driven by scroll
+  position rather than frame count, so nothing about the pacing changes.
+
+  The adaptive guard was also sharpened, for every device: it reacts after
+  twenty-five bad frames instead of ninety — ninety was three seconds of a
+  visitor watching it struggle — and can step twice instead of once, which
+  matters at HIGH tier where DPR starts at 2.0. The floor stays at 1.0. A
+  phone that stutters for a moment does not get a blurry model for the rest
+  of the visit.
+
+  | software rasteriser | before   | after       |
+  | ------------------- | -------- | ----------- |
+  | Performance         | 51       | 64 / 65 / 64|
+  | main-thread work    | 21.2 s   | 16.4–17.9 s |
+  | long tasks          | 20       | 3 – 5       |
+  | Speed Index         | 5.6 s    | 5.1–5.5 s   |
+  | TBT                 | 5,000 ms | 5,021–5,695 |
+
+  Hardware path, same commit: 98 / 99 / 98, TBT 1–11ms. Effective DPR and
+  frame rate on the hardware path are unchanged — 1.398 and 60fps, verified
+  by measuring the canvas backing store, not by trusting the branch.
+
+  TBT does not improve, and the table is honest about that: fewer, longer
+  tasks earn fewer 50ms deductions, so TBT can hold steady while the work
+  underneath it falls by a fifth. What improved is real — four seconds less
+  CPU and a quarter of the long tasks.
+
+WHAT WAS NOT DONE, AND IS A DESIGN DECISION
+
+  A machine with no GPU cannot run a sixty-frame procedural scene well, and
+  the site already has a complete, designed answer for machines that cannot
+  run it at all: the stacked editorial fallback that .gd-off produces. Routing
+  a software rasteriser to that fallback would take the software path from 64
+  to something close to the hardware score in one line.
+
+  It is not done here because it is not a performance decision. It decides
+  that a class of visitor sees a different site, and §68 of the brief is
+  explicit that low tiers exist to preserve the concept rather than to drop
+  it. That call belongs to the owner.
+
+  Worth knowing before making it: this is almost certainly a local Chrome or
+  driver state on one machine, not a population. Every M-series Mac, every
+  current phone and every mainstream desktop GPU gives Chrome hardware WebGL.
+  chrome://gpu will say which one this machine has, under "WebGL: Hardware
+  accelerated" or "Software only".
+
+
+════════════════════════════════════════════════════════════════════════════
 16 — WHAT WAS NOT DONE
 ════════════════════════════════════════════════════════════════════════════
 
