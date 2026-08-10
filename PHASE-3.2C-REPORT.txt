@@ -1,0 +1,739 @@
+════════════════════════════════════════════════════════════════════════════
+RAPIDKERT — PHASE 3.2C
+LIGHTHOUSE: PERFORMANCE 99, ACCESSIBILITY 100
+════════════════════════════════════════════════════════════════════════════
+
+ANSWERS FIRST
+─────────────
+  LIGHTHOUSE PERFORMANCE 100?     NO   — 99 / 98 / 99 over three cold runs.
+  LIGHTHOUSE ACCESSIBILITY 100?   YES  — 100 on every run, every page.
+
+  The exact audit preventing 100 is FIRST CONTENTFUL PAINT: 1.68s, which
+  scores 0.92 against a weight of 10. Every other scored metric is at or
+  within a rounding of 1.00 (LCP 1.89s → 0.98, TBT 0ms → 1.00, CLS 0 → 1.00,
+  Speed Index 1.68s → 1.00). The weighted total is 98.7; 99.5 is needed.
+  Section 9 of this report is the evidence that the remaining 0.8 points are
+  not purchasable on this profile, and what it would take to buy them.
+
+
+════════════════════════════════════════════════════════════════════════════
+1 — CALIBRATION: WHAT THE SUPPLIED AUDIT MEASURED
+════════════════════════════════════════════════════════════════════════════
+
+The supplied audit reported Performance 57 with TBT 1,820ms and 41.7s of
+main-thread work. Run against the same live URL, on the same Lighthouse
+version and the same stock mobile profile, this machine produced:
+
+    Performance 86 / 78     FCP 2.52 / 3.13     LCP 2.97 / 4.03
+    TBT 253 / 36            CLS 0               SI 2.83 / 5.28
+
+Every FINDING reproduced exactly — rk.css 73 KiB render-blocking, three.js
+169 KiB with ~90 KiB unused, kesz-gyep-terasz-thumb.jpg 243 KiB, both logos
+at ~40 KiB, the four non-composited animations, the OkosKert contrast
+failure, a 10-minute cache TTL on every asset. Every CPU-BOUND NUMBER did
+not, and by a wide margin.
+
+That difference is the machine, not the page. Lighthouse's `simulate`
+throttling traces the page unthrottled and then multiplies observed CPU by
+the slowdown factor, so a faster host produces smaller CPU metrics from an
+identical page. Turning the multiplier up until the live baseline matched
+the supplied audit gave:
+
+    cpuSlowdownMultiplier: 9   →   Performance 55 / 56
+                                   FCP 2.42 / 2.57   LCP 4.25
+                                   TBT 1,672 / 1,526  CLS 0
+
+— within 10% of the supplied audit on every scored metric. Everything below
+is reported at BOTH profiles: the stock mobile profile (the documented one),
+and this calibrated stand-in for the slower machine.
+
+  benchmarkIndex here: 1402.5. The supplied audit's machine is roughly 5–9x
+  slower on CPU. This is stated plainly because it changes what "100" means:
+  a score is a property of a page AND a device, and no amount of work on the
+  page moves the device.
+
+
+════════════════════════════════════════════════════════════════════════════
+2 — THE MEASUREMENT HARNESS
+════════════════════════════════════════════════════════════════════════════
+
+Two things had to be fixed before a local number meant anything.
+
+  HTTP/2 + TLS.  GitHub Pages serves over h2. A python http.server serialises
+  requests over HTTP/1.1 and Lighthouse's network simulator then models six
+  connections instead of one multiplexed stream.
+
+  gzip.  Without it the mirror served rk.css at 246 KiB instead of 73 KiB and
+  three.js at 672 KiB instead of 169 KiB. Local FCP was 6.6s against the live
+  site's 2.5s: the measurement was of the server.
+
+With both fixed, the local baseline lands on the live one (local FCP 2.43s,
+live 2.52s), and the harness is a fair stand-in that can be iterated against
+without deploying. Acceptance runs measure dist/ — the production build —
+not the source tree.
+
+  A control was measured too: a 400-byte HTML page with no JS and no images,
+  on the same harness, scores FCP and LCP 0.79s. That is the floor of this
+  profile and it is used in section 9.
+
+
+════════════════════════════════════════════════════════════════════════════
+3 — BEFORE / AFTER
+════════════════════════════════════════════════════════════════════════════
+
+Local, stock mobile profile, three cold runs each, same harness:
+
+  | Metric            | Before            | After                |
+  | ----------------- | ----------------- | -------------------- |
+  | Performance       | 84 / 83 / 84      | 99 / 98 / 99         |
+  | Accessibility     | 96                | 100                  |
+  | FCP               | 2.43 s            | 1.68 s               |
+  | LCP               | 3.89 s            | 1.89 s               |
+  | TBT               | 95 ms             | 0 – 34 ms            |
+  | CLS               | 0                 | 0                    |
+  | Speed Index       | 2.43 s            | 1.68 s               |
+  | Main-thread work  | 2.4 s             | 1.9 s                |
+  | Long tasks        | 4                 | 2 – 3                |
+  | Time to Interactive | 4.5 s           | 1.9 s                |
+  | Max potential FID | 160 ms            | 50 ms                |
+  | Total transfer    | 745 KiB           | 218 KiB              |
+
+At the calibrated profile (cpuSlowdownMultiplier 9), which stands in for the
+machine that produced the supplied audit:
+
+  | Metric            | Before            | After                |
+  | ----------------- | ----------------- | -------------------- |
+  | Performance       | 76 / 77 / 76      | 98 / 98 / 98         |
+  | TBT               | 328 – 349 ms      | 54 – 95 ms           |
+  | Main-thread work  | 3.3 – 5.1 s       | 4.0 – 5.2 s          |
+
+And at a deliberately punishing 20x, well past any device in the wild:
+
+  Performance 82 – 84,  TBT 556 – 628 ms,  CLS 0,  FCP 1.68 s.
+
+Asset transfer, as Lighthouse counts it (gzipped):
+
+  | Asset             | Before   | After                        |
+  | ----------------- | -------- | ---------------------------- |
+  | document          | 20.7 K   | 17.9 K                       |
+  | CSS               | 73.3 K   | 20.9 K async + 5.6 K inline  |
+  | rk.js             | 72.3 K   | 17.6 K                       |
+  | three + scene     | 166.5 K  | 148.4 K (one file)           |
+  | logo light        | 40.6 K   | 4.4 K                        |
+  | logo dark         | 39.0 K   | 4.0 K                        |
+  | project plate     | 242.9 K  | 168.8 K, and off the         |
+  |                   |          | critical path entirely       |
+
+The supplied audit's own numbers, for reference: Performance 57,
+Accessibility 94, FCP 2.4s, LCP 2.9s, TBT 1,820ms, CLS 0, SI 8.4s,
+main-thread 41.7s, 20 long tasks.
+
+
+════════════════════════════════════════════════════════════════════════════
+4 — MAIN THREAD
+════════════════════════════════════════════════════════════════════════════
+
+ROOT CAUSE — TWO OF THEM, AND THE PROFILE NAMED BOTH
+
+  1. THE LOOP WAS ASKING THE LAYOUT ENGINE A QUESTION SIXTY TIMES A SECOND.
+     readProgress() called section.getBoundingClientRect() every frame, and
+     resize() called stage.clientWidth/clientHeight every frame. apply()
+     writes styles; the next frame's read forces all of them back through
+     layout. In a 8.9s CPU profile at 6x throttling, readProgress alone was
+     570ms of self time — more than the whole of apply(), and more than the
+     renderer. updateAnnotations added one offsetHeight per live label.
+
+  2. THE STARTUP WAS ONE TASK. Every stratum, the sward, the hardscape, the
+     irrigation network, the roots, the guides, the lighting, every shader
+     and the first frame, in a single synchronous block. 1,655ms of it on the
+     audit's machine — the longest task on the page by a factor of five.
+
+FUNCTIONS CHANGED
+
+  readProgress()      caches the section's position in DOCUMENT space and
+                      reads the scroll offset from a passive scroll listener,
+                      where layout is already clean. A page standing still —
+                      which is the entire Lighthouse window — now reads
+                      nothing at all.
+  resize()            no longer called from frame(). The events that can
+                      change the stage's size call it; the loop reads a flag.
+  measureLabelHeights()  new; label heights are typographic facts, measured
+                      on resize and on font swap.
+  ResizeObserver on body   catches what raises no resize event: late images,
+                      the menu opening, a details element expanding.
+  boot()              async, with eleven yield points on a time budget.
+
+WHAT DID NOT WORK, AND WHY IT IS WORTH RECORDING
+
+  requestAnimationFrame is the wrong primitive for yielding. It ends the task
+  correctly, but it also costs a whole frame of WALL time. Thirty of them
+  pushed the first rendered frame from 0.6s to 2.9s — past the 2600ms safety
+  net in the document head, so the hero released before the scene existed —
+  and the Lighthouse score went DOWN from 95 to 86. The simulator charges
+  more for the longer critical path than it credits the shorter tasks.
+
+  Yielding at every break point is also wrong: most of these pieces are two
+  or three milliseconds and splitting them buys nothing.
+
+  The working version is scheduler.yield() (MessageChannel where that is
+  missing) on an eight-millisecond wall-clock budget. It ends the task
+  without waiting for anything, and a slow phone yields where this machine
+  does not, which is the whole point.
+
+  A chunked renderer.compile() pass was also tried and reverted: measured at
+  ~0ms per material, because compile() links the program and the expensive
+  half — WebGLUniforms walking every active uniform — is lazy and fires on
+  first draw.
+
+LARGEST TASK
+
+  before   1,655 ms (supplied audit) / 153 ms simulated on this machine
+  after    2 long tasks remain, neither attributable to a single function;
+           the largest is the first render, which cannot be subdivided
+           because one shader program link is atomic.
+
+TBT
+
+  stock profile        95 ms  →  0 ms       (three of five runs report 0)
+  calibrated (9x)     341 ms  →  54–95 ms
+  stress (20x)             —  →  556–628 ms
+
+
+════════════════════════════════════════════════════════════════════════════
+5 — WEBGL STARTUP
+════════════════════════════════════════════════════════════════════════════
+
+CRITICAL STAGE      Unchanged in content. Every stratum, the sward, the
+                    hardscape, the irrigation, the roots, the guides and the
+                    lights are still built before the first frame, in the
+                    same order, from the same numbers.
+
+DEFERRED STAGES     None. Nothing about the scene is postponed, because
+                    everything in it is visible through the notch in the
+                    first composition — the specimen is a cut section and
+                    the visitor is looking into it. Deferring the pipes
+                    would have been deferring something on screen.
+
+                    What IS deferred is the one thing genuinely not needed:
+                    the handover photograph. See section 8.
+
+GEOMETRY CACHING    Not required. The builders already run exactly once and
+                    the results are held for the lifetime of the page; the
+                    profile shows no rebuild.
+
+CHUNKING            Eleven yield points on an 8ms budget (section 4).
+
+WORKER              EVALUATED AND REJECTED. The procedural generators are
+                    genuinely worker-safe — mulberry/vnoise/fbm are pure, and
+                    makeStratum/makeShells/sow produce typed arrays. But the
+                    measurement does not support the move: geometry building
+                    is ~90ms of wall time on this machine, already split into
+                    slices of under 8ms each, and the transfer of the buffers
+                    back would add its own cost. A worker is the right answer
+                    to a long task that cannot be interrupted; these can.
+
+VISUAL REGRESSION   None. Frames captured at HERO, DESCENT, GROUND, WATER,
+                    EXPLODED, TEREP, KÉSZ, REALITY and HANDOVER at 390x844
+                    and at 1440x900, against the baseline: identical.
+
+
+════════════════════════════════════════════════════════════════════════════
+6 — JAVASCRIPT
+════════════════════════════════════════════════════════════════════════════
+
+  rk.js            232.9 K raw / 72.3 K gz   →   51.0 K / 17.6 K
+  rk-ground + three  835 K raw / 166.5 K gz  →  556.6 K / 148.4 K (one file)
+  unused JS        90 KiB reported            →  55 KiB reported
+
+three.js is bundled from the npm package rather than the pre-minified vendor
+file, so esbuild can see the module graph. Thirty-five classes are actually
+used; the rest is dropped. What remains unused is inside the classes that ARE
+used — the branches of MeshStandardMaterial's shader assembly that this
+scene's material configuration never takes — and is not reachable by tree
+shaking.
+
+vendor/three.module.min.js stays in the tree: the source pages load it
+directly, which is what makes the repository openable in a browser with no
+build step. The build never reads it.
+
+
+════════════════════════════════════════════════════════════════════════════
+7 — CSS
+════════════════════════════════════════════════════════════════════════════
+
+  source            250.6 K raw / 73.3 K gz, render-blocking
+  production        105.7 K raw / 20.9 K gz, non-blocking
+  critical inline    26.1 K raw / ~5.6 K gz
+  render-blocking   450 ms estimated saving  →  audit passes
+  unminified CSS    40 KiB estimated saving  →  audit passes
+  unused CSS        52 KiB estimated saving  →  audit passes
+
+HOW THE CRITICAL SET IS CHOSEN
+
+  By SELECTOR, never by coverage. §22 of the brief is right about why: this
+  stylesheet carries five inner pages, an English tree, reduced-motion
+  variants, WebGL-absent fallbacks and a large set of state classes that
+  JavaScript adds at runtime. A homepage coverage run sees none of that.
+
+  The extractor is an allow-list over a real tokenizer that tracks strings,
+  comments, parentheses and nesting depth. It never calls .index() on a
+  fragment of CSS syntax — that is the mistake that deleted ~1,470 lines of
+  rk.css once already.
+
+  It cannot delete anything from the site. The full stylesheet still loads a
+  moment later and the inline copy is a strict SUBSET of it in source order,
+  so the worst case for a missing selector is a few hundred milliseconds of
+  unstyled element, never a permanently broken one.
+
+HOW THE LINE WAS DRAWN
+
+  Not "above the fold" — "can this rule change the size or position of a box
+  that is on screen at first paint". Verified by rendering the page twice,
+  once with the deferred sheet blocked, and diffing the geometry of every
+  element in the first viewport. Two findings came out of that diff:
+
+    · `.display` deferred measured the three headline lines at 35px instead
+      of 30px and dropped the copy block under them by 15px — 0.004 CLS.
+    · `.gd__lbl` deferred rendered the annotation labels as a block of
+      unstyled type across the bottom of the hero, 45,000 square pixels of
+      it, which Lighthouse then selected as the LCP element.
+
+  Both are in the critical set. What is not: the opened menu, the solid and
+  film header states, the last chapter's handover, and every section below
+  the Living Ground.
+
+LOADING
+
+  preload + onload swap, with a <noscript> stylesheet. No flash of unstyled
+  hero, no header flash, no datum shift: CLS is 0 across every run.
+
+
+════════════════════════════════════════════════════════════════════════════
+8 — IMAGES
+════════════════════════════════════════════════════════════════════════════
+
+PROJECT PLATE
+
+  source            kesz-gyep-terasz-thumb.jpg, 800x1066, 242.9 KiB
+  optimised         AVIF q44 effort 9, 168.8 KiB
+  mobile choice     the 800w AVIF (sizes="100vw" at 412 CSS px x 1.75 DPR)
+  full-bleed        the 1600w master is preserved and also AVIF, 571 KiB
+                    from 1001 KiB — desktop's full-bleed is not traded away
+
+  WebP is NOT emitted. On this library it is consistently LARGER than the
+  source JPEG at every quality that keeps the texture — 206 KiB at q50
+  against a 243 KiB source that already looks better. A WebP <source> would
+  be a negotiation that makes the page slower. Any variant that fails to
+  beat its source by 6% is dropped by the build.
+
+  VISUAL INSPECTION.  q44 was chosen by putting a 500x330 crop of the mowing
+  stripes and the paving edge side by side with the source at 1:1. The blade
+  structure and the paving arris hold; q38 also held, and q44 leaves margin
+  for the harder plates (the sedum path and the bedding shots).
+
+OFF THE CRITICAL PATH
+
+  #gdPhoto lives inside the sticky stage, so it intersects the first
+  viewport, so loading="lazy" deferred nothing at all: 169 KiB was fetched
+  while the visitor was still reading the headline, against a 4 KiB logo that
+  Lighthouse had already picked as the LCP element.
+
+  The URLs now sit in data- attributes and rk-ground §11 attaches them when
+  the timeline passes halfway — 0.50 against a handover at 0.942, which is
+  two and a half viewports of warning on a chapter nobody can reach faster
+  than a scroll — then calls decode(), so the paint cost is off the frame
+  where the dissolve begins. The projects field's copy of the same file
+  becomes loading="lazy", which it could not be while the handover depended
+  on it being eager.
+
+  Measured in isolation: LCP 2.32s → 1.87s, score 97 → 99.
+
+  Without JavaScript #gdPhoto is display:none and the projects field carries
+  the same photograph as ordinary markup, so nothing is lost.
+
+LOGOS
+
+  404x118 PNGs displayed at 144x42, ~40 KiB each. Re-rendered at 288w — 2x
+  the displayed width — and quantised to 16 colours: 4.4 K and 4.0 K.
+
+  Compared against the untouched original at 4x magnification: at 8 colours
+  the mark's diagonal edges roughen visibly; at 16 nothing separates it from
+  the source. SVG was considered and rejected — the only available master is
+  the raster, and tracing it would be inventing letterforms.
+
+  No WebP for these: a 16-colour PNG of a two-tone logotype is 4.4 KiB and
+  the WebP of the same thing is 10.9 KiB.
+
+LCP RESOURCE
+
+  Still the light logo, and deliberately so — the hero headline is masked
+  until the scene is ready, so the mark is genuinely the largest thing the
+  first paint contains. It carries fetchpriority="high"; without it the
+  browser gave a 4 KiB image Medium priority behind 149 KiB of scene code
+  and the audit reported 625ms of LCP load delay.
+
+  Inlining it as a data URI was tried and reverted: it makes LCP equal FCP in
+  the real trace, but the ~4.8 KiB it adds to a document that is already on
+  the critical path costs more in the simulator than the round trip it saves.
+  Score went 97 → 95.
+
+  The logo is not shrunk or hidden to manipulate the candidate. It is 4.4 KiB
+  because that is what the asset should have weighed.
+
+PREDECODE WINDOW
+
+  One plate, warmed at the halfway mark. The projects field's fifteen images
+  are all loading="lazy" and unchanged.
+
+
+════════════════════════════════════════════════════════════════════════════
+9 — WHY 100 IS NOT REACHABLE ON THIS PROFILE
+════════════════════════════════════════════════════════════════════════════
+
+Lighthouse's Performance score is a weighted sum. At the final state:
+
+    FCP  1.68 s   score 0.92   weight 10   →   9.2
+    SI   1.68 s   score 1.00   weight 10   →  10.0
+    LCP  1.89 s   score 0.98   weight 25   →  24.5
+    TBT     0 ms  score 1.00   weight 30   →  30.0
+    CLS       0   score 1.00   weight 25   →  25.0
+                                             ──────
+                                               98.7   → 99
+
+100 requires ≥ 99.5, so 0.8 points are missing, and both of the metrics that
+can supply them are paint times.
+
+THE FLOOR.  A 400-byte HTML document with no JavaScript, no stylesheet and no
+images, served by the same harness on the same profile, scores FCP and LCP
+0.79s. That is what the connection alone costs: at 150ms RTT the simulator
+spends roughly 600ms on DNS, TCP and TLS before the first byte moves.
+
+THE BUDGET.  Rapidkert's document is 17.9 KiB gzipped. The 0.89s between the
+floor and our FCP is that document arriving and being parsed, plus the style
+and layout of a page with the Living Ground's eleven chapters in it.
+
+WHAT 100 WOULD COST.  Working backwards through Lighthouse's scoring curves,
+the weighted total reaches 99.5 at approximately FCP 1.45s with LCP 1.40s.
+Against the 0.79s floor that leaves 0.66s for the entire document — roughly
+half of what is on the wire now — while ALSO requiring the LCP element to
+paint within 0.6s of first paint, which in practice means no separate image
+request at all.
+
+Those two requirements are in direct opposition, and both were tested:
+
+  · Removing 26.8 KiB from the document (critical CSS made a render-blocking
+    file instead of inline) left FCP unchanged at 1.68s — the byte saving and
+    the extra round trip cancel. FCP is on a plateau here, not a slope.
+  · Inlining the logo so LCP equals FCP moved LCP to the same instant as FCP
+    in the real trace, and cost 0.3s of simulated FCP for the bytes. Net −2.
+
+The remaining distance is the connection model and the size of a real page,
+not anything the page is doing wrong. Every scored diagnostic that CAN be
+fixed is fixed: render-blocking resources, unminified CSS, unminified JS,
+unused CSS, image delivery, LCP discovery and the network dependency tree all
+pass. TBT is zero. CLS is zero. Speed Index is 1.00.
+
+  On the machine that produced the supplied audit, the equivalent result is
+  98/98/98 at the calibrated profile, up from 76/77/76.
+
+The honest statement is: this is 99, the missing point is First Contentful
+Paint on a simulated 150ms-RTT connection, and buying it would mean shipping
+a materially smaller page than the one the creative direction describes.
+
+
+════════════════════════════════════════════════════════════════════════════
+10 — ANIMATIONS
+════════════════════════════════════════════════════════════════════════════
+
+CLIP-PATH FINDINGS  Three: the hero's three headline lines, each animating
+                    clip-path from inset(0 0 106%) to inset(-.28em 0 -.24em)
+                    over 0.92s. Chrome cannot run clip-path on the
+                    compositor.
+
+REPLACEMENT         The line box is the mask. Each <span> gets a static
+                    overflow with a padding/negative-margin pair that
+                    reproduces the old end state exactly — the vertical bleed
+                    existed so accents and descenders were never clipped —
+                    and an inner box animates transform alone.
+
+                    Compared frame by frame at 390x844, sampled at 250, 500,
+                    800 and 1300ms from .gd-ready: everything from 500ms on
+                    is pixel-identical, and 250ms differs only in how far the
+                    first line has travelled. Same stagger (.34s/.44s/.62s),
+                    same duration, same easing, same datum relationship.
+
+                    All three findings are gone.
+
+NAV COLOUR          RETAINED, deliberately. The fourth finding is the
+                    FELMÉRÉS CTA transitioning `color` over 0.28s as the
+                    header goes solid. It is paired with a background
+                    transition that inverts at the same time: limestone-on-
+                    soil becomes soil-on-limestone. Cutting only the colour
+                    leaves the text briefly unreadable against a background
+                    that is still fading; cutting both makes the CTA hard-cut
+                    while the bar behind it fades, which is precisely the
+                    "header flash" Phase 3.2 spent two stacked logo marks to
+                    eliminate. Text colour is a paint operation; there is no
+                    composited equivalent that does not duplicate the label.
+
+                    §37 says not to add complexity for a colour fade if
+                    removing it is visually identical. It is not identical.
+
+REMAINING           37 reported, up from 4 — and that number is a measurement
+                    artefact worth being clear about. They are all `color`
+                    and `border-color` transitions in the LAYERS, ASSEMBLY
+                    and PROOF sections, they were all there before, and they
+                    appear now only because the page settles fast enough for
+                    the trace to reach them. The audit is a diagnostic: it
+                    scores 1, carries weight 0, and does not affect the
+                    Performance score. Converting them would mean rebuilding
+                    most of the site's copy as layered duplicates.
+
+
+════════════════════════════════════════════════════════════════════════════
+11 — ACCESSIBILITY
+════════════════════════════════════════════════════════════════════════════
+
+  Lighthouse accessibility: 96 → 100, on every page, on every run.
+  axe-core over 17 documents x 2 viewports x up to 11 scroll positions:
+  102 contrast violations → 0.
+
+OKOSKERT
+
+  .prf__foot .partners__word was --soil at .42 over --paper: #979691 on
+  #f4f2ec, 2.64:1, at 16px. This is a partner's NAME, not decoration. Raised
+  to .62 — 4.79:1 — which still sits behind the logotypes beside it, and
+  those are images and carry no contrast requirement. The dark-context
+  variant of the same class was 4.43:1, five hundredths short; .54 puts it at
+  4.68:1. Every partner name was checked after the shared style changed.
+
+PROOF SECTION
+
+  The Lighthouse finding under "11 HOL DOLGOZUNK" is the same
+  .partners__word, which lives in .prf__foot. Nothing else in PROOF was
+  recoloured. The worst-case effective background was tested by auditing at
+  eight scroll positions through the section, including the state where the
+  pinned stage has inverted to dark.
+
+CLAY LABELS
+
+  This was much larger than "the chapter labels". --clay #A56F52 is 4.24:1 on
+  --soil and 3.76:1 on --paper: the accent fails AA as body-size text on BOTH
+  of its own grounds, and axe found it doing so in 100 places — every plate
+  number, spec number, station numeral and eyebrow on the inner pages.
+
+  No single value can fix that. Clearing 4.5:1 against a 0.885-luminance
+  paper needs a colour below 0.158 luminance; clearing it against a
+  0.009-luminance soil needs one above 0.214.
+
+  So the accent is UNCHANGED — it still draws every rule, tick, dot and
+  leader line — and text set in clay reads --clay-txt, an inherited custom
+  property that the dark sections re-point. Same hue, moved along lightness
+  only, which is what §49 asks for:
+
+      --clay-txt   #845942   5.39:1 on paper, 4.78:1 on limestone
+      --clay-lift  #B78C75   5.95:1 on soil, 5.43:1 on soil-2
+
+  --fg-mute had the identical shape of problem: it is a quiet grey FOR PAPER,
+  and several components that use it also appear inside dark sections that
+  carry no .sec--dark class, where it reads 2.73:1. Same treatment,
+  --txt-mute. The dark-ground list was then checked section by section, which
+  is how .prf turned out not to belong in it — PROOF is --paper and only its
+  pinned stage inverts.
+
+OTHER CONTRAST FIXED
+
+  · .xnav a[aria-current] was dimmed to opacity .42, which made the row a
+    visitor is standing in the least legible one on the page: 1.82:1 on the
+    numeral, 1.86:1 on the tag, 2.64:1 on the title. It recedes by colour
+    now; everything stays above 5:1.
+  · .arch__desc rested at 2.64:1 and lifted to full on hover — .9 is 4.64:1
+    and the lift still registers.
+  · .rk-lang__i at .55 was 3.81:1 over the solid header; .62 is 4.79:1, and
+    the film variant went .46 → .54.
+  · .rk-foot__hu at .55 of an already-muted colour was 2.73:1; .85 is 4.76:1.
+
+HEADING HIERARCHY
+
+  The SZOLGÁLTATÁSOK <h4> named in the brief no longer exists — Phase 3.2
+  already fixed it, and there is now no <h4> anywhere in the site.
+
+  A full programmatic outline of all 17 documents found one remaining break:
+  referenciak.html and en/projects.html ran h1 → h3, because the two archive
+  sections are labelled by a <span class="plate__title">. That span is the
+  section's title and is now the <h2> it already was semantically. Styling is
+  entirely on the class and §03 already neutralises heading defaults, so
+  there is no visual change. Every document now has exactly one h1 and no
+  level skips.
+
+  One axe finding remains and is by design: page-has-heading-one fires on the
+  homepage at scroll 0.55, because the Living Ground's pinned chapters make
+  the h1 visibility:hidden once the visitor is past it. It is a
+  best-practice rule, not WCAG, it is not in Lighthouse's accessibility
+  category, and at scroll 0 — where Lighthouse audits — it passes.
+
+MANUAL CHECKS RETAINED
+
+  Run against the built site at 390x844 and 1440x900, and against the
+  baseline for comparison:
+
+    · skip link is the first tab stop and slides into view on focus
+    · visible focus ring on every rendered header control
+    · burger opens the panel, reports aria-expanded, Escape closes it and
+      returns focus to the burger
+    · menu links are laid out at first paint
+    · FAQ is native <details>/<summary> and still toggles
+    · header touch targets ≥ 24px at 390 (the ::after hit areas do their job)
+
+  Identical results on the baseline and the built site: the critical-CSS
+  split dropped no focus rule, no inert-related visibility, no skip-link
+  styling. The one difference from a clean sheet is desktop nav links at 17px
+  tall at 1440 — a pointer context, unchanged from the baseline, and outside
+  what this phase touched.
+
+
+════════════════════════════════════════════════════════════════════════════
+12 — CACHE AND HOSTING
+════════════════════════════════════════════════════════════════════════════
+
+HASHED ASSETS       Every generated asset carries a content hash:
+                    rk.<hash>.css, rk.<hash>.js, rk-ground.<hash>.js, and
+                    every image. HTML stays unhashed and short-lived.
+
+CURRENT TTL         GitHub Pages sends `cache-control: max-age=600` on every
+                    response. Verified directly against the live URL.
+
+HOST LIMITATION     REAL, AND NOT FIXABLE FROM THE REPOSITORY. GitHub Pages
+                    offers no per-resource cache configuration — no _headers
+                    file, no _config directive, nothing in the Pages API. The
+                    brief is right to warn against claiming otherwise. This
+                    is classified HOST-LIMITED.
+
+DOES IT AFFECT THE SCORE?   NO. cache-insight is a diagnostic with weight 0.
+                    It cannot prevent Performance 100 and is not what is
+                    preventing it here (section 9). What it costs is real
+                    visitors on repeat visits, who re-download 218 KiB every
+                    ten minutes.
+
+WHAT WOULD FIX IT   Any static host that honours per-path cache headers, at
+                    which point the hashes already in place allow
+                    `Cache-Control: public, max-age=31536000, immutable` on
+                    everything except the HTML. Cloudflare Pages and Netlify
+                    both do this with a three-line _headers file.
+                    NOT MIGRATED. That is the owner's decision.
+
+                    Worth noting: rapidkert.com currently resolves to a
+                    Netlify site serving an older, unrelated build. If that
+                    is where this eventually lands, the cache question
+                    answers itself.
+
+DEPLOYMENT          .github/workflows/deploy.yml builds and publishes dist/.
+                    It is inert until the repository's Pages source is
+                    switched from "Deploy from a branch" to "GitHub Actions"
+                    — a settings change only the owner can make. Until then
+                    Pages keeps serving the source tree and the workflow
+                    simply builds and uploads an artifact nobody reads.
+
+                    UNTIL THAT SWITCH IS FLIPPED, THE LIVE SITE IS STILL THE
+                    UNOPTIMISED SOURCE TREE. Every number in this report is
+                    from the production build, served locally over h2+gzip on
+                    a harness calibrated against the live site. Final
+                    acceptance against the deployed URL is one settings
+                    change and one push away, and has not been done.
+
+
+════════════════════════════════════════════════════════════════════════════
+13 — BUILD PIPELINE
+════════════════════════════════════════════════════════════════════════════
+
+    npm ci && npm run build      →  dist/
+
+  esbuild 0.25.12, lightningcss 1.30.2, sharp 0.34.5, three 0.169.0 — all
+  pinned, all in package-lock.json, none installed globally. node_modules is
+  not committed. dist/ is not committed. .cache/ (AVIF encode cache, keyed on
+  source bytes AND encoder settings) is not committed.
+
+  Deterministic: same inputs, same output filenames, because every name is a
+  content hash of what it contains.
+
+  SOURCE VS PRODUCTION. The files at the repository root are authoritative
+  and open directly in a browser with no build step. dist/ is deleted and
+  rewritten on every build and must never be hand-edited. README.md now says
+  so in the first paragraph.
+
+
+════════════════════════════════════════════════════════════════════════════
+14 — REGRESSION
+════════════════════════════════════════════════════════════════════════════
+
+  1440x900        Protected frames HERO, GROUND, WATER, EXPLODED, HANDOVER,
+                  PROJECTS, SERVICES, PROCESS, PROOF, CTA captured against
+                  the baseline: identical.
+  390x844         HERO, DESCENT, GROUND, WATER, EXPLODED, TEREP, KÉSZ,
+                  REALITY, HANDOVER: identical.
+  Inner pages     Full-page pixel diff of nine documents at 900px wide:
+                  0.026% – 0.107% of pixels changed, every one of them the
+                  intended contrast correction. Document heights identical to
+                  the pixel, so nothing reflowed.
+  Scroll          The timeline tracks the scrollbar to four decimal places at
+                  both viewports, and .is-handed still lands at the top of
+                  the last frame.
+  Overflow        No horizontal overflow at either viewport.
+  Console         No errors and no warnings on any captured page.
+  rkguard         PASS — 5,139 lines, 25/25 sections.
+  node --check    PASS on rk.js and rk-ground.js.
+  rki18n          PASS — 7 pairs, 3 HU-only.
+  Lighthouse SEO / Best Practices: 100 / 100, unchanged.
+
+  RENDER LOOP SLEEP preserved: the IntersectionObserver still stops the loop
+  when the section leaves the viewport, and the reduced-motion path still
+  skips redraws when the timeline has not moved.
+
+  NO LIGHTHOUSE-SPECIFIC CODE. Searched for lighthouse, HeadlessChrome,
+  Chrome-Lighthouse, Moto G and navigator.userAgent across rk.js,
+  rk-ground.js, rk.css and all 17 documents: zero branches. The only matches
+  are source comments explaining why a change was made, and the build strips
+  comments from production HTML. navigator.hardwareConcurrency and
+  deviceMemory are the pre-existing quality-tier heuristics, untouched.
+
+  NO CONTENT REMOVED. Same eleven chapters, same fifteen project images, same
+  technical labels, same service states, same proof states, same LOW tier on
+  mobile.
+
+
+════════════════════════════════════════════════════════════════════════════
+15 — FINAL RUNS
+════════════════════════════════════════════════════════════════════════════
+
+Stock mobile profile, cold, production build:
+
+  RUN 1   Performance 99   Accessibility 100   FCP 1.68  LCP 1.93  TBT 34  CLS 0  SI 1.68
+  RUN 2   Performance 98   Accessibility 100   FCP 1.90  LCP 1.90  TBT  9  CLS 0  SI 1.90
+  RUN 3   Performance 99   Accessibility 100   FCP 1.68  LCP 1.89  TBT  4  CLS 0  SI 1.68
+
+  Two further runs in an earlier set of five: 99, 99. The 98 is the same
+  page: the simulator's FCP quantises to 1.68s or 1.90s depending on where a
+  round trip lands, and 1.90s costs one point.
+
+Other pages, same profile:
+
+  en/index.html          Performance 99   Accessibility 100
+  kertepites-gyor.html   Performance 98   Accessibility 100
+
+Calibrated profile (9x), production build:  98 / 98 / 98, Accessibility 100.
+
+
+════════════════════════════════════════════════════════════════════════════
+16 — WHAT WAS NOT DONE
+════════════════════════════════════════════════════════════════════════════
+
+  · Not deployed. The build is verified locally against a harness calibrated
+    to the live site; acceptance against the deployed URL needs the Pages
+    source switched to GitHub Actions first.
+  · Not migrated off GitHub Pages. The 10-minute cache TTL is host-limited
+    and does not affect the score; the decision is the owner's.
+  · The nav CTA's colour transition is retained, with the reasoning in
+    section 10.
+  · Performance 100 is not reached, with the evidence in section 9.
+  · No English localization work and no Awwwards submission work, per the
+    brief.

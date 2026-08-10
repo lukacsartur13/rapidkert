@@ -25,13 +25,6 @@
 <meta name="theme-color" content="#171814">
 
 <link rel="icon" href="../logo.png">
-<!-- The nav mark is the LCP element on every page: the hero headline is
-     masked until the scene is ready, so this is the largest thing the
-     first paint contains. Discovered in the first kilobyte of <head>
-     rather than a hundred lines later in <body>, because Lighthouse
-     measured 1,323ms of LCP LOAD DELAY — a 4KB image queued behind
-     148KB of scene code and a 169KB photograph.          [PHASE 3.2C] -->
-<link rel="preload" as="image" href="../logo-feher.png" fetchpriority="high">
 <link rel="stylesheet" href="../rk.css">
 <!-- Preload the intro plate — the one image above the fold. It must match the
      img that carries fetchpriority="high" below, or the preload is a wasted
