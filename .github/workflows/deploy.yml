@@ -8,16 +8,11 @@
 # ACTIVATING THIS IS A REPOSITORY SETTING, NOT A FILE.
 # Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
 #
-# Until that switch is flipped, actions/configure-pages FAILS — it cannot
-# configure a Pages site that is still being deployed from a branch — so the
-# deploy job is held behind workflow_dispatch and every push just builds and
-# verifies. That keeps the checks green on a repository whose Pages settings
-# have not changed yet.
-#
-# TO TURN IT ON: flip the setting, run this workflow once from the Actions tab
-# to confirm it deploys, then change the deploy job's `if:` below to
-#     if: github.ref == 'refs/heads/main'
-# and every push to main publishes.
+# That switch was flipped on 2026-08-10 and this workflow is now what serves
+# the site. Pushing to main builds dist/ and publishes it; nothing else does.
+# If the setting is ever changed back to "Deploy from a branch", this workflow
+# starts failing at actions/configure-pages — that is the symptom to look for,
+# not a build problem.
 #
 # Cache lifetime: GitHub Pages sends `cache-control: max-age=600` on every
 # response and offers no way to change it — no _headers file, no per-path
@@ -58,6 +53,17 @@ jobs:
       - name: Install pinned dependencies
         run: npm ci
 
+      # AVIF at effort 9 over forty plates is seven minutes on a fast laptop
+      # and the best part of half an hour on a runner. The encoder cache is
+      # keyed on the source images AND the encoder settings, so a quality
+      # change still re-encodes and an unchanged library never does.
+      - name: Restore the image encoder cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/img
+          key: rk-img-${{ hashFiles('*.jpg', '*.png', 'build.mjs') }}
+          restore-keys: rk-img-
+
       - name: Build
         run: npm run build
 
@@ -76,20 +82,16 @@ jobs:
           test "$(ls dist/rk.*.js | wc -l)" -eq 1
           test "$(ls dist/rk.*.css | wc -l)" -eq 1
 
-      # Uploading the artifact is also a Pages operation, so it waits for the
-      # same switch. A push still proves the build works.
       - uses: actions/configure-pages@v5
-        if: github.event_name == 'workflow_dispatch'
       - uses: actions/upload-pages-artifact@v3
-        if: github.event_name == 'workflow_dispatch'
         with:
           path: dist
 
   deploy:
     needs: build
-    # Manual until the repository's Pages source is "GitHub Actions" — see the
-    # note at the top of this file.
-    if: github.event_name == 'workflow_dispatch'
+    # Only main publishes. workflow_dispatch on another branch builds and
+    # verifies without touching the live site.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

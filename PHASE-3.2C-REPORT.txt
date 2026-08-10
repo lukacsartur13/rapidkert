@@ -628,11 +628,21 @@ WHAT WOULD FIX IT   Any static host that honours per-path cache headers, at
                     answers itself.
 
 DEPLOYMENT          .github/workflows/deploy.yml builds and publishes dist/.
-                    It is inert until the repository's Pages source is
-                    switched from "Deploy from a branch" to "GitHub Actions"
-                    — a settings change only the owner can make. Until then
-                    Pages keeps serving the source tree and the workflow
-                    simply builds and uploads an artifact nobody reads.
+                    The repository's Pages source was switched to "GitHub
+                    Actions" on 2026-08-10, so this workflow is now what
+                    serves the site: a push to main builds dist/, verifies it
+                    and publishes it. Nothing else does.
+
+                    The build is deterministic — a clean clone, npm ci and
+                    npm run build produce byte-identical filenames
+                    (rk.08b5fd1f44.css, rk.cbcf0f4e5d.js,
+                    rk-ground.f2d51fa0b3.js) because every name is a content
+                    hash. Verified before the workflow was armed.
+
+                    The AVIF encoder cache is restored in CI, keyed on the
+                    source images and the encoder settings. Without it a
+                    cold build is ~7 minutes at 627% CPU on a laptop and the
+                    better part of half an hour on a two-core runner.
 
                     UNTIL THAT SWITCH IS FLIPPED, PAGES SERVES THE SOURCE
                     TREE. That is not the same as serving the old site: the
