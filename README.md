@@ -24,6 +24,7 @@ build. See `build.mjs` for what each step does and why.
 | `rk-ground.js` | WebGL Living Ground (model, camera, photo handover) |
 | `*.html`, `en/*.html` | Inner pages, Hungarian and English |
 | `vendor/` | three.js — the runtime copy; the build uses the npm package |
+| `favicon-master.png` | 2000x2000 master for the tab mark. Not shipped — regenerate the three sizes from it |
 | `build.mjs`, `build/` | The production build. Reads the root, writes `dist/` |
 | `dist/` | **Generated.** Not in git, not authoritative, never hand-edited |
 | `_retired/` | Pre-Phase-1 stylesheet and script, kept for reference |
