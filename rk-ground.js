@@ -671,9 +671,21 @@ const U = {
   built:   { value: 1 }    // hardscape presence — drives its contact shading
 };
 
-/* Formats a depth the way a survey sheet would, with a Hungarian decimal
-   comma. Used by the live readout on the horizon rule. */
-const fmtDepth = (m) => (m < 0.005 ? '0,00' : m.toFixed(2).replace('.', ',')) + ' m';
+/* Formats a depth the way a survey sheet in this document's language would.
+   Used by the live readout on the horizon rule.
+
+   THE SEPARATOR IS THE ONLY THING THIS MODULE LOCALISES.        [PHASE 3.3]
+   Not a translation — a notation. A Hungarian drawing writes 0,45 m and an
+   English one writes 0.45 m, and the readout sits eight pixels from a
+   ±0.00 datum that the HTML has already written in the document's own
+   convention. Getting one of the two right and not the other prints two
+   different number systems on one rule. Everything else in this file is
+   geometry; there is no English build of it and there must not be. */
+const DECIMAL = (document.documentElement.lang || 'hu')
+  .toLowerCase().slice(0, 2) === 'en' ? '.' : ',';
+const fmtDepth = (m) =>
+  (m < 0.005 ? '0' + DECIMAL + '00'
+             : m.toFixed(2).replace('.', DECIMAL)) + ' m';
 
 const EMIT = [
   new THREE.Vector3(-3.05, PIPE_Y, 0.6), new THREE.Vector3(-1.05, PIPE_Y, 1.5),

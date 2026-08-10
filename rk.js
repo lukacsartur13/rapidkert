@@ -43,6 +43,89 @@
   var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   /* ------------------------------------------------------------------ */
+  /* 01.5 — LANGUAGE                                        [PHASE 3.3]  */
+  /* ------------------------------------------------------------------ */
+  /* THERE IS NO ENGLISH BUILD OF THIS FILE, AND THERE MUST NOT BE.
+     Both language trees load this exact bundle, this exact stylesheet and
+     this exact WebGL module. Two copies of a 4,400-line interaction layer
+     is two copies that drift, and the drift is always silent: a camera
+     value corrected in one and not the other is not a compile error, it
+     is a screen that is subtly wrong in one language for a year.
+
+     Almost nothing needs to be here. Every label the visitor reads lives
+     in the HTML and localises by being written in the localised document
+     — the strata, the chapter headings, the services, the process
+     stations, the proof claims, the sheet numbers, the field captions.
+     This dictionary covers only the places where THIS FILE writes words
+     rather than reading them: the menu button's two states, the five
+     form messages, and the fourteen labels §14 draws into the section
+     world as SVG text because they are positioned from the same geometry
+     that draws the lines they annotate.
+
+     Fallback is Hungarian, never empty. A control in the wrong language
+     is a defect; a blank control is a broken page. */
+  var DICT = {
+    hu: {
+      menuOpen:  'Menü',
+      menuClose: 'Bezár',
+
+      formBad:   'Néhány mező hiányzik vagy hibás. Kérjük, nézd át a megjelölt sorokat.',
+      formBusy:  'Küldés folyamatban…',
+      formOk:    'Köszönjük! Megkaptuk az ajánlatkérésed – 1 munkanapon belül keresünk telefonon.',
+      formFail:  'Sajnos nem sikerült elküldeni. Kérjük, hívj minket: +36 30 726 0024',
+      formNet:   'Hálózati hiba. Kérjük, hívj minket: +36 30 726 0024',
+
+      /* EGY CSAPAT — the four disciplines that resolve onto one datum. */
+      cvTerrain: 'Terep',
+      cvWater:   'Öntözés',
+      cvStruct:  'Struktúra',
+      cvPlant:   'Növény',
+
+      /* 70% — the two halves of the comparison, and what is compared. */
+      cmpSpray:  'Szórófejes locsolás',
+      cmpSub:    'Felszín alatti öntözés',
+      cmpEvap:   'Párolgás',
+      cmpRoot:   'Gyökérzóna',
+
+      /* The underground state names only what cannot be deduced. */
+      ntDrip:    'Csepegtető vezeték',
+      ntWet:     'Nedvesedési zóna'
+    },
+    en: {
+      menuOpen:  'Menu',
+      menuClose: 'Close',
+
+      formBad:   'Some fields are missing or incorrect. Please check the marked rows.',
+      formBusy:  'Sending…',
+      formOk:    'Thank you — we have your request. We will call you within one working day.',
+      formFail:  'The message could not be sent. Please call us on +36 30 726 0024.',
+      formNet:   'Network error. Please call us on +36 30 726 0024.',
+
+      /* SITE, not TERRAIN, in this one place: these four name TRADES that
+         agree, not the ground they agree about. "Site" is what a builder
+         calls the discipline that levels and drains a plot; the LAND →
+         LIFE rail, which names the STATE of the ground rather than the
+         trade working it, keeps TERRAIN. Both are in the HTML and in this
+         file respectively, and they are deliberately not the same word. */
+      cvTerrain: 'Site',
+      cvWater:   'Irrigation',
+      cvStruct:  'Structure',
+      cvPlant:   'Planting',
+
+      cmpSpray:  'Sprinkler irrigation',
+      cmpSub:    'Subsurface irrigation',
+      cmpEvap:   'Evaporation',
+      cmpRoot:   'Root zone',
+
+      ntDrip:    'Drip line',
+      ntWet:     'Wetting zone'
+    }
+  };
+  var LANG = (document.documentElement.lang || 'hu').toLowerCase().slice(0, 2);
+  var STR = DICT[LANG] || DICT.hu;
+  function txt(k) { return STR[k] !== undefined ? STR[k] : DICT.hu[k]; }
+
+  /* ------------------------------------------------------------------ */
   /* Shared rAF scroll loop — one listener for the whole page.           */
   /* ------------------------------------------------------------------ */
   var readers = [];
@@ -251,7 +334,7 @@
       }
 
       burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if (label) label.textContent = open ? 'Bezár' : 'Menü';
+      if (label) label.textContent = open ? txt('menuClose') : txt('menuOpen');
     }
 
     burger.addEventListener('click', function () { setOpen(!open); });
@@ -572,26 +655,26 @@
       if (bad) {
         // Worded without a colour reference on purpose: the invalid state is
         // marked with a rule and a written message, not with red alone.
-        say('err', 'Néhány mező hiányzik vagy hibás. Kérjük, nézd át a megjelölt sorokat.');
+        say('err', txt('formBad'));
         bad.focus();
         return;
       }
 
-      if (submit) { submit.disabled = true; submit.textContent = 'Küldés folyamatban…'; }
+      if (submit) { submit.disabled = true; submit.textContent = txt('formBusy'); }
 
       fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
         .then(function (r) { return r.json(); })
         .then(function (res) {
           if (res.success) {
-            say('ok', 'Köszönjük! Megkaptuk az ajánlatkérésed – 1 munkanapon belül keresünk telefonon.');
+            say('ok', txt('formOk'));
             form.reset();
             form.querySelectorAll('.frm__f.is-bad').forEach(function (w) { w.classList.remove('is-bad'); });
           } else {
-            say('err', 'Sajnos nem sikerült elküldeni. Kérjük, hívj minket: +36 30 726 0024');
+            say('err', txt('formFail'));
           }
         })
         .catch(function () {
-          say('err', 'Hálózati hiba. Kérjük, hívj minket: +36 30 726 0024');
+          say('err', txt('formNet'));
         })
         .finally(function () {
           if (submit) { submit.disabled = false; submit.textContent = submitText; }
@@ -1062,10 +1145,10 @@
          which is the claim. No count of people is stated anywhere: the copy
          does not support one. */
       var gcv = grp('wrl__conv', 'conv');
-      [[-150, -74, -2.4, 'Terep', 250],
-       [190,  96,  3.1, 'Öntözés', 470],
-       [-90,  128, 1.7, 'Struktúra', 730],
-       [130, -108, -3.6, 'Növény', 950]]
+      [[-150, -74, -2.4, txt('cvTerrain'), 250],
+       [190,  96,  3.1, txt('cvWater'), 470],
+       [-90,  128, 1.7, txt('cvStruct'), 730],
+       [130, -108, -3.6, txt('cvPlant'), 950]]
         .forEach(function (o, i) {
           var g = el('g', { 'class': 'wrl__cvg',
             'data-dx': o[0], 'data-dy': o[1], 'data-r': o[2], 'data-i': i });
@@ -1142,8 +1225,8 @@
 
          data-y is an offset from that half's own ground level, so a label
          under grade stays under grade whatever the terrain is doing. */
-      [['Szórófejes locsolás', 400, -128], ['Felszín alatti öntözés', 800, -128],
-       ['Párolgás', 400, -62], ['Gyökérzóna', 800, 116]].forEach(function (n) {
+      [[txt('cmpSpray'), 400, -128], [txt('cmpSub'), 800, -128],
+       [txt('cmpEvap'), 400, -62], [txt('cmpRoot'), 800, 116]].forEach(function (n) {
         var g = el('g', { 'class': 'wrl__cplb', 'data-x': n[1], 'data-y': n[2] });
         var t = el('text', { 'class': 'wrl__ntx' });
         t.textContent = n[0];
@@ -1195,7 +1278,7 @@
         g.appendChild(el('path', { 'class': 'wrl__vsl', d: '' }));   // the block and its layers
         g.appendChild(el('path', { 'class': 'wrl__vsgd', d: '' }));  // grade
         var t = el('text', { 'class': 'wrl__ntx wrl__vst' });
-        t.textContent = m ? 'Felszín alatti öntözés' : 'Szórófejes locsolás';
+        t.textContent = m ? txt('cmpSub') : txt('cmpSpray');
         g.appendChild(t);
         gvs.appendChild(g);
       });
@@ -1232,8 +1315,8 @@
       /* Placed in the clear third of the underground framing — the type
          column owns the left 45% of that camera and a label under a
          monumental service name is not a label. */
-      [['Csepegtető vezeték', 520, Y_DRIP, -15, 1],
-       ['Nedvesedési zóna', 606, Y_DRIP + 40, 15, -1]].forEach(function (n) {
+      [[txt('ntDrip'), 520, Y_DRIP, -15, 1],
+       [txt('ntWet'), 606, Y_DRIP + 40, 15, -1]].forEach(function (n) {
         var g = el('g', { 'class': 'wrl__nt', 'data-x': n[1], 'data-y': n[2],
                           'data-o': n[3], 'data-dir': n[4] });
         g.appendChild(el('path', { 'class': 'wrl__nl', d: '' }));

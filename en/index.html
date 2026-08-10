@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Garden construction and irrigation in Győr, Hungary | Rapidkert Kft.</title>
+<meta name="description" content="Garden construction and automatic irrigation, planned and built in Győr, Hungary and the surrounding area. Earthworks to handover, from one team. Free site survey.">
+<link rel="canonical" href="https://www.rapidkert.com/en/">
+
+<!-- Reciprocal with the Hungarian document, self-referential canonical, and
+     x-default on Hungarian: this is a Győr contractor whose customers are
+     Hungarian. The English tree exists so the work can be read abroad, not
+     to reposition the business, and nothing redirects anybody anywhere. -->
+<link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/">
+<link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/">
+<link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Rapidkert Kft.">
+<meta property="og:title" content="Garden construction and irrigation in Győr, Hungary | Rapidkert Kft.">
+<meta property="og:description" content="Garden construction and automatic irrigation, planned and built in Győr, Hungary and the surrounding area. From plan to handover, one team.">
+<meta property="og:url" content="https://www.rapidkert.com/en/">
+<meta property="og:image" content="https://www.rapidkert.com/kertepites-elokeszites.jpg">
+<meta property="og:locale" content="en_GB">
+<meta property="og:locale:alternate" content="hu_HU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Garden construction and irrigation in Győr, Hungary | Rapidkert Kft.">
+<meta name="twitter:description" content="Garden construction and automatic irrigation, planned and built in Győr, Hungary and the surrounding area. From plan to handover, one team.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#12130F">
+
+<link rel="icon" href="../logo.png">
+<link rel="stylesheet" href="../rk.css">
+<link rel="modulepreload" href="../rk-ground.js">
+<link rel="modulepreload" href="../vendor/three.module.min.js">
+
+<!-- The Living Ground layout is committed to BEFORE first paint when WebGL is
+     available, so the hero never renders in its fallback form and then jumps.
+     rk-ground.js removes the class again if initialisation actually fails. -->
+<script>
+(function () {
+  var h = document.documentElement;
+  try {
+    var c = document.createElement('canvas');
+    var gl = c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl');
+    if (gl && !(gl.getParameter(gl.MAX_TEXTURE_SIZE) < 2048)) h.className += ' gd-on';
+  } catch (e) { /* no WebGL — the stacked editorial fallback stands */ }
+
+  /* The hero's entrance is gated on .gd-ready, which rk-ground.js adds once
+     the first frame is on screen. If that module never arrives — a 404, a
+     stale cache, a thrown error — the headline must not stay masked, so the
+     class lands anyway. A late scene is a compromise; an invisible H1 is a
+     broken page.
+
+     The deadline is absolute — 2600ms from NAVIGATION START, not from
+     whenever this script happened to run. Measured on Slow 4G with 4x CPU
+     throttling: this script did not execute until 4.06s, because it waits
+     behind a 240KB render-blocking stylesheet. .gd-on hid the hero at that
+     instant and the old relative timer then held it hidden until 6.7s, so
+     the copy did not become readable until 7.5s — 3.2 seconds of an empty
+     dark rectangle stacked on top of an already slow start. Being late is
+     exactly when the safety net is needed soonest.               [PHASE 3.2B] */
+  setTimeout(function () { h.classList.add('gd-ready'); },
+             Math.max(0, 2600 - (performance.now ? performance.now() : 0)));
+})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div class="rk-wipe" aria-hidden="true"><span class="rk-wipe__mk">Rapidkert</span></div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     NAVIGATION
+     ══════════════════════════════════════════════════════════════════ -->
+<header class="rk-nav" id="rkNav">
+  <div class="shell rk-nav__bar">
+    <a href="index.html" class="rk-nav__logo" aria-label="Rapidkert Kft. – home">
+      <img src="../logo-feher.png" alt="Rapidkert Kft." class="is-light" width="404" height="118">
+      <img src="../logo.png" alt="" aria-hidden="true" class="is-dark" width="404" height="118">
+    </a>
+
+    <div class="rk-nav__right">
+      <nav class="rk-nav__links" aria-label="Main navigation">
+        <a href="garden-construction.html">Garden construction</a>
+        <a href="irrigation-systems.html">Irrigation</a>
+        <a href="projects.html">Projects</a>
+        <a href="about.html">About</a>
+      </nav>
+
+      <div class="rk-lang" role="group" aria-label="Language">
+        <a class="rk-lang__i" href="../index.html" hreflang="hu" lang="hu">HU<span class="rk-lang__nm"> — Magyar</span></a>
+        <span class="rk-lang__sep" aria-hidden="true">/</span>
+        <a class="rk-lang__i" href="index.html" hreflang="en" lang="en" aria-current="true">EN<span class="rk-lang__nm"> — English</span></a>
+      </div>
+
+      <a href="contact.html" class="rk-nav__cta">
+        <span class="rk-nav__cta-full">Free site survey</span>
+        <span class="rk-nav__cta-short">Survey</span>
+      </a>
+      <button class="rk-nav__burger" id="navBurger" aria-expanded="false" aria-controls="navPanel" aria-label="Menu">
+        <span data-burger-label>Menu</span><i aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Fullscreen navigation overlay -->
+<div class="rk-nav__panel" id="navPanel" data-open="false" hidden>
+  <div class="shell rk-menu">
+    <ul class="rk-menu__list">
+      <li class="rk-menu__item">
+        <a class="rk-menu__link" href="garden-construction.html">
+          <span class="rk-menu__no">01</span>
+          <span class="rk-menu__txt">Garden construction</span>
+          <span class="rk-menu__tag">Terrain · Structure · Planting</span>
+        </a>
+      </li>
+      <li class="rk-menu__item">
+        <a class="rk-menu__link" href="irrigation-systems.html">
+          <span class="rk-menu__no">02</span>
+          <span class="rk-menu__txt">Irrigation systems</span>
+          <span class="rk-menu__tag">Zoned · Automatic</span>
+        </a>
+      </li>
+      <li class="rk-menu__item">
+        <a class="rk-menu__link" href="subsurface-irrigation.html">
+          <span class="rk-menu__no">03</span>
+          <span class="rk-menu__txt">Subsurface irrigation</span>
+          <span class="rk-menu__tag">SDI · Root zone</span>
+        </a>
+      </li>
+      <li class="rk-menu__item">
+        <a class="rk-menu__link" href="projects.html">
+          <span class="rk-menu__no">04</span>
+          <span class="rk-menu__txt">Projects</span>
+          <span class="rk-menu__tag">Gardens we built</span>
+        </a>
+      </li>
+      <li class="rk-menu__item">
+        <a class="rk-menu__link" href="about.html">
+          <span class="rk-menu__no">05</span>
+          <span class="rk-menu__txt">About</span>
+          <span class="rk-menu__tag">A Győr team</span>
+        </a>
+      </li>
+      <li class="rk-menu__item">
+        <a class="rk-menu__link" href="contact.html">
+          <span class="rk-menu__no">06</span>
+          <span class="rk-menu__txt">Contact</span>
+          <span class="rk-menu__tag">Free site survey</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="rk-menu__foot">
+      <div>
+        <span class="label">Phone</span>
+        <a href="tel:+36307260024" class="ulink">+36 30 726 0024</a>
+      </div>
+      <div>
+        <span class="label">Email</span>
+        <a href="mailto:info@rapidkert.com" class="ulink">info@rapidkert.com</a>
+      </div>
+      <div>
+        <span class="label">Where we work</span>
+        <span>Győr + 40 km radius</span>
+      </div>
+      <div>
+        <span class="label">Language</span>
+        <div class="rk-lang rk-lang--menu" role="group" aria-label="Language">
+          <a class="rk-lang__i" href="../index.html" hreflang="hu" lang="hu">HU<span class="rk-lang__nm"> — Magyar</span></a>
+          <span class="rk-lang__sep" aria-hidden="true">/</span>
+          <a class="rk-lang__i" href="index.html" hreflang="en" lang="en" aria-current="true">EN<span class="rk-lang__nm"> — English</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     THE LIVING GROUND
+     ──────────────────────────────────────────────────────────────────────
+     One WebGL canvas, one scene, one scroll timeline. Every chapter below
+     is real, semantic DOM sitting on top of it — nothing that matters is
+     drawn inside the canvas. Without WebGL the whole thing degrades into a
+     stacked editorial narrative with a drawn cross-section, and no copy,
+     no link and no call to action is lost.
+
+     This document and its Hungarian counterpart load the SAME stylesheet,
+     the same interaction layer and the same WebGL module. Nothing here is
+     an English build of anything: the geometry, the camera solve, the
+     chapter ranges and the scene tracks are one contract, shared.
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="gd" id="ground" data-nav-anchor data-tone="dark" data-film
+         aria-label="A great garden starts below the surface">
+
+  <div class="gd__stage" id="gdStage">
+
+    <canvas class="gd__canvas" id="gdCanvas" aria-hidden="true"></canvas>
+    <div class="gd__vig" aria-hidden="true"></div>
+
+    <!-- The rendered surface hands over to a real photograph here. -->
+    <div class="gd__photo" id="gdPhoto" aria-hidden="true">
+      <img src="../kesz-gyep-terasz.jpg"
+           srcset="../kesz-gyep-terasz-thumb.jpg 800w, ../kesz-gyep-terasz.jpg 1600w"
+           sizes="100vw" alt="" width="1600" height="2133" loading="lazy" decoding="async">
+    </div>
+
+    <!-- Architectural annotation layer: DOM labels + SVG leader lines, both
+         positioned every frame from real 3D anchor points on the model. -->
+    <div class="gd__anno" id="gdAnno" aria-hidden="true">
+      <svg class="gd__lines" id="gdLines" viewBox="0 0 1200 800" fill="none"></svg>
+
+      <!-- chapter 02 — the strata -->
+      <span class="gd__lbl" data-anchor="turf"     data-from=".248" data-to=".392" data-side="right" data-off="-2"><b>01</b>Surface</span>
+      <span class="gd__lbl" data-anchor="topsoil"  data-from=".252" data-to=".392" data-side="right" data-off="-2"><b>02</b>Topsoil</span>
+      <span class="gd__lbl" data-anchor="rootzone" data-from=".256" data-to=".392" data-side="right" data-off="-2"><b>03</b>Root zone</span>
+      <span class="gd__lbl" data-anchor="drain"    data-from=".260" data-to=".392" data-side="right" data-off="-2"><b>04</b>Drainage</span>
+      <span class="gd__lbl" data-anchor="base"     data-from=".264" data-to=".392" data-side="right" data-off="-2"><b>05</b>Base</span>
+
+      <!-- chapter 03 — the network. Both lead LEFT, away from the copy
+           column. The chapter is about where the water ENDS UP. -->
+      <span class="gd__lbl" data-anchor="irrig" data-from=".444" data-to=".578" data-side="left" data-off="-34">Zone · lateral</span>
+      <span class="gd__lbl" data-anchor="emit"  data-from=".470" data-to=".578" data-side="left" data-off="40">Drip line <i>in the root zone</i></span>
+
+      <!-- chapter 04 — the exploded section -->
+      <span class="gd__lbl gd__lbl--tech" data-anchor="turf"     data-from=".662" data-to=".762" data-side="right" data-off="-4"><b>A</b>Surface</span>
+      <span class="gd__lbl gd__lbl--tech" data-anchor="topsoil"  data-from=".668" data-to=".762" data-side="right" data-off="-4"><b>B</b>Topsoil</span>
+      <span class="gd__lbl gd__lbl--tech" data-anchor="irrig"    data-from=".674" data-to=".762" data-side="left"  data-off="-4"><b>C</b>Irrigation</span>
+      <span class="gd__lbl gd__lbl--tech" data-anchor="rootzone" data-from=".680" data-to=".762" data-side="right" data-off="-4"><b>D</b>Root zone</span>
+      <span class="gd__lbl gd__lbl--tech" data-anchor="drain"    data-from=".686" data-to=".762" data-side="right" data-off="-4"><b>E</b>Drain</span>
+      <span class="gd__lbl gd__lbl--tech" data-anchor="base"     data-from=".692" data-to=".762" data-side="right" data-off="-4"><b>F</b>Base</span>
+
+      <!-- The exploded section's dimension string. The datum keeps the
+           architectural notation and takes the English decimal point: the
+           live depth readout on the horizon rule is written by rk-ground.js
+           in the same convention, and two number systems on one drawing is
+           not a translation choice, it is an error. -->
+      <span class="gd__dim-datum" id="gdDimDatum">&plusmn;0.00 <i>surface</i></span>
+      <span class="gd__dim-cap" id="gdDimCap">Typical build-up<i>Schematic — not a construction dimension</i></span>
+    </div>
+
+    <!-- The horizon is not decoration: JS pins it to the projected top face
+         of the specimen, so SURFACE is literally the surface. -->
+    <div class="gd__horizon" id="gdHorizon" aria-hidden="true">
+      <span class="gd__horizon-l">Surface</span>
+      <span class="gd__horizon-r" id="gdDepth">0.00 m</span>
+    </div>
+
+    <!-- ── CHAPTERS ─────────────────────────────────────────────────── -->
+    <div class="gd__ui">
+
+      <!-- 01 · SURFACE ------------------------------------------------ -->
+      <div class="gd__ch gd__ch--hero" data-ch data-from="0" data-to=".105">
+        <div class="shell gd__inner">
+          <!-- The company half of the eyebrow is a SPAN because on a 320
+               screen it is printed 8px under a header logo that already
+               reads "Rapidkert Kft." at the same x. It is dropped there
+               (rk.css §31.86) so the line stops wrapping — and here the
+               locator is doing more work than it does in Hungarian: an
+               English reader needs the country, not the district. -->
+          <p class="label label--clay gd__eyebrow">
+            <span class="gd__eyebrow-co">Rapidkert Kft. — </span>Győr, Hungary
+          </p>
+
+          <!-- THE DATUM.
+               The headline is deliberately broken across the ground plane:
+               the first two lines are above grade, the last one is below it,
+               and the rule between them is the specimen's own surface —
+               rk-ground.js solves the hero camera so the model's grade plane
+               projects onto exactly this gap.
+
+               THE ENGLISH LINE IS NOT THE HUNGARIAN LINE TRANSLATED INTO
+               THE SAME SLOT.                                    [PHASE 3.3]
+               "A jó kert / nem a felszínen / kezdődik." puts the verb last,
+               so Hungarian can hold "kezdődik" back and drop it below the
+               datum on its own. English cannot: word-for-word it becomes "A
+               good garden does not start on the surface", the negation lands
+               in the middle, and the word under the ground plane is "surface"
+               attached to nothing.
+
+               So the sentence is rebuilt around the same figure rather than
+               around the same words: A GREAT GARDEN / STARTS BELOW / THE
+               SURFACE. Three lines, the same 2-above / 1-below split, the
+               same object below grade — and now the phrase that crosses the
+               datum is "starts below | the surface", which is what the datum
+               IS. The metaphor is carried by the break, not by the syntax. -->
+          <h1 class="display gd__h1">
+            <span>A great garden</span>
+            <span>starts below</span>
+            <i class="gd__datum" aria-hidden="true"></i>
+            <span><em>the surface.</em></span>
+          </h1>
+
+          <div class="gd__lead">
+            <!-- THREE LINES, MEASURED, NOT TRANSLATED.            [PHASE 3.3]
+                 The first draft of this ran to four lines at 1440x900 — one
+                 more than Hungarian — and the cost was not a longer paragraph.
+                 The hero block is vertically centred, so the extra line lifted
+                 the whole composition 34.5px: the eyebrow moved from 123px to
+                 93px and closed on the header, and the datum band the camera
+                 solves against moved with it. English being longer is not a
+                 fact to accommodate, it is a draft to cut. "One team" left the
+                 sentence because it is printed as a statistic 60px below it. -->
+            <p class="gd__lede">
+              The finished garden is only the visible layer. What it looks like
+              in two years is decided below it — ground, drainage, irrigation.
+              We build that too, plan to handover.
+            </p>
+            <div class="gd__cta">
+              <a href="contact.html" class="btn btn--light" data-magnetic>
+                Free site survey <i class="btn__arrow" aria-hidden="true"></i>
+              </a>
+              <a href="projects.html" class="btn btn--line">
+                Gardens we built <i class="btn__arrow" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="gd__foot">
+            <div class="gd__stats">
+              <div class="gd__stat"><b>One team</b><span>Plan + build</span></div>
+              <div class="gd__stat"><b>Free</b><span>Site survey</span></div>
+              <div class="gd__stat"><b>40 km</b><span>Radius around Győr</span></div>
+            </div>
+            <span class="cue label">
+              <span class="cue__line" aria-hidden="true"></span> Scroll below the surface
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 02 · DESCENT ------------------------------------------------ -->
+      <div class="gd__ch gd__ch--mid" data-ch data-from=".128" data-to=".212">
+        <div class="shell gd__inner">
+          <p class="label label--clay">02 — Descent</p>
+          <p class="gd__mid">
+            From here down<br>is where the work is.
+          </p>
+        </div>
+      </div>
+
+      <!-- 03 · GROUND ------------------------------------------------- -->
+      <div class="gd__ch gd__ch--left" data-ch data-from=".240" data-to=".396">
+        <div class="shell gd__inner">
+          <p class="label label--clay">03 — Below the surface</p>
+          <h2 class="display gd__h2">Under the lawn<br><em>the garden begins.</em></h2>
+          <p class="gd__body">
+            Topsoil, root zone, irrigation, bedding, drainage. This is the
+            build-up we construct — before a single blade of grass goes down
+            on it. The longest phase, the least photogenic, and the one that
+            decides the rest.
+          </p>
+
+          <!-- Shown only when WebGL is unavailable: the same section, drawn.
+               Every label in it is English, because a fallback in the wrong
+               language is a fallback that failed. -->
+          <div class="gd__fb">
+            <svg class="xsec" viewBox="-66 -6 542 348" role="img"
+                 aria-label="Garden cross-section: surface, topsoil, root-zone irrigation, bedding and drainage layers">
+              <rect x="30" y="52"  width="360" height="72"  class="fill-soil"/>
+              <rect x="30" y="124" width="360" height="62"  class="fill-soil-2"/>
+              <rect x="30" y="186" width="360" height="58"  class="fill-soil"/>
+              <rect x="30" y="244" width="360" height="52"  class="fill-soil-2"/>
+              <path class="strata draw" d="M30 124 H390" style="--d:.20s"/>
+              <path class="strata draw" d="M30 186 H390" style="--d:.30s"/>
+              <path class="strata draw" d="M30 244 H390" style="--d:.40s"/>
+              <path class="strata draw" d="M30 296 H390" style="--d:.50s"/>
+              <path class="turf draw" d="M30 52 H390" style="--d:0s"/>
+              <g class="turf drop" style="--d:.7s">
+                <path d="M52 52 v-7 M64 52 v-10 M76 52 v-6 M120 52 v-9 M132 52 v-6 M144 52 v-10
+                         M196 52 v-7 M208 52 v-10 M220 52 v-6 M280 52 v-9 M292 52 v-6 M304 52 v-10
+                         M348 52 v-7 M360 52 v-10"/>
+              </g>
+              <path class="root draw" d="M120 52 C118 78 112 96 104 116 M120 52 C124 80 132 98 141 118 M120 52 C120 84 121 104 122 132" style="--d:.9s"/>
+              <path class="root draw" d="M292 52 C289 78 283 94 276 114 M292 52 C296 80 303 96 311 116 M292 52 C292 84 293 102 294 128" style="--d:1.05s"/>
+              <path class="pipe draw" d="M46 108 H374" style="--d:.55s"/>
+              <g class="pipe drop" style="--d:1.25s">
+                <circle cx="104" cy="108" r="2.6" fill="currentColor" stroke="none"/>
+                <circle cx="188" cy="108" r="2.6" fill="currentColor" stroke="none"/>
+                <circle cx="272" cy="108" r="2.6" fill="currentColor" stroke="none"/>
+                <circle cx="340" cy="108" r="2.6" fill="currentColor" stroke="none"/>
+                <path d="M104 113 v9 M188 113 v9 M272 113 v9 M340 113 v9" stroke-dasharray="2 3"/>
+              </g>
+              <g class="drop" style="--d:1.4s">
+                <circle cx="150" cy="268" r="11" fill="none" stroke="#6E8794" stroke-width="1.4"/>
+                <circle cx="150" cy="268" r="4"  fill="none" stroke="#6E8794" stroke-width="1"/>
+                <path d="M60 262 h6 M78 272 h6 M96 260 h6 M114 274 h6 M196 262 h6 M214 272 h6
+                         M232 260 h6 M250 274 h6 M268 262 h6 M286 271 h6 M304 261 h6 M322 273 h6 M348 264 h6"
+                      stroke="#E8E5DA" stroke-opacity=".22" stroke-width="1.2"/>
+              </g>
+              <g class="tick">
+                <path d="M30 52 h-9 M30 124 h-9 M30 186 h-9 M30 244 h-9 M30 296 h-9"/>
+                <path d="M24 52 V296"/>
+              </g>
+              <text x="398" y="56"  text-anchor="start">Surface</text>
+              <text x="398" y="94"  text-anchor="start">Topsoil</text>
+              <text x="398" y="128" text-anchor="start">Root zone</text>
+              <text x="398" y="190" text-anchor="start">Bedding</text>
+              <text x="398" y="248" text-anchor="start">Drain</text>
+              <text x="18" y="112" text-anchor="end" class="lbl-depth">Irrigation</text>
+              <text x="18" y="272" text-anchor="end" class="lbl-depth">Drainage</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 04 · WATER -------------------------------------------------- -->
+      <div class="gd__ch gd__ch--right" data-ch data-from=".424" data-to=".584">
+        <div class="shell gd__inner">
+          <p class="label label--clay">04 — Irrigation</p>
+          <h2 class="display gd__h2">What you don't see<br><em>is what keeps it alive.</em></h2>
+          <p class="gd__body">
+            The water goes into the root zone, not into the air. We measure the
+            real pressure and flow of your water source — that decides how many
+            zones there are and how many can run at once. The pipework goes
+            under the lawn.
+          </p>
+          <a href="irrigation-systems.html" class="btn btn--line">
+            Irrigation systems <i class="btn__arrow" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 05 · STRUCTURE ---------------------------------------------- -->
+      <div class="gd__ch gd__ch--left" data-ch data-from=".650" data-to=".768">
+        <div class="shell gd__inner">
+          <p class="label label--clay">05 — Structure</p>
+          <h2 class="display gd__h2 gd__h2--wide">Under the finish<br><em>a solid base.</em></h2>
+          <p class="gd__body">
+            Graded ground, good soil, careful drainage, a load-bearing base.
+            One system — and we don't cut corners where it doesn't show.
+          </p>
+        </div>
+      </div>
+
+      <!-- 06 · LAND → LIFE -------------------------------------------- -->
+      <div class="gd__ch gd__ch--rail" data-ch data-from=".780" data-to=".922">
+        <div class="shell gd__inner">
+          <p class="label label--clay">06 — From ground to garden</p>
+          <!-- TERRAIN, not SITE. These five name the STATE OF THE GROUND at
+               five moments — what it is, not who is working it. §14's ONE
+               TEAM convergence names the four TRADES that agree, and there
+               the same Hungarian word is SITE. Both are deliberate and they
+               are deliberately not the same word.              [PHASE 3.3] -->
+          <ol class="gd__rail" id="gdRail">
+            <li data-step="0"><span>01</span> Terrain</li>
+            <li data-step="1"><span>02</span> Water</li>
+            <li data-step="2"><span>03</span> Structure</li>
+            <li data-step="3"><span>04</span> Planting</li>
+            <li data-step="4"><span>05</span> Finished garden</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="gd__ch gd__ch--step" data-ch data-from=".782" data-to=".812">
+        <div class="shell gd__inner">
+          <h3 class="display gd__step">Terrain</h3>
+          <p class="gd__body">Grading, levelling, foundations for the paving, and the drainage runs put in.</p>
+        </div>
+      </div>
+      <div class="gd__ch gd__ch--step" data-ch data-from=".812" data-to=".840">
+        <div class="shell gd__inner">
+          <h3 class="display gd__step">Water</h3>
+          <p class="gd__body">Trenching, main line, laterals for each zone, and drip taken into the root zone.</p>
+        </div>
+      </div>
+      <div class="gd__ch gd__ch--step" data-ch data-from=".840" data-to=".866">
+        <div class="shell gd__inner">
+          <h3 class="display gd__step">Structure</h3>
+          <p class="gd__body">Paving, paths, terrace — laid on bedding, in a coordinated sequence.</p>
+        </div>
+      </div>
+      <div class="gd__ch gd__ch--step" data-ch data-from=".866" data-to=".892">
+        <div class="shell gd__inner">
+          <h3 class="display gd__step">Planting</h3>
+          <p class="gd__body">Lawn, shrubs, perennials — species chosen for your garden and how the light falls on it.</p>
+        </div>
+      </div>
+      <div class="gd__ch gd__ch--step" data-ch data-from=".892" data-to=".922">
+        <div class="shell gd__inner">
+          <h3 class="display gd__step">Finished garden</h3>
+          <p class="gd__body">Commissioning, instruction, handover. The system below, the garden above.</p>
+        </div>
+      </div>
+
+      <!-- 07 · REALITY ------------------------------------------------ -->
+      <div class="gd__ch gd__ch--real" data-ch data-from=".944" data-to="1">
+        <div class="shell gd__inner">
+          <p class="label label--clay">07 — Evidence</p>
+          <!-- "Nem látványterv. / Megépített kert." is a negation followed by
+               the real thing, and both halves are noun phrases. English keeps
+               exactly that shape. RENDER is the term the trade actually uses
+               against "látványterv", and it is one syllable — which matters,
+               because this line is set at display scale and the second half
+               has to be able to carry the emphasis on its own. -->
+          <h2 class="display gd__h2 gd__h2--real">Not a render.<br><em>A built garden.</em></h2>
+          <p class="gd__body">
+            So far this has been the system. From here it is the work: real
+            gardens in and around Győr, made out of empty plots and worn-out
+            yards.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /gd__ui -->
+  </div><!-- /gd__stage -->
+
+  <div class="gd__scroll" aria-hidden="true"></div>
+</section>
+<!-- ══════════════════════════════════════════════════════════════════════
+     08 — THE PROJECT FIELD
+     ──────────────────────────────────────────────────────────────────────
+     The model handed over to a photograph. This section does not START —
+     it CONTINUES: the same plate, at the same crop and the same grade, now
+     closing into a field plate while its metadata writes itself around the
+     edge. Only once the photograph has become a measured sheet does the
+     field behind it begin to move.
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="fld" id="munkak" data-tone="dark" data-film aria-labelledby="projTitle">
+
+  <!-- ── 08.1 · THE BRIDGE ───────────────────────────────────────────── -->
+  <div class="brg" data-brg>
+    <div class="brg__stage">
+
+      <figure class="brg__plate" data-brg-plate>
+        <!-- EAGER ON PURPOSE, PRIORITISED DOWN ON PURPOSE.        [PHASE 3.2]
+             Same file as the Living Ground's handover plate (#gdPhoto), which
+             has to be decoded before the rendered surface dissolves into it.
+             fetchpriority="low" keeps the fetch starting immediately and lets
+             the critical path win the race. -->
+        <img src="../kesz-gyep-terasz.jpg"
+             srcset="../kesz-gyep-terasz-thumb.jpg 800w, ../kesz-gyep-terasz.jpg 1600w"
+             sizes="100vw"
+             alt="Finished, even lawn with a terrace, paving and the irrigation valve box set into the grass"
+             width="1600" height="2133" decoding="async" fetchpriority="low">
+      </figure>
+
+      <!-- The field marks close around the plate as it contracts. -->
+      <div class="brg__rig" aria-hidden="true">
+        <span class="brg__tick brg__tick--tl"></span>
+        <span class="brg__tick brg__tick--tr"></span>
+        <span class="brg__tick brg__tick--bl"></span>
+        <span class="brg__tick brg__tick--br"></span>
+        <span class="brg__rule brg__rule--t"></span>
+        <span class="brg__rule brg__rule--b"></span>
+      </div>
+
+      <div class="shell brg__meta">
+        <p class="brg__eyebrow">08 — Built work</p>
+        <h2 class="brg__h2" id="projTitle">Built <em>gardens.</em></h2>
+        <p class="brg__note">
+          After the model, the work. Real gardens in Győr — out of empty plots
+          and worn-out yards, with the same build-up underneath.
+        </p>
+      </div>
+
+      <dl class="brg__spec" aria-hidden="true">
+        <div><dt>Sheet</dt><dd>01</dd></div>
+        <div><dt>Trade</dt><dd>Garden construction</dd></div>
+        <div><dt>Location</dt><dd>Győr</dd></div>
+        <div><dt>Status</dt><dd>Built</dd></div>
+      </dl>
+    </div>
+    <div class="brg__run" aria-hidden="true"></div>
+  </div>
+
+  <!-- ── 08.2 · THE FIELD ──────────────────────────────────────────────
+       A SURVEY SPACE, not a gallery. Seven sheets standing at authored
+       stations in one continuous depth, with the datum plane of that space
+       marked underneath them. The camera travels the space; the plates do
+       not move relative to it. The stations, the depths and the rhythm are
+       the shared contract — only the captions are in English.          -->
+  <div class="fld__field" data-fld>
+    <div class="fld__stage">
+      <div class="fld__deep" data-fld-deep>
+
+        <div class="fld__datum" data-fld-datum data-step="700" data-n="26" aria-hidden="true"></div>
+
+        <!-- 02 · the room, established. -->
+        <figure class="fld__pl" data-run=".05" data-dx="26" data-dy="-6" data-w="24" data-h="58"
+                data-near="460" data-cull="780" data-no="02">
+          <span class="fld__img"><img src="../terep-elokeszites-halo-thumb.jpg"
+               srcset="../terep-elokeszites-halo-thumb.jpg 800w, ../terep-elokeszites-halo.jpg 1600w" sizes="40vw"
+               alt="Site preparation: spread topsoil with a weed-suppressing membrane over it" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:52% 66%"></span>
+          <!-- One word, like every other caption in this field. Below 860 the
+               rig prints these in a 114px slot with an ellipsis (rk.css
+               §32.9); "Site · preparation" measured 151px there and arrived
+               as "Site · prepar…". Hungarian ellipsises too, so parity was
+               not the problem — a truncated label is. -->
+          <figcaption class="fld__cap"><span>Preparation</span><i>Győr</i></figcaption>
+        </figure>
+
+        <!-- 03 · THE FIRST PASS. 32vw at its station, ~80vw when it goes by. -->
+        <figure class="fld__pl fld__pl--near" data-run=".185" data-dx="12" data-dy="2" data-w="32" data-h="64"
+                data-near="880" data-cull="1060" data-no="03">
+          <span class="fld__img"><img src="../kertepites-elokeszites-thumb.jpg"
+               srcset="../kertepites-elokeszites-thumb.jpg 800w, ../kertepites-elokeszites.jpg 1600w" sizes="90vw"
+               alt="Garden construction during the preparation phase" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 58%"></span>
+          <!-- CAPTIONS ARE READ TWICE.                            [PHASE 3.3]
+               Below 860 the rig prints this caption in place of "Sheet"
+               (rk.js §12.2), in a fixed slot beside the station number. The
+               Hungarian names are one word each and the English ones must
+               behave the same way there — so this is "Construction", not
+               "Garden construction", which measured 18 characters into a
+               slot that holds about 12 at 390. -->
+          <figcaption class="fld__cap"><span>Construction</span><i>Győr</i></figcaption>
+        </figure>
+
+        <!-- 04 · THE RESET, and it is still a photograph. -->
+        <figure class="fld__pl" data-run=".335" data-dx="-18" data-dy="8" data-w="32" data-h="60"
+                data-near="520" data-cull="820" data-no="04">
+          <span class="fld__img"><img src="../kerti-osveny-sedum-thumb.jpg"
+               srcset="../kerti-osveny-sedum-thumb.jpg 800w, ../kerti-osveny-sedum.jpg 1600w" sizes="62vw"
+               alt="Stepping-stone garden path laid into a sedum bed" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 60%"></span>
+          <figcaption class="fld__cap"><span>Path · sedum</span><i>Győr</i></figcaption>
+        </figure>
+
+        <!-- 05 · THE PAIR. -->
+        <figure class="fld__pl" data-run=".455" data-dx="16" data-dy="-8" data-w="32" data-h="62"
+                data-near="480" data-cull="860" data-no="05">
+          <span class="fld__img"><img src="../novenytelepites-agyas-thumb.jpg"
+               srcset="../novenytelepites-agyas-thumb.jpg 800w, ../novenytelepites-agyas.jpg 1600w" sizes="62vw"
+               alt="Planting into a freshly formed bed" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 62%"></span>
+          <figcaption class="fld__cap"><span>Planting</span><i>Near Győr</i></figcaption>
+        </figure>
+
+        <!-- 06 · THE CROSSING. The camera goes THROUGH this plate. -->
+        <figure class="fld__pl fld__pl--band fld__pl--near" data-run=".59" data-dx="-6" data-dy="0" data-w="48" data-h="46"
+                data-near="1120" data-cull="1300" data-no="06">
+          <span class="fld__img"><img src="../kesz-kert-panorama-thumb.jpg"
+               srcset="../kesz-kert-panorama-thumb.jpg 800w, ../kesz-kert-panorama.jpg 1600w" sizes="190vw"
+               alt="Panorama of the plot before garden construction started" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 50%"></span>
+          <!-- EXISTING is the drawing-office word for the state before the
+               works, and it fits the rig's slot whole. -->
+          <figcaption class="fld__cap"><span>Existing</span><i>Near Győr</i></figcaption>
+        </figure>
+
+        <!-- 07 · the second pass, off centre — it goes by on the right. -->
+        <figure class="fld__pl fld__pl--near" data-run=".745" data-dx="12" data-dy="-4" data-w="30" data-h="70"
+                data-near="940" data-cull="1120" data-no="07">
+          <span class="fld__img"><img src="../terburkolat-osveny-thumb.jpg"
+               srcset="../terburkolat-osveny-thumb.jpg 800w, ../terburkolat-osveny.jpg 1600w" sizes="85vw"
+               alt="Paved garden path framed by a clipped hedge" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 74%"></span>
+          <figcaption class="fld__cap"><span>Paving</span><i>Near Győr</i></figcaption>
+        </figure>
+
+        <!-- 08 · THE CLOSING PLATE. It LANDS before it transforms.
+             dy = 0 and dx = 0 are contracts: this plate is not released, it
+             is crushed onto the datum plane, and the line it leaves has to
+             land on --datum exactly, because that line is the ground the
+             first service is built on. See rk.css §32.2 THE SURVIVOR. -->
+        <figure class="fld__pl fld__pl--near fld__pl--last" data-run=".90" data-dx="0" data-dy="0" data-w="44" data-h="70"
+                data-near="4000" data-cull="4400" data-no="08">
+          <span class="fld__img"><img src="../gyep-elokeszites-burkolat-thumb.jpg"
+               srcset="../gyep-elokeszites-burkolat-thumb.jpg 800w, ../gyep-elokeszites-burkolat.jpg 1600w" sizes="100vw"
+               alt="Lawn area being prepared alongside the finished paving" width="800" height="1066"
+               loading="lazy" decoding="async" style="object-position:50% 64%"></span>
+          <figcaption class="fld__cap"><span>Lawn · paving</span><i>Győr</i></figcaption>
+        </figure>
+
+      </div>
+
+      <div class="fld__veil" data-fld-veil aria-hidden="true"></div>
+
+      <!-- Technical furniture. Fixed to the stage, not to the plates. -->
+      <div class="fld__hud" aria-hidden="true">
+        <span class="fld__hud-l">Selected work</span>
+        <span class="fld__hud-r">Győr + 40 km radius</span>
+        <span class="fld__hud-n" data-fld-no>02</span>
+        <span class="fld__hud-t">Sheet</span>
+        <span class="fld__hud-bar"><i data-fld-bar></i></span>
+      </div>
+
+      <!-- Pointer state over the field only. Native cursor everywhere else. -->
+      <span class="fld__cur" data-fld-cur aria-hidden="true">View</span>
+
+      <a class="fld__all" href="projects.html">
+        View all projects <i class="btn__arrow" aria-hidden="true"></i>
+      </a>
+
+      <span class="fld__cut" data-fld-cut aria-hidden="true"></span>
+    </div>
+    <div class="fld__run" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     09 — SERVICES AS LANDSCAPE LAYERS
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="lyr" id="szolgaltatasok" data-tone="light" aria-labelledby="svcTitle">
+  <div class="lyr__stage">
+
+    <div class="lyr__tone" aria-hidden="true"><i data-lyr-tone></i></div>
+
+    <!-- ONE piece of land, and the three services are three transformations
+         of it. The geometry is defined once in rk.js §14 and instantiated
+         here, in PROCESS and in PROOF, so the three sections are the same
+         object rather than three drawings in the same style. -->
+    <div class="lyr__world" data-lyr-world aria-hidden="true"></div>
+
+
+    <div class="shell lyr__type">
+      <header class="lyr__head">
+        <span class="lyr__no">09</span>
+        <h2 class="lyr__h2" id="svcTitle">Three services, <em>one approach.</em></h2>
+        <span class="lyr__of"><i data-lyr-i>01</i> / 03</span>
+      </header>
+
+      <div class="lyr__list" data-lyr>
+        <a class="lyr__it" data-i="0" href="garden-construction.html">
+          <span class="lyr__it-no">01</span>
+          <span class="lyr__name">Garden construction</span>
+          <span class="lyr__tag">Terrain · Structure · Planting</span>
+          <span class="lyr__desc">Grading, turfing, planting, paving and garden structures. An
+            empty plot or a neglected yard, built into a finished garden.</span>
+          <span class="lyr__go">Details <i class="btn__arrow" aria-hidden="true"></i></span>
+        </a>
+
+        <a class="lyr__it" data-i="1" href="irrigation-systems.html">
+          <span class="lyr__it-no">02</span>
+          <span class="lyr__name">Irrigation systems</span>
+          <span class="lyr__tag">Zoned · Automatic</span>
+          <span class="lyr__desc">An automatic, zoned system with smart control and rain and frost
+            sensors. Sized on the real figures from your water source, built and commissioned.</span>
+          <span class="lyr__go">Details <i class="btn__arrow" aria-hidden="true"></i></span>
+        </a>
+
+        <a class="lyr__it" data-i="2" href="subsurface-irrigation.html">
+          <span class="lyr__it-no">03</span>
+          <span class="lyr__name">Subsurface irrigation</span>
+          <span class="lyr__tag">SDI · Root zone</span>
+          <span class="lyr__desc">Subsurface drip irrigation (SDI), delivered into the root zone.
+            No sprinklers, no evaporation — up to 70% less water, and nothing visible.</span>
+          <span class="lyr__go">Details <i class="btn__arrow" aria-hidden="true"></i></span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="lyr__run" aria-hidden="true"></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     10 — PROCESS AS ASSEMBLY
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="asm" id="folyamat" data-tone="dark" aria-labelledby="procTitle">
+  <div class="asm__stage">
+    <div class="asm__tone" aria-hidden="true"><i data-asm-tone></i></div>
+
+    <div class="shell asm__head">
+      <span class="asm__no">10</span>
+      <h2 class="asm__h2" id="procTitle">From the first line <em>to the finished garden.</em></h2>
+      <p class="asm__lede">
+        You don't find out what it costs halfway through — and you don't find
+        out halfway through that something doesn't fit.
+      </p>
+    </div>
+
+    <!-- THE DATUM.
+         PLAN & QUOTE, not DESIGN & QUOTE.                    [PHASE 3.3]
+         Stage 02's own copy says we set out the garden's layout and the
+         irrigation zoning and then price it. That is a builder's setting-out
+         drawing, not a landscape design commission, and DESIGN would offer a
+         service Rapidkert does not sell. -->
+    <div class="asm__datum" aria-hidden="true">
+      <span class="asm__line"></span>
+      <span class="asm__head-mk" data-asm-head></span>
+      <ol class="asm__stations">
+        <li data-st="0"><b>01</b><span>Site survey</span></li>
+        <li data-st="1"><b>02</b><span>Plan &amp; quote</span></li>
+        <li data-st="2"><b>03</b><span>Earthworks &amp; soil</span></li>
+        <li data-st="3"><b>04</b><span>Construction</span></li>
+        <li data-st="4"><b>05</b><span>Handover</span></li>
+      </ol>
+    </div>
+
+    <div class="asm__world" data-asm-world aria-hidden="true"></div>
+
+    <!-- The written stages. One is current; the others hold their position. -->
+    <div class="shell asm__steps" data-asm>
+      <article class="asm__step" data-st="0">
+        <h3>Free site survey</h3>
+        <p>We come out, look at the ground, the soil and the orientation, and
+           measure the pressure at your water source. We talk through how you
+           want to use the garden.</p>
+      </article>
+      <article class="asm__step" data-st="1">
+        <h3>Plan &amp; quote</h3>
+        <p>We set out the garden's layout and the irrigation zoning, then give
+           an itemised, fixed-price quote. No surprises.</p>
+      </article>
+      <article class="asm__step" data-st="2">
+        <h3>Earthworks &amp; soil</h3>
+        <p>Grading, levelling, foundations for the paving, drainage. A solid
+           base under the part that shows.</p>
+      </article>
+      <article class="asm__step" data-st="3">
+        <h3>Construction</h3>
+        <p>Paving, irrigation, planting, turfing — in a coordinated sequence,
+           so nothing has to be opened up twice.</p>
+      </article>
+      <article class="asm__step" data-st="4">
+        <h3>Handover &amp; care</h3>
+        <p>We commission it, show you how it runs, and hand it over. Ongoing
+           garden care and seasonal servicing are ours too, if you want them.</p>
+      </article>
+    </div>
+  </div>
+  <div class="asm__run" aria-hidden="true"></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     11 — PROOF
+     ──────────────────────────────────────────────────────────────────────
+     One claim at a time, at the largest scale on the page after the hero.
+     Every figure is one Rapidkert already publishes; nothing is invented,
+     and nothing is made stronger on its way into English. AKÁR stays UP TO.
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="prf" id="miertunk" data-tone="light" aria-labelledby="trustTitle">
+  <div class="prf__pin">
+  <div class="prf__stage">
+
+    <div class="prf__world" data-prf-world aria-hidden="true"></div>
+
+    <!-- THE SURVIVOR. The instrument's last state flattens back to a level
+         line with station marks on it, and then it TURNS: by the section
+         boundary it is standing in the page gutter, and it becomes the
+         specification sheet's index rail. -->
+    <div class="prf__rail" data-prf-rail aria-hidden="true">
+      <i><b></b><b></b><b></b><b></b><b></b><b></b></i>
+    </div>
+
+    <div class="shell prf__rig" aria-hidden="true">
+      <span class="prf__no">11</span>
+      <span class="prf__of"><i data-prf-i>01</i> / 05</span>
+    </div>
+
+    <div class="prf__slots" data-prf>
+      <div class="shell prf__slot" data-s="0">
+        <h2 class="prf__big" id="trustTitle">One team.</h2>
+        <p class="prf__d">Not one firm for the plan, another for the paving and a third for the
+          irrigation. One team works from the plan to the handover — the details line up, and
+          there is nobody to point at if something doesn't.</p>
+      </div>
+      <div class="shell prf__slot" data-s="1">
+        <p class="prf__big"><span>40</span><small>km</small></p>
+        <p class="prf__d">Győr and the surrounding area: Győrújbarát, Győrújfalu, Abda, Nyúl, Écs,
+          Pannonhalma, Töltéstava, Kisbajcs, Vámosszabadi, Gyirmót, Ménfőcsanak.</p>
+      </div>
+      <div class="shell prf__slot" data-s="2">
+        <!-- "Akár" is the site's own qualifier — the third service's copy
+             reads "akár 70% vízmegtakarítással" — and the claim is weaker
+             and truer with it than without. UP TO carries it exactly; "70%
+             water saving" would be a claim this site does not make. The
+             drawing behind this statement shows the MECHANISM and measures
+             nothing. -->
+        <p class="prf__big"><i class="prf__upto">Up to</i><span>70</span><small>%</small></p>
+        <p class="prf__d">Less water with subsurface irrigation, compared with sprinklers. The
+          exact figure depends on the soil, the planting and the climate.</p>
+      </div>
+      <div class="shell prf__slot" data-s="3">
+        <!-- ONE WORKING DAY IS THE CALL BACK, NOT THE BUILD.     [PHASE 3.3]
+             The figure is a response time and the supporting line has to say
+             so in its first clause, or an English reader arriving at a
+             display-scale "1 WORKING DAY" over a garden reads it as how long
+             the garden takes. -->
+        <p class="prf__big"><span>1</span><small>working day</small></p>
+        <p class="prf__d">We call you back within one working day of your enquiry. The site survey
+          itself is free and comes with no obligation.</p>
+      </div>
+      <div class="shell prf__slot" data-s="4">
+        <!-- "Teljes körű garancia" is a scope, not a duration, and the
+             supporting copy says exactly what the scope is: the plan and the
+             whole build are ours. COMPREHENSIVE carries that. Not "full",
+             not "lifetime", not "100%" — none of those are supported. -->
+        <p class="prf__big prf__big--word">Comprehensive <em>warranty.</em></p>
+        <p class="prf__d">Because the plan and the whole build are ours, we warrant our own work.
+          The conditions are set out in the quote.</p>
+      </div>
+    </div>
+  </div>
+  <div class="prf__run" aria-hidden="true"></div>
+  </div>
+
+  <!-- Local SEO + partners. Deliberately quiet: this is the level of the
+       hierarchy that is present for anyone who looks for it. -->
+  <div class="shell prf__foot">
+    <div class="prf__area">
+      <h3 class="label">Where we work</h3>
+      <p class="body" style="max-width:78ch">
+        We are a Győr team, and most of our work is in the city and its
+        immediate area: Győrújbarát, Győrújfalu, Abda, Nyúl, Écs, Pannonhalma,
+        Töltéstava, Kisbajcs, Vámosszabadi, Gyirmót and Ménfőcsanak. For larger
+        projects we also travel out towards Mosonmagyaróvár, Csorna, Kapuvár
+        and Pápa. If your town is not on the list,
+        <a href="tel:+36307260024" class="ulink">call us</a> — we can probably
+        work something out.
+      </p>
+    </div>
+    <div class="partners">
+      <span class="label" style="width:100%">Our partners</span>
+      <img src="../partner-stihl.svg" alt="STIHL" width="120" height="27" loading="lazy">
+      <span class="partners__word">OkosKert</span>
+      <img src="../partner-hunter.svg" alt="Hunter" width="120" height="27" loading="lazy">
+      <img src="../partner-barenbrug.svg" alt="Barenbrug" width="120" height="27" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     12 — FAQ AS A SPECIFICATION SHEET
+     ──────────────────────────────────────────────────────────────────────
+     Native <details>, so every answer stays in the DOM for search engines
+     and the section works with scripting off.
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="sheet" id="kerdesek" data-tone="light" aria-labelledby="faqTitle">
+  <div class="sheet__grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="shell">
+    <header class="sheet__head">
+      <span class="sheet__no">12</span>
+      <h2 class="sheet__h2" id="faqTitle">Common questions</h2>
+      <span class="sheet__meta">Worth knowing — 06 items</span>
+    </header>
+
+    <div class="sheet__body">
+      <details class="sheet__row" name="faq">
+        <summary>
+          <span class="sheet__i">01</span>
+          <span class="sheet__q">What does a garden or an irrigation system cost?</span>
+          <span class="sheet__mk" aria-hidden="true"></span>
+        </summary>
+        <div class="sheet__a"><p>It depends on the size of the area, the ground conditions, how much paving there is, and — for irrigation — the number of zones and the type of water source. That is why we don't work from a price list: after the free site survey you get a specific, itemised quote with every cost in it. A fixed price, with nothing hidden.</p></div>
+      </details>
+
+      <details class="sheet__row" name="faq">
+        <summary>
+          <span class="sheet__i">02</span>
+          <span class="sheet__q">Do the garden and the irrigation have to be done together?</span>
+          <span class="sheet__mk" aria-hidden="true"></span>
+        </summary>
+        <div class="sheet__a"><p>No — we take on either one on its own. But if a new garden is being built, it is worth thinking about both at once: irrigation is easiest to lay before the lawn and the paving go down, and that way the least has to be opened up. It can also go into a finished garden — we lift the turf carefully and put it back.</p></div>
+      </details>
+
+      <details class="sheet__row" name="faq">
+        <summary>
+          <span class="sheet__i">03</span>
+          <span class="sheet__q">How long does the work take?</span>
+          <span class="sheet__mk" aria-hidden="true"></span>
+        </summary>
+        <div class="sheet__a"><p>It depends on size and complexity: an irrigation system is typically a few days, and so is a smaller garden, while a complete large garden with paving and structures can run to several weeks. We give a realistic schedule at the planning stage and we keep to it — the exact timing is set out in the quote.</p></div>
+      </details>
+
+      <details class="sheet__row" name="faq">
+        <summary>
+          <span class="sheet__i">04</span>
+          <span class="sheet__q">When is the best time to start?</span>
+          <span class="sheet__mk" aria-hidden="true"></span>
+        </summary>
+        <div class="sheet__a"><p>Earthworks, paving, garden structures and irrigation can be done almost all year round. Planting and turfing are best in spring and early autumn. At the survey we will find the timing that suits your situation.</p></div>
+      </details>
+
+      <details class="sheet__row" name="faq">
+        <summary>
+          <span class="sheet__i">05</span>
+          <span class="sheet__q">Can we count on you after the handover?</span>
+          <span class="sheet__mk" aria-hidden="true"></span>
+        </summary>
+        <div class="sheet__a"><p>Yes. We take on ongoing garden care if you want it — mowing, pruning, bed maintenance — and seasonal servicing for irrigation: spring start-up, autumn draining, fault finding. We don't disappear the day after handover.</p></div>
+      </details>
+
+      <details class="sheet__row" name="faq">
+        <summary>
+          <span class="sheet__i">06</span>
+          <span class="sheet__q">Is there a warranty on the work?</span>
+          <span class="sheet__mk" aria-hidden="true"></span>
+        </summary>
+        <div class="sheet__a"><p>Yes. Because the plan and the whole build are ours, we warrant our own work. The specific conditions — for the paving, the garden structures, the planting and the irrigation system — are set out in the quote.</p></div>
+      </details>
+    </div>
+
+    <p class="sheet__call">
+      Not the answer you needed? <a href="tel:+36307260024" class="ulink">Call us.</a>
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     13 — THE SURFACE, CLOSED
+     ──────────────────────────────────────────────────────────────────────
+     WHAT SURVIVES: the sheet's last rule. It descends and becomes GRADE.
+     The page opened with "A great garden starts below the surface." and the
+     visitor has been under it ever since; here the ground closes over the
+     system and the call to action sits exactly ON the line.
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="grd" id="kezdjuk" data-tone="dark" aria-labelledby="endTitle" data-grd>
+  <div class="grd__sky" aria-hidden="true"></div>
+
+  <div class="grd__rail" aria-hidden="true"><i></i></div>
+
+  <div class="shell grd__above">
+    <span class="grd__no">13 — Let's start</span>
+    <!-- "Itt kezdődik / a kerted." leads with the place and lands on the
+         possessive. English inverts it — YOUR GARDEN / STARTS HERE — because
+         the literal order produces "Here your garden starts", which is a
+         translation, not a sentence. The closure is unchanged: the second
+         line lands on the grade rule with the same two-part break. -->
+    <h2 class="grd__h2" id="endTitle">Your garden<br><em>starts here.</em></h2>
+  </div>
+
+  <!-- GRADE. The single line the whole page has been about. -->
+  <div class="grd__line" aria-hidden="true">
+    <span class="grd__rule"></span>
+    <span class="grd__mk grd__mk--l">&plusmn;0.00 surface</span>
+    <span class="grd__mk grd__mk--r">Rapidkert · Győr</span>
+    <svg class="grd__turf" viewBox="0 0 1200 18" preserveAspectRatio="none">
+      <path d="M60 18 v-9 M92 18 v-13 M124 18 v-8 M300 18 v-10 M332 18 v-14 M364 18 v-8
+               M600 18 v-9 M632 18 v-13 M664 18 v-7 M900 18 v-11 M932 18 v-8 M964 18 v-14
+               M1090 18 v-9 M1122 18 v-12"/>
+    </svg>
+  </div>
+
+  <div class="grd__below">
+    <div class="shell grd__act">
+      <div class="grd__col">
+        <p class="grd__lede">
+          Book a free site survey in Győr or the surrounding area. We look at
+          the ground, listen to what you want, and show you what can be made
+          of it — with no obligation.
+        </p>
+        <div class="gd__cta">
+          <a href="contact.html" class="btn btn--light" data-magnetic>
+            Free site survey <i class="btn__arrow" aria-hidden="true"></i>
+          </a>
+          <a href="tel:+36307260024" class="btn btn--line">
+            +36 30 726 0024 <i class="btn__arrow" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+      <div class="grd__contact">
+        <div><span class="label">Email</span><a href="mailto:info@rapidkert.com" class="ulink">info@rapidkert.com</a></div>
+        <div><span class="label">Response time</span><span>1 working day</span></div>
+      </div>
+    </div>
+
+    <!-- The system, still running below grade. -->
+    <div class="grd__sub" aria-hidden="true">
+      <svg viewBox="0 0 1200 90" preserveAspectRatio="none">
+        <path class="grd__strata" d="M0 22 H1200"/>
+        <path class="grd__strata" d="M0 66 H1200"/>
+        <path class="grd__pipe" d="M0 44 H1200"/>
+        <circle class="grd__head" cx="0" cy="44" r="3.2"/>
+        <g class="grd__grit"><path d="M40 78 h8 M140 84 h8 M250 76 h8 M360 86 h8 M470 78 h8 M580 85 h8 M690 77 h8 M800 86 h8 M910 78 h8 M1020 84 h8 M1130 76 h8"/></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     FOOTER — the last stratum of the same composition.
+     ══════════════════════════════════════════════════════════════════ -->
+<footer class="rk-foot">
+  <div class="shell">
+    <div class="rk-foot__grid">
+      <div>
+        <img src="../logo-feher.png" alt="Rapidkert Kft." class="rk-foot__logo" width="404" height="118">
+        <p style="max-width:38ch">
+          Garden construction and irrigation, planned and built in Győr,
+          Hungary and the surrounding area. From plan to handover, one team.
+        </p>
+      </div>
+      <div>
+        <h3>Services</h3>
+        <ul>
+          <li><a href="garden-construction.html" class="ulink">Garden construction</a></li>
+          <li><a href="irrigation-systems.html" class="ulink">Irrigation systems</a></li>
+          <li><a href="subsurface-irrigation.html" class="ulink">Subsurface irrigation</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Company</h3>
+        <ul>
+          <li><a href="projects.html" class="ulink">Projects</a></li>
+          <li><a href="about.html" class="ulink">About</a></li>
+          <li><a href="contact.html" class="ulink">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact details</h3>
+        <ul>
+          <li><a href="tel:+36307260024" class="ulink">+36 30 726 0024</a></li>
+          <li><a href="mailto:info@rapidkert.com" class="ulink">info@rapidkert.com</a></li>
+          <li>Ikrényi út 14., 9025 Győr, Hungary</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rk-foot__bottom">
+      <span>&copy; 2026 Rapidkert Kft.</span>
+      <!-- THE LEGAL DOCUMENTS ARE NOT TRANSLATED, AND SAYING SO IS THE
+           HONEST ANSWER.                                        [PHASE 3.3]
+           The imprint, the privacy notice and the cookie notice are the
+           filings of a Hungarian company under Hungarian and EU law. An
+           unreviewed English rendering of a privacy notice is not a
+           localisation, it is a second legal text nobody has approved — so
+           these stay in the original, and each link says in English, before
+           it is clicked, which language it leads to. hreflang carries the
+           same fact to machines. -->
+      <ul class="rk-foot__legal">
+        <li><a href="../impresszum.html" class="ulink" hreflang="hu">Imprint <span class="rk-foot__hu">(in Hungarian)</span></a></li>
+        <li><a href="../adatkezelesi-tajekoztato.html" class="ulink" hreflang="hu">Privacy notice <span class="rk-foot__hu">(in Hungarian)</span></a></li>
+        <li><a href="../cookie-tajekoztato.html" class="ulink" hreflang="hu">Cookie notice <span class="rk-foot__hu">(in Hungarian)</span></a></li>
+      </ul>
+      <span>Site by <a href="https://stratosweb.hu" target="_blank" rel="noopener" class="ulink">Stratos Media Agency</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- JSON-LD: LocalBusiness.
+     THE GEOGRAPHY DOES NOT CHANGE BECAUSE THE PAGE IS ENGLISH.
+     Same company, same street, same country, same service area. Only the
+     descriptive fields and the service names are in English, and the node
+     carries its own @id and url so the two language documents describe the
+     one business without either claiming to be the other. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": "https://www.rapidkert.com/en/#business",
+  "name": "Rapidkert Kft.",
+  "description": "Garden construction and automatic irrigation, planned and built in Győr, Hungary and the surrounding area.",
+  "url": "https://www.rapidkert.com/en/",
+  "inLanguage": "en",
+  "telephone": "+36307260024",
+  "email": "info@rapidkert.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Ikrényi út 14.",
+    "addressLocality": "Győr",
+    "postalCode": "9025",
+    "addressRegion": "Győr-Moson-Sopron",
+    "addressCountry": "HU"
+  },
+  "areaServed": [
+    {"@type": "City", "name": "Győr"},
+    {"@type": "City", "name": "Mosonmagyaróvár"},
+    {"@type": "City", "name": "Csorna"},
+    {"@type": "City", "name": "Kapuvár"},
+    {"@type": "City", "name": "Pápa"}
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Services",
+    "itemListElement": [
+      {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Garden construction", "url": "https://www.rapidkert.com/en/garden-construction.html"}},
+      {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Irrigation system design and installation", "url": "https://www.rapidkert.com/en/irrigation-systems.html"}},
+      {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Subsurface irrigation (SDI)", "url": "https://www.rapidkert.com/en/subsurface-irrigation.html"}}
+    ]
+  }
+}
+</script>
+
+<!-- JSON-LD: FAQPage. The questions and answers below are the questions and
+     answers on this page, in this page's language. No mixing. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "inLanguage": "en",
+  "mainEntity": [
+    {"@type":"Question","name":"What does a garden or an irrigation system cost?","acceptedAnswer":{"@type":"Answer","text":"It depends on the size of the area, the ground conditions, how much paving there is, and — for irrigation — the number of zones and the type of water source. After the free site survey you get a specific, itemised quote, with nothing hidden."}},
+    {"@type":"Question","name":"Do the garden and the irrigation have to be done together?","acceptedAnswer":{"@type":"Answer","text":"No — we take on either one on its own. But for a new garden it is worth thinking about both at once: irrigation is easiest to lay before the lawn and the paving go down. It can also go into a finished garden."}},
+    {"@type":"Question","name":"How long does the work take?","acceptedAnswer":{"@type":"Answer","text":"An irrigation system is typically a few days, while a complete large garden with paving and structures can run to several weeks. We give a realistic schedule at the planning stage and set the exact timing out in the quote."}},
+    {"@type":"Question","name":"When is the best time to start?","acceptedAnswer":{"@type":"Answer","text":"Earthworks, paving, garden structures and irrigation can be done almost all year round. Planting and turfing are best in spring and early autumn."}},
+    {"@type":"Question","name":"Can we count on you after the handover?","acceptedAnswer":{"@type":"Answer","text":"Yes. We take on ongoing garden care if you want it — mowing, pruning, bed maintenance — and seasonal servicing for irrigation: spring start-up, autumn draining, fault finding."}},
+    {"@type":"Question","name":"Is there a warranty on the work?","acceptedAnswer":{"@type":"Answer","text":"Yes. Because the plan and the whole build are ours, we warrant our own work. The specific conditions are set out in the quote."}}
+  ]
+}
+</script>
+
+<script src="../rk.js" defer></script>
+<script type="module" src="../rk-ground.js"></script>
+</body>
+</html>

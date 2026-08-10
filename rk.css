@@ -4888,3 +4888,185 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   .prf__d{position:relative;top:auto;margin-top:1.2rem}
   .grd__head{animation:none;opacity:.7;transform:translateX(600px)}
 }
+
+/* --------------------------------------------------------------------------
+   34 — LANGUAGE SWITCH                                          [PHASE 3.3]
+   --------------------------------------------------------------------------
+   UTILITY, NOT A FEATURE. Two mono words at label size in the header's own
+   type, at the header's own tracking, sitting in the gap that already exists
+   between the inline links and the call to action. It does not get a flag, a
+   globe, a chevron or a panel: this site's navigation is set in one typeface
+   at one size, and a language control that announces itself is a second
+   design system arriving to solve a problem the design does not have.
+
+   IT IS TWO REAL LINKS TO TWO REAL DOCUMENTS. No script reads it, no script
+   is required for it to work, and nothing about it is deferred to runtime —
+   scripting off, the switch is the last thing on the page still functioning.
+   Each page hard-codes its own counterpart, so the switch preserves where
+   the visitor is: a service page changes language, not subject.
+
+   THE CURRENT LANGUAGE STAYS A LINK. Disabling it, or replacing it with a
+   span, removes a stop from the tab order between two adjacent controls and
+   the reason is invisible to anyone who cannot see which one is lit.
+   aria-current carries the state instead, and opacity carries it visually —
+   with the counterpart at .55, so the pair reads as one lit and one unlit
+   rather than as two live controls.
+   -------------------------------------------------------------------------- */
+.rk-lang{display:flex;align-items:center;gap:.5em;flex:none}
+.rk-lang__i{
+  position:relative;
+  font-family:var(--font-mono);font-size:var(--t-label);
+  letter-spacing:.15em;text-transform:uppercase;color:var(--on-dark);
+  opacity:.55;padding:.4em 0;
+  transition:opacity var(--dur-fast) var(--ease),color .45s var(--ease);
+}
+.rk-lang__i:hover{opacity:.9}
+.rk-lang__i[aria-current]{opacity:1}
+.rk-lang__sep{
+  font-family:var(--font-mono);font-size:var(--t-label);
+  color:var(--on-dark);opacity:.28;
+  transition:color .45s var(--ease);
+}
+
+/* THE TARGET IS NOT THE WORD. Two 22px words are two 22x15 hit boxes in the
+   header of every phone on the site. Same remedy as the burger (§04): the
+   glyph does not move, the TARGET is grown underneath it, and no other
+   breakpoint notices. The two boxes must not overlap, so each takes half of
+   the .5em gap and no more. */
+.rk-lang__i::after{
+  content:"";position:absolute;top:50%;left:50%;
+  width:calc(100% + .5em);height:44px;transform:translate(-50%,-50%);
+}
+
+/* The accessible name, not a caption: "HU" and "EN" alone are two glyphs a
+   screen reader spells out, and 47 is explicit that they must carry the
+   language. Kept as text in the flow rather than display:none so it is
+   actually announced, and clipped to a pixel so it is never seen. */
+.rk-lang__nm{
+  position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;
+}
+
+/* The three header states the rest of the bar already answers. */
+.rk-nav.is-solid .rk-lang__i,
+.rk-nav.is-solid .rk-lang__sep,
+.rk-nav.is-locked .rk-lang__i,
+.rk-nav.is-locked .rk-lang__sep{color:var(--fg)}
+.rk-nav.is-film .rk-lang__i{opacity:.46}
+.rk-nav.is-film .rk-lang__i[aria-current]{opacity:.82}
+.rk-nav.is-film .rk-lang__i:hover{opacity:1}
+
+/* THE HEADER AT 620 HOLDS THREE THINGS, AND IT ALREADY HELD THREE.
+   Below this width the inline links are gone, the call to action is down to
+   one word and the burger is an icon — the bar is at its limit, and a fourth
+   item on it is how the logo starts wrapping on a 320 screen.
+
+   So the pair collapses to the half that does something. The current
+   language is already stated by the document the visitor is reading; what
+   the header has to keep is the way OUT of it, which is one word wide. The
+   full pair is still in the menu panel for anyone who opens it. */
+@media (max-width:620px){
+  .rk-lang{gap:0}
+  .rk-lang__i[aria-current],.rk-lang__sep{display:none}
+  .rk-lang__i::after{width:44px}
+}
+
+/* In the panel there is room, so the pair is whole and set at the size of
+   the contact details beside it. */
+.rk-lang--menu{gap:.7em}
+.rk-lang--menu .rk-lang__i,.rk-lang--menu .rk-lang__sep{font-size:var(--t-sm)}
+.rk-lang--menu .rk-lang__i[aria-current]{display:inline}
+.rk-lang--menu .rk-lang__sep{display:inline}
+
+/* --------------------------------------------------------------------------
+   35 — ENGLISH TYPOGRAPHY                                       [PHASE 3.3]
+   --------------------------------------------------------------------------
+   ONE STYLESHEET, TWO LANGUAGES, AND THE SECOND ONE IS NOT A COPY.
+   English is not Hungarian with different words in it. It sets shorter
+   compounds and longer phrases, it breaks in different places, and three of
+   this site's compositions are solved to the character: the hero's datum
+   gap, the service names that each own a viewport, and the closing call to
+   action at 390 and 320.
+
+   Everything in this section is scoped to html[lang="en"] and every rule in
+   it is a MEASURED correction to a composition that is otherwise unchanged.
+   No new type scale, no new colour, no new layout. If a rule here cannot be
+   traced to a frame that was measured and found wrong, it does not belong.
+   -------------------------------------------------------------------------- */
+html[lang="en"] .rk-menu__link[aria-current="page"] .rk-menu__tag::after{
+  content:" ·  Current page";
+}
+
+/* The English footer's legal links lead to Hungarian documents and say so
+   (see the note in en/index.html). The qualifier is information, not a
+   label — it sits back so the link still reads as its own name first. */
+.rk-foot__hu{opacity:.55}
+
+/* --------------------------------------------------------------------------
+   36 — THE 320 PROCESS GRID                                     [PHASE 3.3]
+   --------------------------------------------------------------------------
+   NOT AN ENGLISH FIX. Found by the English regression, present in both
+   languages, and worse in Hungarian.
+
+   §11 drops the inner pages' process rail to three columns below 1100 and
+   leaves it there all the way down. `repeat(3,1fr)` resolves each track to
+   minmax(AUTO,1fr), and auto is min-content — so once the longest word in a
+   step no longer fits a third of the screen, the track stops shrinking and
+   the grid pushes the DOCUMENT wider than the viewport. Measured at 320x568,
+   document scrollWidth against a 320 frame:
+
+     felszin-alatti-ontozes.html   391   (HU)   en/subsurface-irrigation  353
+     kertepites-gyor.html          365   (HU)   en/garden-construction    360
+     ontozorendszer-gyor.html      383   (HU)   en/irrigation-systems     389
+     rolunk.html                   341   (HU)   en/about                  372
+
+   Every one of those is a horizontally scrolling business page on a small
+   phone, and the Hungarian column is the older of the two. English is
+   narrower on three of the four, so this is not English being long — it is a
+   breakpoint that was never solved this far down.
+
+   Below 360 the three tracks are about 93px wide, which is not a column
+   anybody was going to read anyway. One column, and the grid can no longer
+   be pushed by its own content. 390 is untouched: it measures clean in both
+   languages and its composition is Phase 3.1 art direction, locked.
+   -------------------------------------------------------------------------- */
+@media (max-width:360px){
+  .proc__steps{grid-template-columns:1fr;row-gap:clamp(26px,7vw,40px)}
+}
+
+/* --------------------------------------------------------------------------
+   37 — THE STILLED WORLDS ARE STILL DRAWINGS IN A FRAME       [PHASE 3.3]
+   --------------------------------------------------------------------------
+   Also not an English fix, also found by the English regression, also
+   identical in both languages: measured at 1440x900 under
+   prefers-reduced-motion, document scrollWidth is 1503 against a 1440
+   viewport in Hungarian and in English alike.
+
+   §32.10 releases the three pinned stages into ordinary flow with
+   `overflow:visible` and gives each world a height. What it does not give
+   them is the CROP. §14's geometry is one twelve-metre section drawn 2180px
+   wide — the pinned stage used to be its frame, and without one the widest
+   `<use>` in the assembly reaches x=1814 and drags 63px of horizontal
+   document scroll behind it. Most of what overflows is `visibility:hidden`,
+   which is worse rather than better: a reduced-motion visitor gets a
+   sideways scrollbar and nothing to see at the end of it.
+
+   The world is a drawing in a frame in every other mode. It stays one here.
+
+   AND THE FIELD'S RIG KEEPS ITS OLD COORDINATES.
+   The 63px itself turned out to be one span. §32.10 already relaxes the
+   project field's HUD from a pinned overlay into ordinary flow —
+   `.fld__hud{position:relative;inset:auto}` and `.fld__hud span
+   {position:relative;display:block}` — but the INSETS the spans were placed
+   with are still live. `.fld__hud-l` carries `left:var(--pad)` (§32.2), and
+   on a relatively-positioned block that is no longer a placement, it is a
+   63px shove to the right of a box that already fills the measure. So
+   "Selected work" — and "Válogatott munkák" before it, at the same 63px —
+   hangs off the side of the document and takes the page's horizontal scroll
+   with it. `inset:auto` is the declaration that was missing from the line
+   above it.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  .lyr__world,.asm__world,.prf__world{overflow:hidden}
+  .fld__hud span{inset:auto}
+}

@@ -36,3 +36,11 @@ jobs:
 
       - name: rk-ground.js parses
         run: node --check rk-ground.js
+
+      # Phase 3.3 added a second language tree that shares one stylesheet, one
+      # interaction layer and one WebGL module with the first. Nothing about
+      # that arrangement throws when it breaks: a page silently loses its
+      # counterpart, an English document keeps lang="hu", a canonical points
+      # at the other language. This asserts the pair, offline and stdlib-only.
+      - name: HU/EN localisation guard
+        run: python3 .claude/tools/rki18n.py
