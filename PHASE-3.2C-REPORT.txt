@@ -634,12 +634,21 @@ DEPLOYMENT          .github/workflows/deploy.yml builds and publishes dist/.
                     Pages keeps serving the source tree and the workflow
                     simply builds and uploads an artifact nobody reads.
 
-                    UNTIL THAT SWITCH IS FLIPPED, THE LIVE SITE IS STILL THE
-                    UNOPTIMISED SOURCE TREE. Every number in this report is
-                    from the production build, served locally over h2+gzip on
-                    a harness calibrated against the live site. Final
-                    acceptance against the deployed URL is one settings
-                    change and one push away, and has not been done.
+                    UNTIL THAT SWITCH IS FLIPPED, PAGES SERVES THE SOURCE
+                    TREE. That is not the same as serving the old site: the
+                    accessibility work, the composited reveal, the layout-read
+                    caching, the sliced startup and the armed handover plate
+                    all live in the sources and work without the build. The
+                    source tree measures 90 / 100 on the same profile, up from
+                    84 / 96. What it does not have is the minification, the
+                    tree shaking, the critical-CSS split and the optimised
+                    images — which is the difference between 90 and 99.
+
+                    Every headline number in this report is from the
+                    production build, served locally over h2+gzip on a harness
+                    calibrated against the live site. Final acceptance against
+                    the deployed URL is one settings change away and has not
+                    been done.
 
 
 ════════════════════════════════════════════════════════════════════════════
