@@ -2901,8 +2901,36 @@ const CORNERS = [
   new THREE.Vector3(W / 2, 0, D / 2), new THREE.Vector3(-W / 2, 0, D / 2)
 ];
 
+/* THE PLATE IS FETCHED WHEN THE STORY IS HALFWAY TO IT.          [PHASE 3.2C]
+   #gdPhoto sits inside the sticky stage, which means it intersects the very
+   first viewport, which means loading="lazy" deferred nothing at all: the
+   browser pulled 169KB down while the visitor was still reading the headline,
+   against a 4KB logo that Lighthouse had already picked as the LCP element.
+
+   The markup now holds the URLs in data- attributes and this attaches them at
+   the halfway mark — two and a half viewports before the handover at 0.942,
+   on a timeline nobody can traverse faster than a scroll. decode() then takes
+   the paint cost off the frame where the dissolve starts, which is the one
+   frame on the page that cannot survive a stall. */
+let plateArmed = false;
+function warmPlate() {
+  if (plateArmed || !photoImg) return;
+  plateArmed = true;
+  const pic = photoImg.parentElement;
+  if (pic && pic.tagName === 'PICTURE') {
+    for (const s of pic.querySelectorAll('source[data-srcset]')) {
+      s.srcset = s.dataset.srcset;
+      s.removeAttribute('data-srcset');
+    }
+  }
+  if (photoImg.dataset.srcset) photoImg.srcset = photoImg.dataset.srcset;
+  if (photoImg.dataset.src) photoImg.src = photoImg.dataset.src;
+  if (photoImg.decode) photoImg.decode().catch(() => { /* a stalled decode is not a failure */ });
+}
+
 function updatePhoto(p, w, h) {
   if (!photo) return;
+  if (!plateArmed && p > 0.50) warmPlate();
   const start = 0.942;
   if (p < start) {
     if (photo.__on !== false) { photo.__on = false; photo.style.opacity = '0'; photo.style.visibility = 'hidden'; }

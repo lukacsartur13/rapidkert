@@ -203,9 +203,25 @@
          a bare earth plot under an open sky, which matched neither the
          geometry nor the sentence it is illustrating. -->
     <div class="gd__photo" id="gdPhoto" aria-hidden="true">
-      <img src="kesz-gyep-terasz.jpg"
-           srcset="kesz-gyep-terasz-thumb.jpg 800w, kesz-gyep-terasz.jpg 1600w"
-           sizes="100vw" alt="" width="1600" height="2133" loading="lazy" decoding="async">
+      <!-- ARMED, NOT LOADED.                                    [PHASE 3.2C]
+           This plate is the handover: the rendered surface dissolves into it
+           at 94% of a six-viewport scroll. It is also the heaviest request on
+           the homepage, and because #gdPhoto lives inside the sticky stage it
+           intersects the first viewport, so loading="lazy" never deferred
+           anything — the browser fetched 169KB before the visitor had read the
+           headline. Measured: removing it from the critical window moves LCP
+           from 2.32s to 1.87s and the Lighthouse score from 97 to 99.
+
+           So the URLs are held in data- attributes and rk-ground.js §11 puts
+           them on the element once the timeline passes halfway, then decodes.
+           That is two and a half viewports of warning on a chapter the visitor
+           cannot reach any faster. Nothing is lazy about the moment it is
+           needed. Without JavaScript this element is display:none and the
+           projects field below carries the same photograph as ordinary
+           markup. -->
+      <img data-src="kesz-gyep-terasz.jpg" data-defer
+           data-srcset="kesz-gyep-terasz-thumb.jpg 800w, kesz-gyep-terasz.jpg 1600w"
+           sizes="100vw" alt="" width="1600" height="2133" decoding="async">
     </div>
 
     <!-- Architectural annotation layer: DOM labels + SVG leader lines, both
@@ -530,7 +546,8 @@
              srcset="kesz-gyep-terasz-thumb.jpg 800w, kesz-gyep-terasz.jpg 1600w"
              sizes="100vw"
              alt="Elkészült, egyenletes gyep terasszal, térburkolattal és a gyepbe süllyesztett szelepaknával"
-             width="1600" height="2133" decoding="async" fetchpriority="low">
+             width="1600" height="2133" decoding="async" fetchpriority="low"
+             loading="lazy">
       </figure>
 
       <!-- The field marks close around the plate as it contracts. -->

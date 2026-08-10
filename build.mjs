@@ -309,6 +309,13 @@ function minifyHtml(t) {
    WebP <source>s are added in front of it and inherit the same `sizes`. */
 function rewriteImages(t, prefix) {
   return t.replace(/<img\b[^>]*>/g, (tag) => {
+    /* data-defer: the element carries its URLs in data- attributes and a
+       script attaches them when the page is ready for the picture. The build
+       still has to rewrite those URLs to the hashed, AVIF-converted ones, so
+       the attribute names are swapped out and back around the normal path. */
+    const deferred = / data-defer\b/.test(tag);
+    if (deferred) tag = tag.replace(/ data-src(set)?=/g, ' src$1=');
+
     const srcM = tag.match(/\ssrc="(?:\.\.\/)?([A-Za-z0-9._-]+\.(?:jpg|jpeg|png))"/);
     if (!srcM) return tag;
     const out = imageMap.get(srcM[1]);
@@ -337,7 +344,9 @@ function rewriteImages(t, prefix) {
     if (srcsetM) img = img.replace(/\ssrcset="[^"]*"/, ` srcset="${mapSrcset(srcsetM[1], 'jpg')}"`);
     img = img.replace(/\ssrc="(?:\.\.\/)?([A-Za-z0-9._-]+\.(?:jpg|jpeg|png))"/,
       (m, f) => ` src="${prefix}${(imageMap.get(f) || {}).jpg || (imageMap.get(f) || {}).png || f}"`);
-    return `<picture>${sources.join('')}${img}</picture>`;
+    let picture = `<picture>${sources.join('')}${img}</picture>`;
+    if (deferred) picture = picture.replace(/ src(set)?=/g, ' data-src$1=');
+    return picture;
   });
 }
 
