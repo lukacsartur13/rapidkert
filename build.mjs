@@ -105,7 +105,7 @@ const threeAlias = {
 const groundOut = await esbuild.build({
   entryPoints: [path.join(ROOT, 'rk-ground.js')],
   bundle: true, format: 'esm', target: 'es2020',
-  minify: true, treeShaking: true, legalComments: 'none',
+  minify: process.env.RK_NOMIN ? false : true, treeShaking: true, legalComments: 'none',
   plugins: [threeAlias], write: false, metafile: true,
 });
 const groundCode = groundOut.outputFiles[0].contents;
@@ -115,7 +115,7 @@ fs.writeFileSync(path.join(DIST, groundName), groundCode);
 const rkOut = await esbuild.build({
   entryPoints: [path.join(ROOT, 'rk.js')],
   bundle: false, format: 'iife', target: 'es2020',
-  minify: true, legalComments: 'none', write: false,
+  minify: process.env.RK_NOMIN ? false : true, legalComments: 'none', write: false,
 });
 const rkCode = rkOut.outputFiles[0].contents;
 const rkName = `rk.${hash(rkCode)}.js`;
@@ -260,7 +260,7 @@ for (const doc of HTML) {
   t = t.replace(new RegExp(`\\s*<link rel="modulepreload" href="${prefix ? '\\.\\./' : ''}vendor/three\\.module\\.min\\.js">`), '');
   t = t.replace(new RegExp(`<link rel="modulepreload" href="${prefix ? '\\.\\./' : ''}rk-ground\\.js">`), `<link rel="modulepreload" href="${P(groundName)}">`);
   t = t.replace(new RegExp(`<script src="${prefix ? '\\.\\./' : ''}rk\\.js" defer></script>`), `<script src="${P(rkName)}" defer></script>`);
-  t = t.replace(new RegExp(`<script type="module" src="${prefix ? '\\.\\./' : ''}rk-ground\\.js"></script>`), `<script type="module" src="${P(groundName)}"></script>`);
+  t = t.replace(new RegExp(`<script type="module" src="${prefix ? '\\.\\./' : ''}rk-ground\\.js"( data-off)?></script>`), (m,off)=> off ? '' : `<script type="module" src="${P(groundName)}"></script>`);
 
   /* images: <img> elements become <picture> with AVIF and WebP in front. */
   t = rewriteImages(t, prefix);
@@ -272,10 +272,36 @@ for (const doc of HTML) {
     t = t.split(`https://www.rapidkert.com/${src}`).join(`https://www.rapidkert.com/${to}`);
   }
 
+  t = minifyHtml(t);
   htmlAfter += Buffer.byteLength(t);
   fs.writeFileSync(path.join(DIST, doc.rel), t);
 }
 log(`${HTML.length} documents : ${kb(htmlBefore)} -> ${kb(htmlAfter)}`);
+
+/* The documents carry a great deal of prose about themselves — why a plate is
+   eager, what the datum is measuring, which phase changed a rule and what it
+   broke. That is the point of them and none of it is removed from the source.
+   It is 40% of index.html's bytes, though, and those bytes are on the
+   critical path: the document has to arrive and be parsed before anything
+   can paint. So production ships the markup without the margin notes.
+
+   Deliberately conservative. Comments go; leading indentation goes, because
+   an indent that follows a newline collapses to the same single space the
+   newline already provides. Nothing else is touched — no tag omission, no
+   attribute quoting games, and script and style bodies are left exactly as
+   they are, so nothing here can change what the page renders. */
+function minifyHtml(t) {
+  const keep = [];
+  /* Script and style bodies are parked first so nothing below can reach
+     into them. The sentinel is NUL, which is not legal in an HTML document
+     — a bare numeric placeholder would have collided with any number
+     surrounded by spaces in the copy. */
+  t = t.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, (m) => `\0${keep.push(m) - 1}\0`);
+  t = t.replace(/<!--(?!\[if)[\s\S]*?-->/g, '');
+  t = t.replace(/\n[ \t]+/g, '\n');
+  t = t.replace(/\n{2,}/g, '\n');
+  return t.replace(/\0(\d+)\0/g, (m, i) => keep[+i]);
+}
 
 /* Wrap every <img> whose source has modern variants in a <picture>. Any
    attribute the author wrote — sizes, srcset, fetchpriority, loading, width,

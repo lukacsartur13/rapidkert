@@ -21,23 +21,42 @@
    rk.css once already, and .claude/tools/README.md exists because of it.
    ========================================================================== */
 
-/* Everything the first viewport of any page needs: the document shell, the
-   custom-property root, the nav, the skip link, the page-entry wipe, and the
-   whole Living Ground hero — stage, canvas, headline, datum, chapter one. */
+/* Everything the FIRST PAINT of any page needs, and nothing that can wait a
+   couple of hundred milliseconds for the rest of the sheet. The line between
+   the two is not "above the fold" — it is "can this rule change the size or
+   position of a box that is on screen at first paint". A rule that only
+   recolours something, or that styles a state the visitor has not reached
+   (the opened menu, the solid header after scrolling, the last chapter of the
+   timeline), can arrive late and cost nothing. A rule that changes a metric
+   cannot: that is a layout shift.
+
+   Every exclusion below was checked by rendering the page twice, once with
+   the deferred sheet blocked, and diffing the geometry of everything in the
+   first viewport. */
 const KEEP = [
   /* document shell and the custom-property root everything else reads */
   /^:root\b/, /^html\b/, /^body\b/, /^\*/, /^::?selection\b/, /^\[hidden\]/,
   /^(img|svg|video|a|button|h1)\b/,
-  /* the header, the skip link, the page-entry wipe */
-  /^\.skip\b/, /^\.shell\b/, /^\.rk-wipe/, /^\.rk-nav/, /^\.rk-lang/,
-  /* The whole Living Ground. Trimming this to "just the hero" was a false
-     economy that cost 0.004 CLS: the hero's H1 sets `.display`, and with
-     `.display` deferred the three headline lines measured 35px instead of
-     30px, so the copy block under them dropped 15px the instant the async
-     sheet landed. The section is one sticky 100svh stage whose eleven
-     chapters all share the first viewport's box — there is no part of it
-     that is genuinely below the fold. */
-  /^\.gd\b/, /^\.gd-on\b/, /^\.gd-ready\b/, /^\.no-js\b/, /^\.gd__/,
+  /* the header, the skip link, the page-entry wipe. NOT .rk-nav__panel or
+     .rk-menu — the overlay is `hidden` at first paint and cannot shift
+     anything — and not the .is-solid / .is-film / .is-locked / .is-open
+     states, none of which exist until the visitor scrolls or taps. */
+  /^\.skip\b/, /^\.shell\b/, /^\.rk-wipe/, /^\.rk-lang(?!--menu)/,
+  /* .rk-nav__burger stays: excluding it left the button 40x24 instead of
+     24x17 and moved the whole right-hand cluster 16px, at the top of the
+     viewport, which is the most expensive place on the page to shift. */
+  /^\.rk-nav(?!__panel|\.is-)/,
+  /* The Living Ground's hero. The H1 sets `.display`, and deferring that one
+     class measured the three headline lines at 35px instead of 30px, dropped
+     the copy block under them by 15px when the sheet landed, and cost 0.004
+     CLS — which is how this list was calibrated. */
+  /^\.gd\b(?!\.is-handed)/, /^\.gd-on\b/, /^\.gd-ready\b/,
+  /* The annotation labels look like an overlay that cannot matter, and they
+     are the opposite: their whole appearance is a transform that parks them
+     off-screen until the scene positions them. Deferred, they render as a
+     block of unstyled type across the bottom of the hero — 45,000 square
+     pixels of it, enough that Lighthouse picked it as the LCP element. */
+  /^\.gd__(stage|canvas|vig|scroll|ui|ch|inner|h1|h2|step|datum|lede|body|lead|cta|foot|stats|stat|fb|horizon|anno|photo|mid|rail|lbl|mark|dim-datum|dim-cap|lines)\b/,
   /* the type primitives every one of those elements is set in */
   /^\.display\b/, /^\.label\b/, /^\.body\b/, /^\.btn\b/, /^\.cue\b/, /^\.ulink\b/,
 ];

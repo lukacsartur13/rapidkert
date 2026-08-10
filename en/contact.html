@@ -25,6 +25,13 @@
 <meta name="theme-color" content="#171814">
 
 <link rel="icon" href="../logo.png">
+<!-- The nav mark is the LCP element on every page: the hero headline is
+     masked until the scene is ready, so this is the largest thing the
+     first paint contains. Discovered in the first kilobyte of <head>
+     rather than a hundred lines later in <body>, because Lighthouse
+     measured 1,323ms of LCP LOAD DELAY — a 4KB image queued behind
+     148KB of scene code and a 169KB photograph.          [PHASE 3.2C] -->
+<link rel="preload" as="image" href="../logo-feher.png" fetchpriority="high">
 <link rel="stylesheet" href="../rk.css">
 </head>
 <body>
@@ -35,7 +42,7 @@
 <header class="rk-nav" id="rkNav">
   <div class="shell rk-nav__bar">
     <a href="index.html" class="rk-nav__logo" aria-label="Rapidkert Kft. – home">
-      <img src="../logo-feher.png" alt="Rapidkert Kft." class="is-light" width="404" height="118">
+      <img src="../logo-feher.png" alt="Rapidkert Kft." class="is-light" width="404" height="118" fetchpriority="high">
       <img src="../logo.png" alt="" aria-hidden="true" class="is-dark" width="404" height="118">
     </a>
     <div class="rk-nav__right">

@@ -39,10 +39,72 @@ const stage = document.getElementById('gdStage');
 const canvas = document.getElementById('gdCanvas');
 const section = document.getElementById('ground');
 
-/* Nothing to do on pages that do not mount the experience. */
-if (stage && canvas && section) boot();
+/* THE STARTUP IS A SEQUENCE OF SHORT TASKS.                      [PHASE 3.2C]
+   It used to be one. Building the strata, sowing the sward, cutting the
+   hardscape, laying the irrigation and growing the roots all happened inside
+   a single synchronous block — 1,655ms of it on the machine that produced
+   the Phase 3.2C audit, the longest task on the page by a factor of five and
+   most of a 1,820ms Total Blocking Time.
 
-function boot() {
+   None of that work is removed here and none of it is deferred past the
+   point where a visitor could catch it loading: the scene that comes out is
+   the same scene, built in the same order, from the same numbers. What
+   changes is that the main thread is handed back between the pieces, so the
+   browser can answer a tap or paint a frame in the gaps. A long task is not
+   expensive because of what it computes — it is expensive because of what it
+   refuses to let happen while it computes.
+
+   TWO THINGS THIS GOT WRONG FIRST, both measured:
+
+   1. requestAnimationFrame is the wrong yield. It ends the task, but it also
+      costs a whole frame of WALL time, and thirty of them pushed the first
+      rendered frame from 0.6s to 2.9s — past the 2600ms safety net in the
+      document head, so the hero released before the scene was there. The
+      Lighthouse score went DOWN, from 95 to 86: the simulator charges for
+      the longer critical path more than it credits the shorter tasks.
+      scheduler.yield(), or a MessageChannel where that is missing, ends the
+      task without waiting for anything.
+
+   2. Yielding at every break point is also wrong. Most of these pieces are
+      two or three milliseconds; splitting them buys nothing and pays a
+      scheduler hop each time. So the yield is on a BUDGET — a dozen small
+      pieces ride in one task, and the moment the task has been running for
+      eight milliseconds the next break takes it. Eight is wall-clock time on
+      the machine actually doing the work, so a slow phone yields where this
+      one does not, which is the entire point. */
+const SLICE_MS = 8;
+let sliceT0 = 0;
+const yieldNow = (() => {
+  if (typeof scheduler !== 'undefined' && scheduler.yield) return () => scheduler.yield();
+  const ch = new MessageChannel();
+  return () => new Promise((resolve) => {
+    ch.port1.onmessage = () => resolve();
+    ch.port2.postMessage(0);
+  });
+})();
+async function slice() {
+  if (performance.now() - sliceT0 < SLICE_MS) return;
+  await yieldNow();
+  sliceT0 = performance.now();
+}
+
+/* Nothing to do on pages that do not mount the experience. */
+if (stage && canvas && section) {
+  boot().catch((err) => {
+    /* boot() is a sequence of awaited slices now, so a throw arrives as a
+       rejected promise rather than an uncaught module error. The page still
+       has to end up in a state somebody can read: drop the pinned layout and
+       release the hero, which is what fail() would have done from inside. */
+    console.warn('[rk] the Living Ground did not finish building.', err);
+    root.classList.remove('gd-on');
+    root.classList.add('gd-off', 'gd-ready');
+  });
+}
+
+
+async function boot() {
+
+sliceT0 = performance.now();
 
 /* ==========================================================================
    01 — ENVIRONMENT
@@ -1364,7 +1426,13 @@ const NOTCHED = { surface: true, topsoil: true, root: true, drain: false, base: 
 const backfill = new THREE.Group();
 core.add(backfill);
 
-LAYERS.forEach((L, i) => {
+/* One stratum per break: five slabs of a few thousand vertices, and each is
+   a natural stopping point because the next does not depend on it. */
+let layerIndex = 0;
+for (const L of LAYERS) {
+  const i = layerIndex++;
+  await slice();
+  {
   const g = new THREE.Group();
   const geo = makeStratum(BOUND[i], BOUND[i + 1], segX, segZ, NOTCHED[L.id] ? 'notched' : 'full');
   const mat =
@@ -1391,7 +1459,8 @@ LAYERS.forEach((L, i) => {
     backfill.add(pm);
     disposables.push(pg);
   }
-});
+  }
+}
 
 /* -- surface vegetation ----------------------------------------------------
    Two systems, one lawn: the shells carry the density, the blades carry the
@@ -1476,7 +1545,9 @@ function sow(count, accept) {
   return im;
 }
 
+await slice();
 layerGroups.surface.add(sow(Math.round(Q.grass * 0.80), (x, z) => !inNotch(x, z)));
+await slice();
 backfill.add(sow(Math.round(Q.grass * 0.20), inNotch));
 
 /* -- hardscape: a paved path and a small terrace ---------------------------
@@ -1489,6 +1560,7 @@ backfill.add(sow(Math.round(Q.grass * 0.20), inNotch));
    grade, per-slab dimensions and a seed baked into the vertices so a merged
    run still varies stone by stone. Everything still merges down to two draw
    calls.                                                                     */
+await slice();
 const stoneMat = stoneMaterial(0xB0A78F, 0.70, true);
 const bedMat = stoneMaterial(0x8A8271, 0.95, true);
 const hardscape = new THREE.Group();
@@ -1571,6 +1643,7 @@ layerGroups.surface.add(built);
    A conceptual system: source, main, four laterals, inline emitters, and a
    valve box at grade. It is not a copy of anyone's as-built drawing, and it
    does not claim to be.                                                     */
+await slice();
 const pipes = new THREE.Group();
 pipes.userData.ex = PIPE_EX;
 core.add(pipes);
@@ -1688,6 +1761,7 @@ const netCurves = [];       // { curve, t0, t1, r } — shared by pipe and water
 }
 
 /* -- roots ----------------------------------------------------------------- */
+await slice();
 const rootMat = rootMaterial();
 disposables.push(rootMat);
 {
@@ -1791,6 +1865,7 @@ disposables.push(rootMat);
    Four vertical axes at the corners plus a set of measurement ticks. These
    are what turn "floating rectangles" into "architectural exploded drawing",
    so they fade in with the explosion and are invisible otherwise.          */
+await slice();
 const guides = new THREE.Group();
 const guideMat = new THREE.LineBasicMaterial({
   color: 0xE8E5DA, transparent: true, opacity: 0, depthWrite: false
@@ -1820,6 +1895,7 @@ disposables.push(guideMat);
    timeline, because the light IS the transition between chapters.
    ========================================================================== */
 
+await slice();
 const key = new THREE.DirectionalLight(0xFFF3E2, 2.6);
 key.position.set(7.5, 11.0, 8.0);
 if (Q.shadow) {
@@ -1909,6 +1985,7 @@ scene.add(lip);
            drawn, but the pinned layout stays exactly as it is.            */
 let dead = false, lost = false, restoreT = 0;
 
+await slice();
 let renderer;
 try {
   renderer = new THREE.WebGLRenderer({
@@ -3409,7 +3486,9 @@ resize();
 pScroll = pTarget = readProgress();
 p = frozen !== null ? frozen : warp(pScroll);
 apply(performance.now());
+await slice();
 renderer.compile(scene, camera);
+await slice();
 renderer.render(scene, camera);
 introT0 = performance.now();
 root.classList.add('gd-ready');
