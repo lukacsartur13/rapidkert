@@ -1,0 +1,84 @@
+# Publish the PRODUCTION BUILD to GitHub Pages.                 [PHASE 3.2C]
+#
+# Until this exists, Pages serves the repository root — which is the SOURCE
+# tree: a 246KB render-blocking stylesheet, a 687KB Three.js bundle, two 40KB
+# logo PNGs at three times the size they are displayed. `npm run build` turns
+# that into dist/, and dist/ is what a visitor should be given.
+#
+# ACTIVATING THIS IS A REPOSITORY SETTING, NOT A FILE.
+# Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# While the source is still "Deploy from a branch", this workflow will build
+# and upload the artifact and GitHub will keep serving the branch root, so
+# nothing changes until that switch is flipped. Nothing breaks either.
+#
+# Cache lifetime: GitHub Pages sends `cache-control: max-age=600` on every
+# response and offers no way to change it — no _headers file, no per-path
+# configuration, nothing in the Pages API. Every generated asset here carries
+# a content hash in its filename, which is the precondition for a host that
+# CAN serve `immutable`; on GitHub Pages the hashes cost nothing and simply
+# wait. See the HOSTING section of the Phase 3.2C report.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time, and never cancel one that is already publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # `ci`, not `install`: the lockfile is the build's contract. A fresh
+      # clone must produce byte-identical output.
+      - name: Install pinned dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # A build that silently dropped the stylesheet, the scripts or the
+      # structured data would still produce a dist/ that looks fine in a
+      # directory listing.
+      - name: Verify the output
+        run: |
+          test -f dist/index.html
+          test -f dist/en/index.html
+          grep -q '<style>' dist/index.html
+          grep -q 'rel="preload" href="rk\..*\.css" as="style"' dist/index.html
+          grep -q '<noscript><link rel="stylesheet"' dist/index.html
+          grep -q 'application/ld+json' dist/index.html
+          test "$(ls dist/rk-ground.*.js | wc -l)" -eq 1
+          test "$(ls dist/rk.*.js | wc -l)" -eq 1
+          test "$(ls dist/rk.*.css | wc -l)" -eq 1
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

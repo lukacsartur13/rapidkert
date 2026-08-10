@@ -1,21 +1,49 @@
 # Rapidkert Kft. — website
 
-Static site. No build step, no dependencies to install: `index.html` loads
-`rk.css`, `rk.js` and `rk-ground.js` directly, plus `vendor/three.module.min.js`
-for the Living Ground model.
+Static site. The files at the repository root are the **sources** and open
+directly in a browser: `index.html` loads `rk.css`, `rk.js` and
+`rk-ground.js`, plus `vendor/three.module.min.js` for the Living Ground.
+
+There is now also a **production build**. It does not change how the site is
+authored — it changes what a visitor downloads.
+
+```bash
+npm ci && npm run build      # -> dist/
+```
+
+**Edit the root. Never edit `dist/`.** It is deleted and rewritten on every
+build. See `build.mjs` for what each step does and why.
 
 ## Layout
 
 | Path | What it is |
 |---|---|
 | `index.html` | Homepage — the whole Living Ground narrative |
-| `rk.css` | The single stylesheet, ~3,860 lines in numbered sections §01–§33 |
+| `rk.css` | The single stylesheet, ~5,100 lines in numbered sections §01–§36 |
 | `rk.js` | Scroll reader, stage controllers, the §14 world geometry |
 | `rk-ground.js` | WebGL Living Ground (model, camera, photo handover) |
-| `*.html` | Inner pages (services, references, legal) |
-| `vendor/` | three.js |
+| `*.html`, `en/*.html` | Inner pages, Hungarian and English |
+| `vendor/` | three.js — the runtime copy; the build uses the npm package |
+| `build.mjs`, `build/` | The production build. Reads the root, writes `dist/` |
+| `dist/` | **Generated.** Not in git, not authoritative, never hand-edited |
 | `_retired/` | Pre-Phase-1 stylesheet and script, kept for reference |
 | `.claude/tools/` | rk.css safety tools — see below |
+
+## What the build does
+
+| Step | Before | After |
+|---|---|---|
+| three.js | 687 KB vendor bundle (170 KB gz) | tree-shaken from npm, bundled with the scene |
+| `rk.js` | 233 KB (74 KB gz) | 51 KB (18 KB gz) |
+| `rk.css` | 249 KB (73 KB gz), render-blocking | 106 KB (21 KB gz), non-blocking + a 26 KB critical subset inlined |
+| logos | 404×118 PNGs, ~40 KB each | 288 w, 16 colours, ~4 KB each |
+| photographs | JPEG only | AVIF beside every JPEG the pages reference |
+| filenames | plain | content-hashed, ready for `immutable` caching |
+
+`.github/workflows/deploy.yml` builds and publishes `dist/` to GitHub Pages.
+It only takes effect once the repository's Pages source is switched from
+"Deploy from a branch" to "GitHub Actions" — until then Pages keeps serving
+the source tree and the workflow is harmless.
 
 ## Preview
 

@@ -51,6 +51,11 @@
      along lightness only, which is what §49 asks for.                   */
   --clay-txt:    #845942;   /* clay text on a LIGHT ground  — 5.39:1 on paper */
   --clay-lift:   #B78C75;   /* clay text on a DARK ground   — 5.95:1 on soil  */
+  /* Same problem, same shape: --fg-mute is a quiet grey FOR PAPER, and a
+     handful of components that use it (the plate caption bar, most visibly)
+     also appear inside dark sections that carry no .sec--dark class. There
+     it reads 2.73:1. --txt-mute is the one the dark grounds re-point. */
+  --txt-mute:    var(--fg-mute);
   --water:       #6E8794;   /* the one cool tone: water / irrigation     */
 
   /* Semantic ------------------------------------------------------------ */
@@ -185,8 +190,16 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
    `color:var(--clay-txt)` anywhere inside these resolves to the light
    terracotta, and the same declaration on a light page resolves to the
    dark one. New dark sections get it for free by being listed here. */
-.sec--dark,.gd,.brg,.fld,.asm,.prf,.end,.grd,.pin,.rk-nav__panel,.lb,.film{
+/* Every one of these paints a dark background: .sec--dark and .pin and .end
+   are --soil, .brg and .fld are #0B0C09, .asm is #191A15, .grd is #0E0F0B,
+   .lb is soil at 97%, .gd is the WebGL stage. PROOF is NOT among them —
+   .prf is --paper and only its pinned stage inverts — and neither are .lyr
+   or .sheet, which are limestone. Putting .prf here painted its footer's
+   copy at 1.07:1, which is how the list came to be checked one by one. */
+.sec--dark,.gd,.brg,.fld,.asm,.end,.grd,.pin,.rk-nav__panel,.lb,
+.prf__stage.is-under,.lyr__stage.is-under{
   --clay-txt:var(--clay-lift);
+  --txt-mute:var(--on-dark-mute);
 }
 /* ASSEMBLY turns its stage over to limestone halfway through. The token
    has to turn with it or the station numerals go pale on white. */
@@ -225,7 +238,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
   font-size:var(--t-label);
   letter-spacing:.18em;
   text-transform:uppercase;
-  color:var(--fg-mute);
+  color:var(--txt-mute);
   line-height:1;
 }
 .sec--dark .label{color:var(--on-dark-mute)}
@@ -248,7 +261,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 }
 .plate__meta{
   margin-left:auto;font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.14em;text-transform:uppercase;color:var(--fg-mute);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--txt-mute);
   text-align:right;
 }
 .sec--dark .plate__meta{color:var(--on-dark-mute)}
@@ -257,10 +270,10 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 .lede{
   font-size:var(--t-md);
   line-height:1.62;
-  color:var(--fg-mute);
+  color:var(--txt-mute);
   max-width:44ch;
 }
-.body{max-width:56ch;color:var(--fg-mute)}
+.body{max-width:56ch;color:var(--txt-mute)}
 .sec--dark .body{color:var(--on-dark-mute)}
 
 /* --------------------------------------------------------------------------
@@ -372,7 +385,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
   padding-top:.72rem;margin-top:.72rem;
   border-top:1px solid var(--rule);
   font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.13em;text-transform:uppercase;color:var(--fg-mute);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--txt-mute);
 }
 .sec--dark .capbar{border-color:var(--rule-dark);color:var(--on-dark-mute)}
 .capbar__i{margin-left:auto;flex:none}
@@ -655,13 +668,13 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 }
 .svc__desc{
   display:block;
-  margin-top:.75rem;max-width:46ch;color:var(--fg-mute);
+  margin-top:.75rem;max-width:46ch;color:var(--txt-mute);
   font-size:var(--t-body);
 }
 .svc__go{
   display:flex;align-items:center;gap:.8em;flex:none;
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);
+  text-transform:uppercase;color:var(--txt-mute);
   transition:color var(--dur-fast) var(--ease);
 }
 .svc__link:hover .svc__name{transform:translateX(clamp(6px,1vw,16px));color:var(--moss)}
@@ -730,7 +743,7 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   font-size:clamp(1rem,1.55vw,1.35rem);letter-spacing:-.015em;line-height:1.05;
   margin-bottom:.7rem;
 }
-.proc__step p{font-size:var(--t-sm);color:var(--fg-mute);line-height:1.55}
+.proc__step p{font-size:var(--t-sm);color:var(--txt-mute);line-height:1.55}
 
 /* --------------------------------------------------------------------------
    16 — TRUST
@@ -2841,10 +2854,10 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .lyr__h2{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
   font-size:clamp(.95rem,1.5vw,1.25rem);letter-spacing:-.01em;
-  color:var(--fg-mute);
+  color:var(--txt-mute);
 }
 .lyr__h2 em{font-style:normal;color:var(--moss)}
-.lyr__of{margin-left:auto;color:var(--fg-mute);flex:none}
+.lyr__of{margin-left:auto;color:var(--txt-mute);flex:none}
 .lyr__of i{font-style:normal;color:var(--fg)}
 
 .lyr__list{position:relative;height:100%}
@@ -2880,12 +2893,12 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   display:block;margin-top:1.5rem;padding-top:.9rem;
   border-top:1px solid var(--rule);
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--fg-mute);
+  text-transform:uppercase;color:var(--txt-mute);
   max-width:min(46vw,38ch);
 }
 .lyr__desc{
   display:block;margin-top:1rem;max-width:min(44vw,42ch);
-  font-size:var(--t-sm);line-height:1.62;color:var(--fg-mute);
+  font-size:var(--t-sm);line-height:1.62;color:var(--txt-mute);
 }
 .lyr__go{
   display:inline-flex;align-items:center;gap:.8em;margin-top:1.6rem;
@@ -2928,9 +2941,9 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .asm__stage.is-lit{background:var(--limestone);color:var(--fg)}
 .asm__stage.is-lit .asm__h2{color:var(--fg)}
 .asm__stage.is-lit .asm__h2 em{color:var(--moss)}
-.asm__stage.is-lit .asm__lede{color:var(--fg-mute)}
+.asm__stage.is-lit .asm__lede{color:var(--txt-mute)}
 .asm__stage.is-lit .asm__step h3{color:var(--fg)}
-.asm__stage.is-lit .asm__step p{color:var(--fg-mute)}
+.asm__stage.is-lit .asm__step p{color:var(--txt-mute)}
 .asm__stage.is-lit .asm__stations li{color:rgba(23,24,20,.34)}
 .asm__stage.is-lit .asm__stations li.is-live{color:var(--fg)}
 .asm__stage.is-lit .asm__stations li.is-done{color:rgba(23,24,20,.55)}
@@ -3103,7 +3116,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
    page and it belongs to the world; the claim stands above it and its
    qualifier hangs under it, which is what the composition always meant. */
 .prf__no{position:absolute;top:clamp(84px,12vh,124px);left:0;color:var(--clay-txt)}
-.prf__of{position:absolute;top:clamp(84px,12vh,124px);right:0;color:var(--fg-mute)}
+.prf__of{position:absolute;top:clamp(84px,12vh,124px);right:0;color:var(--txt-mute)}
 .prf__of i{font-style:normal;color:var(--fg)}
 
 .prf__slots{position:absolute;inset:0;z-index:3;display:block}
@@ -3132,7 +3145,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .prf__upto{
   font-style:normal;font-family:var(--font-mono);
   font-size:.115em;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--fg-mute);align-self:flex-start;
+  color:var(--txt-mute);align-self:flex-start;
   padding-top:.7em;margin-right:.5em;
 }
 .prf__big--word{font-size:clamp(2.4rem,8.4vw,8.4rem);letter-spacing:-.045em;display:block}
@@ -3142,7 +3155,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .prf__d{
   position:absolute;top:100%;left:0;
   margin-top:clamp(1.4rem,3vh,2.4rem);
-  max-width:52ch;font-size:var(--t-sm);line-height:1.65;color:var(--fg-mute);
+  max-width:52ch;font-size:var(--t-sm);line-height:1.65;color:var(--txt-mute);
 }
 
 /* THE SURVIVOR — PROOF -> FAQ.                              [PHASE 2.4]
@@ -3281,7 +3294,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
   font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.015em;
 }
-.sheet__meta{margin-left:auto;color:var(--fg-mute)}
+.sheet__meta{margin-left:auto;color:var(--txt-mute)}
 
 .sheet__row{border-bottom:1px solid var(--rule)}
 .sheet__row > summary{
@@ -3318,7 +3331,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   gap:clamp(12px,2vw,32px);
   padding-bottom:clamp(1.6rem,3vw,2.4rem);
 }
-.sheet__a p{grid-column:2;max-width:66ch;font-size:var(--t-sm);line-height:1.7;color:var(--fg-mute)}
+.sheet__a p{grid-column:2;max-width:66ch;font-size:var(--t-sm);line-height:1.7;color:var(--txt-mute)}
 
 /* THE TONE DARKENS BEFORE THE SECTION DOES.                 [PHASE 2.4]
    The page has to arrive at the surface, and a limestone sheet meeting a
@@ -4125,7 +4138,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .ed{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gut)}
 .ed__aside{grid-column:1 / span 3;position:sticky;top:clamp(90px,12vh,130px);align-self:start}
 .ed__aside .label{display:block;margin-bottom:1rem}
-.ed__aside p{font-size:var(--t-sm);color:var(--fg-mute);max-width:26ch}
+.ed__aside p{font-size:var(--t-sm);color:var(--txt-mute);max-width:26ch}
 .sec--dark .ed__aside p{color:var(--on-dark-mute)}
 .ed__body{grid-column:5 / span 8}
 /* Contact variant: a wider aside, because it carries the phone/e-mail rail
@@ -4135,7 +4148,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .ed--contact .ed__aside{grid-column:1 / span 4}
 .ed--contact .ed__body {grid-column:6 / span 7}
 .ed__body > * + *{margin-top:1.25rem}
-.ed__body p{max-width:64ch;color:var(--fg-mute)}
+.ed__body p{max-width:64ch;color:var(--txt-mute)}
 .sec--dark .ed__body p{color:var(--on-dark-mute)}
 .ed__body h3{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
@@ -4169,7 +4182,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   color:var(--fg);
 }
 .sec--dark .spec__k{color:var(--on-dark)}
-.spec__v{font-size:var(--t-sm);color:var(--fg-mute);line-height:1.6;max-width:56ch}
+.spec__v{font-size:var(--t-sm);color:var(--txt-mute);line-height:1.6;max-width:56ch}
 .sec--dark .spec__v{color:var(--on-dark-mute)}
 .spec__v a{text-decoration:underline;text-underline-offset:.2em}
 .spec__v a:hover{color:var(--moss)}
@@ -4192,7 +4205,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .pullq cite{
   display:block;margin-top:1.1rem;font-style:normal;
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--fg-mute);
+  text-transform:uppercase;color:var(--txt-mute);
 }
 .sec--dark .pullq cite{color:var(--on-dark-mute)}
 
@@ -4206,7 +4219,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .sec--dark .bignum b{color:var(--on-dark)}
 .bignum b small{font-size:.34em;letter-spacing:.02em;vertical-align:.9em;margin-left:.12em;color:var(--moss)}
 .sec--dark .bignum b small{color:var(--moss-lift)}
-.bignum span{font-size:var(--t-sm);color:var(--fg-mute);max-width:30ch;line-height:1.6}
+.bignum span{font-size:var(--t-sm);color:var(--txt-mute);max-width:30ch;line-height:1.6}
 .sec--dark .bignum span{color:var(--on-dark-mute)}
 
 /* Service navigation strip — cross-links between the three service pages,
@@ -4228,13 +4241,19 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 }
 .xnav__g{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);flex:none;
+  text-transform:uppercase;color:var(--txt-mute);flex:none;
   display:flex;align-items:center;gap:.7em;
 }
 .sec--dark .xnav__g{color:var(--on-dark-mute)}
 .xnav a:hover .xnav__t{transform:translateX(clamp(6px,1vw,16px));color:var(--moss)}
 .sec--dark .xnav a:hover .xnav__t{color:var(--moss-lift)}
-.xnav a[aria-current="page"]{opacity:.42;pointer-events:none}
+/* .42 was 1.82:1 on the numeral, 1.86:1 on the 'current page' tag and 2.64:1
+   on the title — the row a visitor is standing in was the least legible one
+   on the page. It recedes by colour now: the title drops to the muted grey
+   the tag already uses, everything stays above 5:1, and nothing else about
+   the state changes.                                            [PHASE 3.2C] */
+.xnav a[aria-current="page"]{pointer-events:none}
+.xnav a[aria-current="page"] .xnav__t{color:var(--txt-mute)}
 
 /* --------------------------------------------------------------------------
    24 — PROCEDURAL TECHNICAL DIAGRAMS
@@ -4317,7 +4336,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   font-size:clamp(1.3rem,2.6vw,2.1rem);letter-spacing:-.03em;line-height:1;
   margin-bottom:1rem;
 }
-.pl-rail__txt p{font-size:var(--t-sm);color:var(--fg-mute);max-width:34ch;line-height:1.62}
+.pl-rail__txt p{font-size:var(--t-sm);color:var(--txt-mute);max-width:34ch;line-height:1.62}
 .sec--dark .pl-rail__txt p{color:var(--on-dark-mute)}
 
 /* Two offset plates — the second always drops, never a symmetric pair. */
@@ -4382,13 +4401,13 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 }
 .arch__mk span{
   font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.18em;text-transform:uppercase;color:var(--fg-mute);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--txt-mute);
 }
 .sec--dark .arch__mk span{color:var(--on-dark-mute)}
 .arch__mk i{
   margin-left:auto;font-style:normal;font-family:var(--font-mono);
   font-size:var(--t-label);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--fg-mute);
+  color:var(--txt-mute);
 }
 .sec--dark .arch__mk i{color:var(--on-dark-mute)}
 
@@ -4416,7 +4435,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap;
   padding-top:.72rem;margin-top:.72rem;border-top:1px solid var(--rule);
   font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.13em;text-transform:uppercase;color:var(--fg-mute);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--txt-mute);
 }
 .sec--dark .arch__cap{border-color:var(--rule-dark);color:var(--on-dark-mute)}
 .arch__cap b{color:var(--fg);font-weight:400;flex:none}
@@ -4426,8 +4445,10 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .arch__desc{
   display:block;margin-top:.6rem;font-family:var(--font-ui);font-size:var(--t-sm);
   width:100%;
-  letter-spacing:0;text-transform:none;color:var(--fg-mute);max-width:38ch;
-  opacity:.62;transition:opacity var(--dur) var(--ease),color var(--dur) var(--ease);
+  letter-spacing:0;text-transform:none;color:var(--txt-mute);max-width:38ch;
+  /* .62 read 2.64:1 at rest; .9 is 4.64:1 and the lift to 1 on pointer or
+     focus still registers. */
+  opacity:.9;transition:opacity var(--dur) var(--ease),color var(--dur) var(--ease);
 }
 .sec--dark .arch__desc{color:var(--on-dark-mute)}
 .arch__it:hover .arch__desc,.arch__it:focus-within .arch__desc{opacity:1}
@@ -4621,7 +4642,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   margin-bottom:clamp(1.2rem,2.6vw,2rem);
 }
 .doc > .lead,.legal > .lead{
-  font-size:var(--t-md);line-height:1.62;color:var(--fg-mute);max-width:60ch;
+  font-size:var(--t-md);line-height:1.62;color:var(--txt-mute);max-width:60ch;
   margin-bottom:clamp(1.4rem,3vw,2.2rem);
 }
 .doc h2{
@@ -4635,7 +4656,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   font-size:clamp(.95rem,1.4vw,1.12rem);letter-spacing:-.01em;
   margin-top:1.9rem;margin-bottom:.7rem;
 }
-.doc p,.doc li{color:var(--fg-mute);line-height:1.7}
+.doc p,.doc li{color:var(--txt-mute);line-height:1.7}
 .doc p + p{margin-top:1rem}
 .doc ul{margin:1rem 0 0;display:grid;gap:.6rem}
 .doc ul li{padding-left:1.5rem;position:relative}
@@ -4650,7 +4671,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 }
 .doc dt{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);padding-block:.85rem;
+  text-transform:uppercase;color:var(--txt-mute);padding-block:.85rem;
   border-bottom:1px solid var(--rule);
 }
 .doc dd{padding-block:.85rem;border-bottom:1px solid var(--rule);color:var(--fg)}
@@ -4662,7 +4683,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .doc__date{
   margin-top:clamp(2.4rem,4vw,3.4rem);padding-top:1.2rem;border-top:1px solid var(--rule);
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);
+  text-transform:uppercase;color:var(--txt-mute);
 }
 
 /* --- Legacy legal-page class aliases -------------------------------------
@@ -4682,7 +4703,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   font-size:clamp(.95rem,1.4vw,1.12rem);letter-spacing:-.01em;
   margin-top:1.9rem;margin-bottom:.7rem;
 }
-.legal p,.legal li{color:var(--fg-mute);line-height:1.7}
+.legal p,.legal li{color:var(--txt-mute);line-height:1.7}
 .legal p + p{margin-top:1rem}
 .legal ul{margin:1rem 0 0;display:grid;gap:.6rem;list-style:none}
 .legal ul li{padding-left:1.5rem;position:relative}
@@ -4697,7 +4718,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 }
 .datalist dt{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);padding-block:.85rem;
+  text-transform:uppercase;color:var(--txt-mute);padding-block:.85rem;
   border-bottom:1px solid var(--rule);
 }
 .datalist dd{padding-block:.85rem;border-bottom:1px solid var(--rule);color:var(--fg)}
@@ -4709,7 +4730,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .legal-updated{
   margin-top:clamp(2.4rem,4vw,3.4rem);padding-top:1.2rem;border-top:1px solid var(--rule);
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  text-transform:uppercase;color:var(--fg-mute);
+  text-transform:uppercase;color:var(--txt-mute);
 }
 @media (max-width:1100px){
   .datalist{grid-template-columns:1fr;gap:0}
@@ -5043,7 +5064,9 @@ html[lang="en"] .rk-menu__link[aria-current="page"] .rk-menu__tag::after{
 /* The English footer's legal links lead to Hungarian documents and say so
    (see the note in en/index.html). The qualifier is information, not a
    label — it sits back so the link still reads as its own name first. */
-.rk-foot__hu{opacity:.55}
+/* .55 of an already-muted colour is 2.73:1. .85 is 4.76:1 and still sits
+   behind the link's own name. */
+.rk-foot__hu{opacity:.85}
 
 /* --------------------------------------------------------------------------
    36 — THE 320 PROCESS GRID                                     [PHASE 3.3]
