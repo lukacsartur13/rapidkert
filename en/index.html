@@ -77,7 +77,13 @@
 <header class="rk-nav" id="rkNav">
   <div class="shell rk-nav__bar">
     <a href="index.html" class="rk-nav__logo" aria-label="Rapidkert Kft. – home">
-      <img src="../logo-feher.png" alt="Rapidkert Kft." class="is-light" width="404" height="118">
+      <!-- The nav mark is what Lighthouse picks as the Largest Contentful Paint
+           on every page: the hero headline is masked until the scene is ready,
+           so this is the biggest thing the first paint contains. Left to the
+           default heuristics the browser gave a 4KB image Medium priority and
+           the audit reported 625ms of LCP load delay.          [PHASE 3.2C] -->
+      <img src="../logo-feher.png" alt="Rapidkert Kft." class="is-light"
+           width="404" height="118" fetchpriority="high">
       <img src="../logo.png" alt="" aria-hidden="true" class="is-dark" width="404" height="118">
     </a>
 
