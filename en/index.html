@@ -37,40 +37,119 @@
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<link rel="stylesheet" href="../rk.css">
-<link rel="modulepreload" href="../rk-ground.js">
-<link rel="modulepreload" href="../vendor/three.module.min.js">
+<!-- THE CAPABILITY GATE.                                          [PHASE 3.2D]
+     One decision, taken before anything is fetched or painted, about which of
+     the page's two authored layouts owns this visit. It runs above the
+     stylesheet deliberately: a classic script in <head> cannot execute until
+     every stylesheet before it has loaded, and this script's whole value is
+     that it runs at the first possible instant.
 
-<!-- The Living Ground layout is committed to BEFORE first paint when WebGL is
-     available, so the hero never renders in its fallback form and then jumps.
-     rk-ground.js removes the class again if initialisation actually fails. -->
+     The rule is written out in full at the top of rk-ground.js. In short:
+     hardware WebGL keeps the Living Ground; a CONFIRMED software rasteriser
+     and a missing context both go to the stacked editorial layout, which is
+     a complete, authored version of this page and not a degradation. -->
 <script>
 (function () {
   var h = document.documentElement;
+
+  /* The two module URLs. They are injected rather than written as static
+     <link>s because the fallback path must not pay for either — a 151 KiB
+     three.js chunk fetched for a scene that will never be built is the exact
+     cost this gate exists to avoid. The build rewrites both strings to its
+     hashed, code-split names; the ground preload carries data-ground so the
+     injector at the end of <body> can find it again. */
+  var GROUND = '../rk-ground.js';
+  var THREE_URL = '../vendor/three.module.min.js';
+
+  /* RENDERER STRINGS THAT ARE A CPU RASTERISER — and nothing else.
+
+     Every entry here names a specific software implementation: Chrome's
+     SwiftShader (including the ANGLE/Vulkan wrapper, whose string contains
+     it), Mesa's llvmpipe and softpipe, OSMesa's off-screen renderer, and
+     Microsoft's Basic Render Driver, which is what Windows reports when no
+     display driver is loaded at all.
+
+     What is deliberately NOT here, because none of it is a software
+     rasteriser: integrated graphics, Apple GPUs, Intel parts, anything the
+     tier system calls low, low device pixel ratios, small viewports,
+     headless browsers and audit tools. Those all have a GPU and all keep the
+     full experience. There is no user-agent test anywhere in this file. */
+  var SOFT = /swiftshader|llvmpipe|softpipe|mesa offscreen|osmesa|software rasteri|software render|software adapter|basic render driver|basic display adapter/i;
+
+  var name = '', why = 'hardware', off = false;
   try {
     var c = document.createElement('canvas');
     var gl = c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl');
-    if (gl && !(gl.getParameter(gl.MAX_TEXTURE_SIZE) < 2048)) h.className += ' gd-on';
-  } catch (e) { /* no WebGL — the stacked editorial fallback stands */ }
+    if (!gl || gl.getParameter(gl.MAX_TEXTURE_SIZE) < 2048) {
+      off = true; why = 'no-webgl';
+    } else {
+      var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+      name = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || '') : '';
+      /* CONSERVATIVE ON PURPOSE. Firefox behind privacy.resistFingerprinting,
+         and any browser that decides WEBGL_debug_renderer_info is too much
+         information, leave this empty. Unknown is NOT software: a capable
+         visitor must never lose the experience to a privacy setting. The
+         quality tiers and the adaptive frame guard handle the rest. */
+      if (!name) why = 'renderer-withheld';
+      else if (SOFT.test(name)) { off = true; why = 'software-rasteriser'; }
+    }
+  } catch (e) { off = true; why = 'no-webgl'; }
 
-  /* The hero's entrance is gated on .gd-ready, which rk-ground.js adds once
-     the first frame is on screen. If that module never arrives — a 404, a
-     stale cache, a thrown error — the headline must not stay masked, so the
-     class lands anyway. A late scene is a compromise; an invisible H1 is a
-     broken page.
+  /* Development override. ?soft=1 takes the fallback route on a machine that
+     has a GPU, so the fallback can be audited; ?soft=0 takes the scene route
+     on a machine that does not. Neither can conjure a context that is not
+     there, so ?soft=0 cannot override no-webgl. */
+  var f = /[?&]soft=([01])(?:&|$)/.exec(location.search);
+  if (f) {
+    if (f[1] === '1') { off = true; why = 'forced-fallback'; }
+    else if (why !== 'no-webgl') { off = false; why = 'forced-scene'; }
+  }
 
-     The deadline is absolute — 2600ms from NAVIGATION START, not from
-     whenever this script happened to run. Measured on Slow 4G with 4x CPU
-     throttling: this script did not execute until 4.06s, because it waits
-     behind a 240KB render-blocking stylesheet. .gd-on hid the hero at that
-     instant and the old relative timer then held it hidden until 6.7s, so
-     the copy did not become readable until 7.5s — 3.2 seconds of an empty
-     dark rectangle stacked on top of an already slow start. Being late is
-     exactly when the safety net is needed soonest.               [PHASE 3.2B] */
-  setTimeout(function () { h.classList.add('gd-ready'); },
-             Math.max(0, 2600 - (performance.now ? performance.now() : 0)));
+  if (off) {
+    /* The fallback owns the page, and owns it from here: no canvas, no
+       module, no preloads, and .gd-ready immediately because there is no
+       first frame to wait for. */
+    h.className += ' gd-off gd-ready';
+  } else {
+    h.className += ' gd-on';
+    pre(GROUND).setAttribute('data-ground', '');
+    if (THREE_URL) pre(THREE_URL);
+
+    /* The hero's entrance is gated on .gd-ready, which rk-ground.js adds once
+       the first frame is on screen. If that module never arrives — a 404, a
+       stale cache, a thrown error — the headline must not stay masked, so the
+       class lands anyway. A late scene is a compromise; an invisible H1 is a
+       broken page.
+
+       The deadline is absolute — 2600ms from NAVIGATION START, not from
+       whenever this script happened to run. Measured on Slow 4G with 4x CPU
+       throttling: this script did not execute until 4.06s, because it waited
+       behind a 240KB render-blocking stylesheet. .gd-on hid the hero at that
+       instant and the old relative timer then held it hidden until 6.7s, so
+       the copy did not become readable until 7.5s — 3.2 seconds of an empty
+       dark rectangle stacked on top of an already slow start. Being late is
+       exactly when the safety net is needed soonest.             [PHASE 3.2B] */
+    setTimeout(function () { h.classList.add('gd-ready'); },
+               Math.max(0, 2600 - (performance.now ? performance.now() : 0)));
+  }
+
+  /* Debug only, and only ever data — there is no debug UI on this page.
+     Without one of these parameters the object is never created, so an
+     ordinary visitor's renderer string is not left lying on `window`.
+     rk-ground.js adds the quality tier to it when the scene starts. */
+  if (/[?&](debug|soft|tier|scene)=/.test(location.search)) {
+    window.RK_GL = { renderer: name, accelerated: !off, reason: why, fallback: off };
+  }
+
+  function pre(u) {
+    var l = document.createElement('link');
+    l.rel = 'modulepreload'; l.href = u;
+    document.head.appendChild(l);
+    return l;
+  }
 })();
 </script>
+<link rel="stylesheet" href="../rk.css">
 </head>
 <body>
 
@@ -1219,6 +1298,26 @@
 </script>
 
 <script src="../rk.js" defer></script>
-<script type="module" src="../rk-ground.js"></script>
+<!-- The Living Ground's module is mounted here rather than written as a static
+     module tag, so that a page the capability gate has already handed to the
+     fallback never requests it at all. The URL is not repeated: it is read
+     back off the modulepreload the gate injected, which is also the proof
+     that the gate chose the scene. Running at the end of the body means the
+     stage, the canvas and every chapter are already parsed by the time the
+     module can execute.
+
+     Do not name a script or style tag in a comment anywhere in this document:
+     the build's minifier parks those two elements' bodies before it strips
+     comments, so a literal one written here swallows the real element after
+     it and leaves this note in production.                       [PHASE 3.2D] -->
+<script>
+(function () {
+  var l = document.querySelector('link[rel=modulepreload][data-ground]');
+  if (!l) return;
+  var s = document.createElement('script');
+  s.type = 'module'; s.src = l.href;
+  document.body.appendChild(s);
+})();
+</script>
 </body>
 </html>

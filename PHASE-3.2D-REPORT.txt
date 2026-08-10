@@ -1,0 +1,429 @@
+════════════════════════════════════════════════════════════════════════════
+PHASE 3.2D — CAPABILITY-BASED FALLBACK
+A confirmed software rasteriser is a different page, not a lower tier.
+════════════════════════════════════════════════════════════════════════════
+
+HEADLINE
+
+  SOFTWARE WEBGL FALLBACK   Performance  65 -> 100      TBT 5,972ms -> 0ms
+                            main thread  21.4s -> 0.6s  long tasks 20 -> 0
+  HARDWARE WEBGL            Performance  99, unchanged  TBT 57ms
+  ACCESSIBILITY             100 on all four matrices (HU + EN, both paths)
+
+  LIGHTHOUSE PERFORMANCE 100?    Software path YES.  Hardware path NO — 99.
+  LIGHTHOUSE ACCESSIBILITY 100?  YES, everywhere.
+
+  The remaining 0.7 points on the hardware path are named exactly in §6, and
+  three separate attempts to buy them are measured there. All three lost.
+
+
+════════════════════════════════════════════════════════════════════════════
+1 — WHAT WAS DECIDED
+════════════════════════════════════════════════════════════════════════════
+
+Phase 3.2C proved the audit machine had no GPU and turned the LOW tier's own
+dials down the rest of the way on a software rasteriser: DPR 1.0, shadows
+off, thirty frames instead of sixty. Total work fell a fifth, long tasks fell
+to a quarter, and TBT did not move. §15B of that report set the decision out
+and left it with the owner. The owner took it:
+
+    HARDWARE-ACCELERATED WEBGL     -> the full Living Ground, HIGH/MED/LOW
+    CONFIRMED SOFTWARE RASTERISER  -> the authored .gd-off editorial page
+
+This is a capability decision, not a performance trick, and it is not a
+degradation: the stacked layout is a complete authored version of the
+homepage that has existed since Phase 2 for machines with no WebGL at all.
+What changed is that it is now also the answer for machines whose WebGL is a
+CPU pretending to be a GPU.
+
+
+════════════════════════════════════════════════════════════════════════════
+2 — HOW THE DECISION IS TAKEN
+════════════════════════════════════════════════════════════════════════════
+
+WHERE.  In the document head, in the inline gate that used to only ask "is
+there a context". It now also asks the driver what it is, and it runs ABOVE
+the stylesheet — a classic script in <head> cannot execute until every
+stylesheet before it has loaded, and this one's whole value is running first.
+
+WHAT COUNTS AS SOFTWARE.  A curated list of specific implementations, matched
+against WEBGL_debug_renderer_info's unmasked renderer string:
+
+    swiftshader        Chrome's own, including the ANGLE/Vulkan wrapper
+    llvmpipe softpipe  Mesa's software rasterisers
+    mesa offscreen     OSMesa
+    osmesa
+    software rasteri…  "Software Rasterizer" / "Software Renderer" /
+    software render…   "Software Adapter", however a driver spells it
+    software adapter
+    basic render driver    Microsoft's, when no display driver is loaded
+    basic display adapter
+
+WHAT DOES NOT COUNT, and was never in the list:
+
+    integrated graphics · Apple GPUs · Intel parts · anything the tier system
+    calls LOW · low device pixel ratio · small or mobile viewports · headless
+    browsers · Lighthouse · any audit tool · any user agent string
+
+  Verified rather than asserted: headless Chrome on this machine reports
+  "ANGLE (Apple, ANGLE Metal Renderer: Apple M4)" and is routed to the full
+  scene. Only the SwiftShader flags change the answer. §7 has the sweep.
+
+CONSERVATIVE WHEN UNSURE.  An absent extension or an empty renderer string —
+Firefox under privacy.resistFingerprinting, or any browser that decides the
+string is too much information — returns HARDWARE. Unknown is not software. A
+privacy setting must never cost a capable visitor the experience; the tier
+system and the adaptive frame guard handle a slow-but-real GPU on their own.
+
+OVERRIDES.  ?soft=1 forces the fallback on a machine with a GPU, so it can be
+audited. ?soft=0 forces the scene. Neither can conjure a context that is not
+there, so ?soft=0 cannot override a genuinely missing one.
+
+
+════════════════════════════════════════════════════════════════════════════
+3 — NOTHING EXPENSIVE IS BUILT BEFORE THE QUESTION IS ASKED
+════════════════════════════════════════════════════════════════════════════
+
+The 3.2C check ran at rk-ground.js §07, AFTER the strata, the sward, the
+hardscape, the irrigation and the roots had all been built. The flow now is:
+
+    probe WebGL  ->  read the renderer  ->  software?  ->  .gd-off
+                                                       ->  no module preload
+                                                       ->  no module at all
+
+The Living Ground's module is no longer a static tag. The gate injects a
+modulepreload on the hardware path and tags it data-ground; a four-line
+injector at the end of <body> mounts the module only if that link exists.
+Running at the end of the body means the stage, the canvas and every chapter
+are parsed before the module can execute, which a dynamically inserted module
+script does not otherwise guarantee.
+
+  Measured on the fallback path: rk-ground.7f6…js is never requested. Six
+  network requests instead of seven, and 557 KB raw / ~150 KB gzipped of
+  scene and three.js never crosses the wire.
+
+rk-ground.js §00 asks the same question a second time, for the case where the
+module is mounted without that head script, and bails before a single vertex
+exists. In production that path does not occur; it exists so the rule lives in
+the module that depends on it.
+
+CODE-SPLITTING THREE WAS TRIED AND REVERTED.  It buys nothing — the fallback
+already requests no chunk of anything — and it costs the path that does draw,
+because a dynamic `import * as` hides from esbuild which of three's exports
+the scene reads:
+
+    | rk-ground bundle              | raw     |
+    | static import, whole bundle   | 557.4 K |   shipped
+    | dynamic import, inlined       | 734.0 K |
+    | dynamic import, split chunk   | 663.8 K |
+
+
+════════════════════════════════════════════════════════════════════════════
+4 — THE FOUR MATRICES
+════════════════════════════════════════════════════════════════════════════
+
+Lighthouse 12.8.2, stock mobile profile: Slow 4G simulated (1.6 Mbps,
+150ms RTT), 4x CPU throttling, emulated Moto G Power at 412x823 DPR 1.75.
+Served over HTTP/2 with gzip from the local mirror, because a plain HTTP/1.1
+server makes the simulator model six serial connections and measures itself.
+Three cold runs each; medians below, individual runs beneath.
+
+  HARDWARE WEBGL — HU
+    Performance    99  (99 / 99 / 99)
+    Accessibility 100
+    TBT          57ms  (60 / 57 / 51)
+    main-thread   1.7s (1.8 / 1.7 / 1.6)
+    FCP 1.36s · LCP 1.90s · CLS 0 · SI 1.36s · long tasks 3
+
+  HARDWARE WEBGL — EN
+    Performance    99  (99 / 99 / 99)
+    Accessibility 100
+    TBT          55ms  (55 / 25 / 60)
+    main-thread   1.6s (1.8 / 1.5 / 1.6)
+    FCP 1.36s · LCP 1.89s · CLS 0 · SI 1.36s · long tasks 3
+
+  SOFTWARE WEBGL FALLBACK — HU
+    Performance   100  (100 / 100 / 100)
+    Accessibility 100
+    TBT           0ms  (0 / 0 / 0)
+    main-thread   0.6s (0.4 / 0.7 / 0.6)
+    FCP 0.99s · LCP 1.13s · CLS 0 · SI 1.34s · long tasks 0
+
+  SOFTWARE WEBGL FALLBACK — EN
+    Performance   100  (100 / 100 / 100)
+    Accessibility 100
+    TBT           0ms  (0 / 0 / 0)
+    main-thread   0.7s (0.7 / 0.7 / 0.6)
+    FCP 0.99s · LCP 1.25s · CLS 0 · SI 0.99s · long tasks 0
+
+WHAT THE SOFTWARE PATH USED TO BE.  The same harness, same commit, forced
+back onto the scene with ?soft=0 under SwiftShader — the exact 3.2C state:
+
+    Performance 65 · TBT 5,972ms · main thread 21.4s · SI 6.04s · 20 long tasks
+
+  which reproduces 3.2C's reported 21.2s / 5,400ms / 20 long tasks. The
+  reproduction is not approximate, and it is the control for the whole phase.
+
+
+════════════════════════════════════════════════════════════════════════════
+5 — THE 2x2 THAT EXPLAINS EVERYTHING
+════════════════════════════════════════════════════════════════════════════
+
+Crossing the rasteriser against the layout, three runs per cell:
+
+  |                  | stacked fallback layout | Living Ground layout    |
+  | hardware Chrome  | FCP 1.01 LCP 1.18       | FCP 1.36 LCP 1.90       |
+  |                  | TBT 0    main 0.7s  100 | TBT 57ms main 1.7s   99 |
+  | SwiftShader      | FCP 0.99 LCP 1.13       | FCP 1.35 LCP 1.88       |
+  |                  | TBT 0    main 0.6s  100 | TBT 5,972 main 21.4s 65 |
+
+Read down the columns, not across the rows:
+
+  · The RASTERISER moves TBT, main-thread work and Speed Index, and nothing
+    else. It does not move FCP or LCP by a millisecond. This is why routing
+    it to the fallback is the correct fix and why sharpening tiers was not.
+  · The LAYOUT moves FCP and LCP, on both rasterisers, identically.
+
+So the 0.7 points missing on the hardware path have nothing to do with the
+GPU, the module's bytes, or anything this phase changed.
+
+
+════════════════════════════════════════════════════════════════════════════
+6 — THE EXACT METRIC KEEPING THE HARDWARE PATH AT 99
+════════════════════════════════════════════════════════════════════════════
+
+    FCP  1.36 s   score 0.98   weight 10   ->   9.80    -0.20
+    LCP  1.90 s   score 0.98   weight 25   ->  24.50    -0.50
+    TBT    57 ms  score 1.00   weight 30   ->  30.00
+    CLS       0   score 1.00   weight 25   ->  25.00
+    SI   1.36 s   score 1.00   weight 10   ->  10.00
+                                              ──────
+                                                99.30    100 needs 99.5
+
+BOTH DEDUCTIONS ARE THE SAME ONE THING, and Lighthouse names it for us. The
+largest contentful element differs between the two layouts:
+
+    Living Ground layout   <img src="logo-feher…png" …>   the navigation mark
+    stacked layout         <p class="gd__lede">           the hero paragraph
+
+The hero's copy — headline, eyebrow, lede, buttons, footer — is masked until
+.gd-ready, because the six-beat entrance is the Living Ground's opening. With
+the copy masked, the biggest thing the first paint can contain is a 4.4 KB
+image, and an image needs a network round trip that text does not:
+
+    TTFB 600ms · load delay 111ms · load time 27ms · RENDER DELAY 1,136ms
+
+The 1,136ms of render delay is the scene build holding the main thread while
+the logo's bytes sit decoded and unpainted. The 0.35s of FCP is what the
+.gd-on layout itself costs to paint: a sticky 100svh stage, a full-viewport
+canvas, three gradient layers and a scrim.
+
+THREE ATTEMPTS TO BUY THE 0.7, ALL MEASURED, ALL WORSE:
+
+  | hardware, mobile, Slow 4G      | FCP    | LCP    | TBT     | score |
+  | as shipped                     | 1.36 s | 1.90 s |    57ms |  99   |
+  | two rAF, paint before building | 1.36 s | 1.88 s |   278ms |  94   |
+  | fetch the module on load       | 1.42 s | 1.83 s |   207ms |  96   |
+  | unmask the hero lede           | 1.49 s | 1.90 s |   266ms |  94   |
+  | fetchpriority=low on the       | 1.35 s | 1.88 s |    41ms |  99   |
+  |   module preload               |        |        |         |       |
+
+  Neither paint ever moved more than 70ms, and every reschedule multiplied
+  TBT by four to seven. The mechanism is the same in all three: Total
+  Blocking Time counts blocking AFTER first paint, and the scene build
+  currently runs inside the window where the page is still waiting on its own
+  stylesheet and images. That is the only free CPU on the page. Moving the
+  build later, or pulling FCP earlier, does not make the build cheaper — it
+  only makes it billable.
+
+  Unmasking the lede did exactly what the arithmetic promised — the LCP
+  element became <p class="gd__lede"> — and still lost five points, because
+  the earlier FCP handed 200ms of previously free build time to TBT.
+
+WHAT WOULD ACTUALLY BUY IT.  Only one thing: making the scene cheaper to
+BUILD, so the 1,136ms of render delay shrinks. Not rescheduling it. Phase
+3.2C already sliced the startup into eight-millisecond tasks, which is what
+holds TBT at 57ms; the remaining cost is the strata, sward, hardscape,
+irrigation and roots themselves. Cutting it means building less scene, which
+is the one thing the brief has consistently refused, and it would trade a
+guaranteed loss of the concept for at most 0.7 of a point.
+
+THE HONEST STATEMENT.  The hardware path is 99. The missing point is the
+Largest Contentful Paint, it is the navigation mark, it is the navigation
+mark because the hero copy is deliberately masked for the entrance, and the
+entrance is the thing the page is for.
+
+
+════════════════════════════════════════════════════════════════════════════
+7 — NO AUDIT-SPECIFIC BEHAVIOUR
+════════════════════════════════════════════════════════════════════════════
+
+Searched rk.js, rk-ground.js, build.mjs, rk.css, index.html and en/index.html
+with comments stripped, and the whole of dist/, for:
+
+    lighthouse · HeadlessChrome · Chrome-Lighthouse · Moto G · navigator
+    .userAgent · navigator.vendor · webdriver · PageSpeed · GTmetrix
+    · WebPageTest
+
+  SOURCE (executable, comments removed) : CLEAN, all six files.
+  DIST                                  : one hit, three.js's own
+        `/OculusBrowser/g.test(navigator.userAgent)` at three.module.js:24143
+        — a framebuffer-invalidation workaround in the vendor library. It
+        gates nothing in this site's code and does not touch the fallback.
+
+Every mention in the source tree is prose in a comment explaining a
+measurement. The decision reads one thing and one thing only: the unmasked
+renderer string.
+
+  Positive control: headless Chrome, which is what every one of these audits
+  runs in, reports the Apple Metal renderer here and is given the full scene.
+  The fallback is only ever reached by adding --use-angle=swiftshader.
+
+
+════════════════════════════════════════════════════════════════════════════
+8 — THE FALLBACK IS A WHOLE PAGE
+════════════════════════════════════════════════════════════════════════════
+
+Verified on the software rasteriser, both languages, at 412x823 and 1440x900:
+
+    brand / navigation        4 links + language switch + nav CTA + burger
+    hero concept              eyebrow, H1, lede, two CTAs, three stats, cue
+    Surface / Below Surface   chapters 01-03 as stacked editorial sections
+    soil / root / irrigation  the drawn cross-section SVG, labelled — the
+                              piece that stands in for the model, with all
+                              seven strata and both service callouts
+    CTAs                      6 visible, every href resolving
+    Services                  "Három szolgáltatás, egy szemlélet" / "Three
+                              services, one approach"
+    Projects                  8 plates, real markup, the same photograph the
+                              scene would have handed over to
+    Process                   the five-step rail + five step sections
+    Proof                     "Nem látványterv. Megépített kert."
+    FAQ                       6 questions
+    final CTA                 "Itt kezdődik a kerted." / "Your garden
+                              starts here."
+    footer                    services / company / contact columns
+
+    dead cinematic spacers    none — 0 empty blocks over 40px tall
+    blank canvas              none — #gdCanvas is display:none
+    scroll driver             collapsed; 27.8 viewports -> 25.0
+    photo handover element    display:none; the plate is never fetched
+
+  EN carries no Hungarian: headings, nav, CTAs, skip link and the SVG's
+  aria-label are all English, and the cross-section's seven labels are
+  Surface / Topsoil / Root zone / Bedding / Drain / Irrigation / Drainage.
+
+ONE ACCESSIBILITY REGRESSION FOUND AND FIXED.  The five .gd__rail steps carry
+opacity .42 until rk-ground.js marks one .is-live. Without the scene nothing
+ever becomes live, so all five sat permanently at 2.09:1 against the soil —
+Accessibility 96. It had never been audited because in the .gd-on layout that
+whole chapter is hidden until the camera reaches it, and the fallback had
+never been a measured production path before. In the stacked page the rail is
+not a progress indicator at all; it is the index of the five sections printed
+directly beneath it, so every entry is now equally current. Back to 100.
+
+MODE OWNERSHIP, ranked, most authoritative first:
+
+    no JavaScript          nothing runs; the stacked page is the document as
+                           authored. Verified: html class is "no-js" only,
+                           19 visible headings, all 6 CTAs, cross-section
+                           drawn, canvas hidden, scroll driver collapsed.
+    the capability gate    .gd-off, set before first paint, and .gd-ready
+                           with it because there is no first frame to wait
+                           for.
+    runtime failure        a context loss or a throw calls fail() and hands
+                           over mid-visit, subtracting the collapsed scroll
+                           height so the visitor is not thrown up the page.
+
+  prefers-reduced-motion is NOT one of these. It is a modifier inside
+  whichever layout won: rk.css §20 answers it in both, and rk-ground.js §10
+  keeps the binding live in the scene. Verified on the software fallback with
+  reduced motion on — 0 running animations, full content, no console errors,
+  no competing state.
+
+  Keyboard and screen readers are unaffected: the fallback is ordinary
+  document order, the skip link is first, and the cross-section carries a
+  descriptive role="img" aria-label in both languages.
+
+
+════════════════════════════════════════════════════════════════════════════
+9 — DEBUG VISIBILITY
+════════════════════════════════════════════════════════════════════════════
+
+window.RK_GL, created ONLY when one of ?debug ?soft ?tier ?scene is present:
+
+    {
+      renderer:    "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, …)",
+      accelerated: true,
+      reason:      "hardware",     // or software-rasteriser, no-webgl,
+                                   // renderer-withheld, forced-fallback,
+                                   // forced-scene
+      fallback:    false,
+      tier:        "low",          // added by rk-ground.js — the head
+      dpr:         1.4,            // cannot know these
+      shadow:      false
+    }
+
+There is no debug UI, nothing is drawn on screen, and without one of those
+parameters the object is never created — an ordinary visitor's renderer
+string is not left lying on `window`. Verified: RK_GL is null on a plain
+visit to either path.
+
+
+════════════════════════════════════════════════════════════════════════════
+10 — WHAT CHANGED
+════════════════════════════════════════════════════════════════════════════
+
+  index.html, en/index.html   the capability gate, moved above the stylesheet
+                              and taught to read the renderer; the two module
+                              URLs held as string literals and injected as
+                              preloads only on the hardware path; the static
+                              module tag replaced by a four-line injector at
+                              the end of <body>.
+
+  rk-ground.js                §00, the second gate, before anything is built.
+                              The 3.2C software quality branch and the 30fps
+                              frame gate removed — dead now, and the brief
+                              asked for capability fallback rather than
+                              progressively destroying the scene. The
+                              adaptive DPR guard stays: it is the answer to a
+                              GPU slower than its numbers, which is a
+                              different problem.
+
+  build.mjs                   rewrites the two URL literals to the hashed
+                              names; asserts no source asset name survives
+                              into a built document, because those literals
+                              are now the only reference and a stale regex
+                              would 404 the whole experience silently.
+
+  rk.css §31.3                the rail's inactive state does not apply where
+                              nothing can become active.
+
+ONE TRAP WORTH KNOWING, hit while writing this. build.mjs's HTML minifier
+parks <script> and <style> BODIES before it strips comments, so a comment
+that names one of those tags literally swallows the real element after it and
+survives into production. Both index documents now carry a note saying so.
+
+
+════════════════════════════════════════════════════════════════════════════
+11 — WHAT WAS NOT DONE
+════════════════════════════════════════════════════════════════════════════
+
+  · The hero entrance was not unmasked to buy the last 0.7 points. It was
+    measured (§6), it works arithmetically, and it costs five points on the
+    way and one beat of the opening. That is an art-direction decision and it
+    is not this phase's to take.
+
+  · The scene was not made cheaper to build. That is the only remaining
+    lever on the hardware path, and it is a separate piece of work with a
+    real risk to the concept.
+
+  · No deploy. The build is verified and staged; pushing it is still the
+    manual trigger it was in 3.2C.
+
+  · A note on the harness: these numbers come from the local HTTP/2 mirror,
+    which is faster than the machine that produced 3.2C's 99 (FCP 1.36s here
+    against 1.68s there). The four matrices are internally comparable because
+    they share one harness, one Chrome and one Lighthouse; the absolute
+    figures should be re-taken on the deployed URL before they are quoted
+    anywhere outward-facing.

@@ -1265,6 +1265,17 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .gd__rail li span{color:var(--clay-txt)}
 .gd__rail li.is-live{opacity:1;color:var(--on-dark)}
 .gd__rail li.is-live span{color:var(--moss-lift)}
+/* THERE IS NO LIVE STEP IN THE STACKED LAYOUT.                   [PHASE 3.2D]
+   .is-live is written by rk-ground.js as the timeline passes each step, and
+   the dimming above is what the four steps that are NOT current look like
+   while the fifth is. Without the scene nothing ever becomes current, so all
+   five sat permanently at opacity .42 — 2.09:1 against the soil, an audit
+   failure that only ever appeared on this layout because in the other one the
+   whole chapter is hidden until the camera reaches it. Here the rail is not a
+   progress indicator at all: it is the index of the five sections printed
+   directly beneath it, and every entry is equally current. */
+html:not(.gd-on) .gd__rail li{opacity:1;color:var(--on-dark)}
+html:not(.gd-on) .gd__rail li span{color:var(--moss-lift)}
 .gd-on .gd__ch--rail{align-items:flex-start}
 .gd-on .gd__ch--rail .gd__inner{padding-top:clamp(104px,15vh,168px)}
 .gd-on .gd__ch--step{align-items:center}

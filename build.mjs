@@ -102,6 +102,17 @@ const threeAlias = {
   },
 };
 
+/* ONE FILE, AND THE CAPABILITY GATE DOES NOT CHANGE THAT.        [PHASE 3.2D]
+   Splitting three into its own chunk, so a page routed to the stacked
+   fallback could skip it, was built and reverted. Two reasons, both measured:
+
+     · It buys nothing. The gate lives in the document head and mounts the
+       module only on the hardware path, so the fallback already requests
+       neither this bundle nor any chunk of it.
+     · It costs the path that DOES draw. Splitting requires a dynamic import,
+       and a dynamic `import * as` hides from esbuild which of three's exports
+       the scene reads: 663.8K as a chunk and 734.0K inlined, against 570.3K
+       whole-bundle with the ~90 KiB of unused three shaken out. */
 const groundOut = await esbuild.build({
   entryPoints: [path.join(ROOT, 'rk-ground.js')],
   bundle: true, format: 'esm', target: 'es2020',
@@ -255,12 +266,15 @@ for (const doc of HTML) {
   /* stylesheet */
   t = t.replace(new RegExp(`<link rel="stylesheet" href="${prefix ? '\\.\\./' : ''}rk\\.css">`), styleBlock(prefix));
 
-  /* scripts. three is bundled into rk-ground now, so its modulepreload is a
-     request for a file that no longer exists. */
-  t = t.replace(new RegExp(`\\s*<link rel="modulepreload" href="${prefix ? '\\.\\./' : ''}vendor/three\\.module\\.min\\.js">`), '');
-  t = t.replace(new RegExp(`<link rel="modulepreload" href="${prefix ? '\\.\\./' : ''}rk-ground\\.js">`), `<link rel="modulepreload" href="${P(groundName)}">`);
+  /* Scripts. The two module URLs live as string literals inside the
+     capability gate in <head>, which injects them as modulepreloads only on
+     the hardware path — so this is where the hashed, code-split names are
+     substituted. Nothing else in the document names either file. */
+  t = t.replace(new RegExp(`var GROUND = '${prefix ? '\\.\\./' : ''}rk-ground\\.js';`), `var GROUND = '${P(groundName)}';`);
+  /* three is inlined into that bundle, so there is no second file to warm.
+     The gate skips the preload when this is empty. */
+  t = t.replace(new RegExp(`var THREE_URL = '${prefix ? '\\.\\./' : ''}vendor/three\\.module\\.min\\.js';`), `var THREE_URL = '';`);
   t = t.replace(new RegExp(`<script src="${prefix ? '\\.\\./' : ''}rk\\.js" defer></script>`), `<script src="${P(rkName)}" defer></script>`);
-  t = t.replace(new RegExp(`<script type="module" src="${prefix ? '\\.\\./' : ''}rk-ground\\.js"( data-off)?></script>`), (m,off)=> off ? '' : `<script type="module" src="${P(groundName)}"></script>`);
 
   /* images: <img> elements become <picture> with AVIF and WebP in front. */
   t = rewriteImages(t, prefix);
@@ -273,6 +287,21 @@ for (const doc of HTML) {
   }
 
   t = minifyHtml(t);
+
+  /* A missed substitution is a 404 on a file the homepage's whole experience
+     depends on, and it would read as "the scene stopped working" rather than
+     as a build fault — the capability gate holds two of these URLs as string
+     literals now, where a regex can go stale without anything else noticing.
+
+     Quoted occurrences only: these documents also DISCUSS their own assets by
+     name, in prose that is deliberately kept, and a bare substring match
+     would fire on the sentence rather than on the reference. */
+  for (const stale of ['rk-ground.js', 'vendor/three.module.min.js', 'rk.js', 'rk.css']) {
+    if (new RegExp(`["'](?:\\.\\./)?${stale.replace(/\./g, '\\.')}["']`).test(t)) {
+      throw new Error(`${doc.rel}: unrewritten reference to ${stale}`);
+    }
+  }
+
   htmlAfter += Buffer.byteLength(t);
   fs.writeFileSync(path.join(DIST, doc.rel), t);
 }

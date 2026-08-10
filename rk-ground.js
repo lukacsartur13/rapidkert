@@ -20,6 +20,7 @@
    into at the very end — and that contrast IS the point.
 
    Structure of this file
+     00  which layout owns the page — the capability gate
      01  environment, tiers, constants
      02  deterministic noise (JS)  + shader chunks (GLSL)
      03  geometry builders   — stratified slabs, tubes, blades
@@ -32,6 +33,17 @@
      10  loop, resize, lifecycle
    ========================================================================== */
 
+/* three is a STATIC import, deliberately, and the capability gate still costs
+   a software rasteriser nothing.                                [PHASE 3.2D]
+
+   The temptation is to import it dynamically so the gate in §00 can refuse it.
+   That was built and measured, and it is worse on the only path that ever
+   loads this file: a dynamic `import * as` hides from the bundler which of
+   three's exports the scene reads, so the whole library ships — 734K against
+   570K inlined, 664K as a split chunk. Both regress the machine that IS going
+   to draw, to save a machine that never requests this module in the first
+   place: the gate lives in the document head and mounts this script only when
+   the answer was hardware.                                                  */
 import * as THREE from './vendor/three.module.min.js';
 
 const root = document.documentElement;
@@ -88,6 +100,37 @@ async function slice() {
   sliceT0 = performance.now();
 }
 
+/* THE SAME QUESTION THE DOCUMENT HEAD ASKS, ASKED AGAIN.          [PHASE 3.2D]
+   In production the head gate has already answered it and this module is only
+   ever loaded when the answer was yes, so this runs on exactly one path: a
+   document that mounts the stage without that script. It exists so the rule
+   lives in the module that depends on it, and so no build or template change
+   can quietly leave the scene running on a CPU rasteriser.
+
+   Every string in SOFT names a specific software implementation. Integrated
+   graphics, Apple GPUs, Intel parts, low tiers, low DPR, small viewports,
+   headless browsers and audit tools are none of them, and all keep the scene.
+   An unavailable or empty renderer string returns TRUE — unknown is not
+   software, and a privacy setting must not cost a capable visitor the
+   experience. */
+const SOFT_RE = /swiftshader|llvmpipe|softpipe|mesa offscreen|osmesa|software rasteri|software render|software adapter|basic render driver|basic display adapter/i;
+function accelerated(params) {
+  const forced = params.get('soft');
+  if (forced === '1') return false;
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl');
+    /* ?soft=0 forces the scene route, but it cannot conjure a context that
+       is not there — the renderer constructor would only fail a moment later
+       and fail() would hand the page over anyway. */
+    if (!gl || gl.getParameter(gl.MAX_TEXTURE_SIZE) < 2048) return false;
+    if (forced === '0') return true;
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || '') : '';
+    return !name || !SOFT_RE.test(name);
+  } catch (e) { return false; }
+}
+
 /* Nothing to do on pages that do not mount the experience. */
 if (stage && canvas && section) {
   boot().catch((err) => {
@@ -106,6 +149,95 @@ async function boot() {
 
 sliceT0 = performance.now();
 
+const params = new URLSearchParams(location.search);
+
+/* ==========================================================================
+   00 — WHICH LAYOUT OWNS THIS PAGE                               [PHASE 3.2D]
+   --------------------------------------------------------------------------
+   The homepage has TWO authored layouts, not one layout and a degradation:
+
+     THE LIVING GROUND   one procedural scene on one scroll timeline.
+     THE STACKED PAGE    the same eleven chapters as an editorial narrative,
+                         with a drawn cross-section where the model was. Same
+                         headline, same copy, same links, same calls to
+                         action, same navigation, same FAQ. Nothing is lost;
+                         .gd-off is the marker that this one is in charge.
+
+   ONE condition decides, and it is a capability, never an identity:
+
+     HARDWARE-ACCELERATED WEBGL   the Living Ground, at whatever quality tier
+                                  §01 picks for the device — HIGH, MED or LOW.
+     CONFIRMED SOFTWARE RASTERISER  the stacked page.
+     NO USABLE CONTEXT AT ALL       the stacked page.
+     ANYTHING AMBIGUOUS             the Living Ground. Unknown is not
+                                    software; see the gate in the document
+                                    head for why that direction matters.
+
+   WHY A SOFTWARE RASTERISER IS A DIFFERENT PAGE AND NOT A LOWER TIER.
+   Measured at 412x823 on the stock mobile CPU throttle, same commit:
+
+       hardware rasteriser    main thread  1.9 s   TBT     0 ms    2 long tasks
+       software rasteriser    main thread 21.2 s   TBT 5,400 ms   20 long tasks
+
+   Startup is 1.1s in both. The whole of that gap is fill — a full-viewport
+   canvas shaded by the CPU, sixty times a second — and Phase 3.2C spent the
+   LOW tier's remaining dials on it: DPR 1.0, shadows off, thirty frames
+   instead of sixty. That cut total work by a fifth and long tasks to a
+   quarter, and TBT did not move. There is no tier below LOW that is still
+   the Living Ground, so the honest answer is the other layout.
+
+   WHERE THE DECISION IS TAKEN.  In the document head, before this module is
+   even requested — a page the gate sends to the fallback never fetches this
+   file or three.js at all. This block is the second gate, for the case where
+   this module is loaded without that head script: it must still be true that
+   nothing expensive is built before the question is asked.
+
+   WHAT DOES NOT DECIDE IT.  Not the user agent, not the viewport, not the
+   device pixel ratio, not the core count, not headlessness, and not any
+   audit tool. Those choose a TIER, never a LAYOUT.
+
+   ONE MODE OWNS THE PAGE AT A TIME.  Ranked, most authoritative first:
+   no JavaScript (nothing here runs; the stacked page is the document as
+   authored) → the capability gate → a context lost or a throw at runtime,
+   which calls fail() and hands over mid-visit. prefers-reduced-motion is
+   NOT one of these: it is a modifier inside whichever layout won, and §10
+   keeps it live in the scene while rk.css §20 answers it in both.
+   ========================================================================== */
+if (root.classList.contains('gd-off')) {
+  /* The gate already chose. Nothing to build, and nothing to wait for. */
+  root.classList.add('gd-ready');
+  return;
+}
+if (!root.classList.contains('gd-on') && !accelerated(params)) {
+  /* The head script did not run, and the probe run here says the same thing
+     it would have said. Take the fallback before a single vertex exists. */
+  root.classList.add('gd-off', 'gd-ready');
+  return;
+}
+
+/* WHY THE BUILD STARTS IMMEDIATELY, AND NOT AFTER THE FIRST PAINT.
+                                                                 [PHASE 3.2D]
+   It looks wrong. The navigation mark's bytes land at 738ms and do not reach
+   the screen until 1,874ms, which Lighthouse reads as 1,136ms of LCP render
+   delay, and letting the browser paint first is one line: two frames of rAF
+   before any of this runs. It was tried, three runs, and it is worse:
+
+     | hardware, mobile, Slow 4G | FCP    | LCP    | TBT    | score |
+     | build immediately         | 1.35 s | 1.89 s |   39ms | 99    |
+     | two rAF, then build       | 1.36 s | 1.88 s |  278ms | 94    |
+     | fetch the module on load  | 1.42 s | 1.83 s |  207ms | 96    |
+
+   Neither paint moved, and Total Blocking Time went up sevenfold. The reason
+   is that TBT counts blocking AFTER first paint. Starting the build inside
+   the window where the page is still waiting on its own stylesheet and its
+   own images spends that time twice — it is the only free CPU on the page,
+   and the eight-millisecond slices are what keep it free for the browser too.
+   Moving the build later does not make it cheaper, it only makes it visible.
+
+   FCP is 1.35s in every one of those three rows because it is not waiting on
+   this module at all: it is what the .gd-on layout costs to paint. See §9 of
+   the phase report for where the remaining 0.7 points actually live. */
+
 /* ==========================================================================
    01 — ENVIRONMENT
    ========================================================================== */
@@ -118,7 +250,6 @@ sliceT0 = performance.now();
 const RMQ = matchMedia('(prefers-reduced-motion: reduce)');
 let reduced = RMQ.matches;
 const coarse = matchMedia('(pointer: coarse)').matches;
-const params = new URLSearchParams(location.search);
 
 /* Deterministic debug states. Harmless in production: without ?scene= the
    whole branch is dead. Used for visual checkpoints during development —
@@ -2011,45 +2142,20 @@ if (!renderer || !renderer.getContext()) {
   return;
 }
 
-/* IS THERE ACTUALLY A GPU BEHIND THIS CONTEXT?                  [PHASE 3.2C]
-   A WebGL context is not a promise of hardware. When Chrome cannot use the
-   driver it falls back to SwiftShader and rasterises every pixel on the CPU,
-   silently — getContext still succeeds, MAX_TEXTURE_SIZE still looks fine,
-   and the head probe still sets .gd-on.
+/* No software-rasteriser branch here any more.                  [PHASE 3.2D]
+   Phase 3.2C asked the driver what it was at THIS point — after the strata,
+   the sward, the hardscape, the irrigation and the roots had all been built —
+   and then turned the LOW tier's dials down the rest of the way: DPR 1.0,
+   shadows off, thirty frames instead of sixty. It worked, in the sense that
+   total work fell by a fifth and long tasks by three quarters, and it did not
+   work, in the sense that TBT did not move at all.
 
-   Measured on this scene, at 412x823 with the stock mobile CPU throttle:
-
-       hardware rasteriser    main thread  1.9s    TBT     0ms    2 long tasks
-       software rasteriser    main thread 21.2s    TBT 5,400ms   20 long tasks
-
-   Startup is 1.1s in both. The entire difference is fill: 60 frames a second
-   of a full-viewport canvas, shaded by the CPU. No amount of work on the
-   startup path touches it, which is why an audit from a machine in this
-   state reported 41.7s of main-thread work against a page that measures 1.9s
-   on a machine with a working driver.
-
-   This is capability detection, in the same spirit as the hardwareConcurrency
-   and deviceMemory heuristics above it — it asks the driver what it is, not
-   who is looking. */
-const soft = (() => {
-  if (params.get('soft') === '1') return true;
-  if (params.get('soft') === '0') return false;
-  try {
-    const gl = renderer.getContext();
-    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
-    const name = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : '');
-    return /swiftshader|llvmpipe|software|basic render|mesa offscreen/i.test(name);
-  } catch (e) { return false; }
-})();
-
+   The question is now asked in §00, before anything is built, and a confirmed
+   software rasteriser never reaches this line: it gets the stacked page
+   instead. Everything from here down is a machine with a GPU, running the
+   scene at the tier §01 chose for it, and the adaptive guard in §10 is what
+   answers a GPU that turns out to be slower than its numbers suggested. */
 renderer.setClearColor(0x000000, 0);
-/* Fill cost is quadratic in DPR, so this is the one lever that matters when
-   the CPU is the rasteriser: 1.4 at 412x823 is 665k pixels a frame, 1.0 is
-   339k. Shadows go too — a second full pass over the scene is the last thing
-   a software rasteriser needs. The narrative, the geometry, the materials
-   and every chapter are untouched: this is the LOW tier's own dial, turned
-   the rest of the way down.                                     [PHASE 3.2C] */
-if (soft) Q = Object.assign({}, Q, { dpr: 1, shadow: 0 });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.12;
@@ -3056,7 +3162,7 @@ function introEase() {
 }
 let vw = 0, vh = 0, dpr = 1, lastBg = '', lastOut = '', lastHanded = false;
 let pendingResize = false;
-let last = performance.now(), slow = 0, downgraded = 0, lastDrawn = -1, softLast = 0;
+let last = performance.now(), slow = 0, downgraded = 0, lastDrawn = -1;
 
 /* WHERE THE SCROLL IS, WITHOUT ASKING THE LAYOUT.                [PHASE 3.2C]
    This used to be one getBoundingClientRect() per frame. That single call was
@@ -3364,30 +3470,25 @@ function frame(now) {
   const dt = now - last;
   last = now;
 
-  /* THIRTY FRAMES INSTEAD OF SIXTY, WHEN EACH ONE IS A CPU RASTER PASS.
-     Half the frames is half the fill, and at 30fps the damping and the grass
-     still read as motion rather than as steps — the timeline is driven by
-     scroll position, not by frame count, so nothing about the narrative's
-     pacing changes. Only drawing is skipped; p still advances every frame,
-     so the scene is never behind the scrollbar.                 [PHASE 3.2C] */
-  if (soft && now - softLast < 30) { raf = requestAnimationFrame(frame); return; }
-  softLast = now;
-
   /* Adaptive quality guard. If the device cannot hold ~38fps, drop DPR.
      Never the narrative, never the geometry.
 
      Two steps rather than one, and after twenty-five bad frames rather than
-     ninety: at 30fps ninety frames is three seconds of a visitor watching
-     the thing struggle before anything responds, and one step of 0.72 was
-     not enough to rescue a machine that was far off the pace. [PHASE 3.2C] */
+     ninety: ninety frames is a second and a half of a visitor watching the
+     thing struggle before anything responds, and one step of 0.72 was not
+     enough to rescue a machine that was far off the pace.       [PHASE 3.2C]
+
+     This is the only quality change that happens after startup, and it is
+     the answer to a GPU that turns out to be slower than its core count and
+     memory suggested. A machine with no GPU at all never gets here — §00
+     gave it the stacked page.                                   [PHASE 3.2D] */
   if (downgraded < 2 && dt > 26) {
     if (++slow > 25) {
       downgraded++;
       slow = 0;
       /* The floor stays at 1. Below it the canvas is visibly soft, and a
          phone that stutters for a moment is not a reason to hand its owner a
-         blurry model for the rest of the visit. Only a confirmed software
-         rasteriser goes lower, and it goes there deliberately, above. */
+         blurry model for the rest of the visit. */
       Q = Object.assign({}, Q, { dpr: Math.max(1, Q.dpr * 0.72) });
       dpr = Math.min(devicePixelRatio || 1, Q.dpr);
       renderer.setPixelRatio(dpr);
@@ -3578,6 +3679,18 @@ renderer.render(scene, camera);
 introT0 = performance.now();
 root.classList.add('gd-ready');
 start();
+
+/* DEBUG VISIBILITY, AND ONLY IN DEBUG.                          [PHASE 3.2D]
+   window.RK_GL is created by the capability gate in the document head, and
+   only when one of ?debug ?soft ?tier ?scene is present. It already carries
+   the renderer string, the hardware/software verdict and the reason; the
+   tier is the one thing the head cannot know, because it is chosen here.
+   Nothing is drawn on screen and an ordinary visitor gets no object at all. */
+if (window.RK_GL) {
+  window.RK_GL.tier = tier;
+  window.RK_GL.dpr = Q.dpr;
+  window.RK_GL.shadow = !!Q.shadow;
+}
 
 /* Expose a minimal handle for debugging without leaking the whole scene. */
 if (frozen !== null || params.has('tier')) {
