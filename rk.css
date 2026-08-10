@@ -1160,6 +1160,18 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
   text-wrap:balance;
 }
 .gd__h1 span{display:block}
+/* THE LINE BOX IS THE MASK.                                     [PHASE 3.2C]
+   The entrance used to animate clip-path on each line, which Chrome cannot
+   run on the compositor — Lighthouse reported it three times under
+   'avoid non-composited animations'. The mask is now a static overflow on
+   the line itself and only the inner box moves, on transform alone.
+   The padding/negative-margin pair reproduces the old end state exactly:
+   inset(-.28em 0 -.24em) was a mask that finished OUTSIDE the box so accents
+   and descenders were never clipped, and this is the same bleed expressed as
+   a padding box the overflow clips to. Nothing about the line's position in
+   the flow changes, so the datum solve underneath it is untouched. */
+.gd__h1 span>b{display:block;font-weight:inherit}
+.gd-on .gd__h1 span{overflow:hidden;padding:.28em 0 .24em;margin:-.28em 0 -.24em}
 /* nth-of-type, not nth-child: the datum is an element between lines two and
    three, and index-based selectors would silently shift onto it. */
 .gd__h1 span:nth-of-type(2){padding-left:.09em}
@@ -1255,27 +1267,23 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
    headline that is waiting for a class that is not coming. The head script
    guarantees .gd-ready lands either way.
    -------------------------------------------------------------------------- */
-.gd-on .gd__ch--hero .gd__h1 span,
+.gd-on .gd__ch--hero .gd__h1 span>b,
 .gd-on .gd__ch--hero .label,
 .gd-on .gd__ch--hero .gd__lede,
 .gd-on .gd__ch--hero .gd__cta,
 .gd-on .gd__ch--hero .gd__foot{
-  will-change:clip-path,opacity,transform;
+  will-change:opacity,transform;
 }
-.gd-on:not(.gd-ready) .gd__ch--hero .gd__h1 span{
-  clip-path:inset(0 0 106% 0);
-  transform:translateY(.20em);
+.gd-on:not(.gd-ready) .gd__ch--hero .gd__h1 span>b{
+  transform:translateY(calc(100% + .24em));
 }
-.gd-on .gd__ch--hero .gd__h1 span{
-  /* the vertical bleed keeps accents and descenders out of the mask edge */
-  clip-path:inset(-.28em 0 -.24em 0);
+.gd-on .gd__ch--hero .gd__h1 span>b{
   transform:none;
-  transition:clip-path .92s var(--ease-out) var(--i,0s),
-             transform .92s var(--ease-out) var(--i,0s);
+  transition:transform .92s var(--ease-out) var(--i,0s);
 }
-.gd-on .gd__ch--hero .gd__h1 span:nth-of-type(1){--i:.34s}
-.gd-on .gd__ch--hero .gd__h1 span:nth-of-type(2){--i:.44s}
-.gd-on .gd__ch--hero .gd__h1 span:nth-of-type(3){--i:.62s}
+.gd-on .gd__ch--hero .gd__h1 span:nth-of-type(1)>b{--i:.34s}
+.gd-on .gd__ch--hero .gd__h1 span:nth-of-type(2)>b{--i:.44s}
+.gd-on .gd__ch--hero .gd__h1 span:nth-of-type(3)>b{--i:.62s}
 
 .gd-on:not(.gd-ready) .gd__ch--hero .label,
 .gd-on:not(.gd-ready) .gd__ch--hero .gd__lede,
@@ -1299,13 +1307,12 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .gd-on:not(.gd-ready) .gd__horizon{opacity:0 !important}
 
 @media (prefers-reduced-motion:reduce){
-  .gd-on .gd__ch--hero .gd__h1 span,
+  .gd-on .gd__ch--hero .gd__h1 span>b,
   .gd-on .gd__ch--hero .label,
   .gd-on .gd__ch--hero .gd__lede,
   .gd-on .gd__ch--hero .gd__cta,
   .gd-on .gd__ch--hero .gd__foot{
     transition:none !important;opacity:1 !important;transform:none !important;
-    clip-path:none !important;
   }
 }
 
