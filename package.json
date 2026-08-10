@@ -1,0 +1,17 @@
+{
+  "name": "rapidkert",
+  "version": "3.2.3",
+  "private": true,
+  "type": "module",
+  "description": "Rapidkert — static site. The files at the repository root are the SOURCES; `npm run build` writes the deployable site to dist/.",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "python3 .claude/tools/rkguard.py rk.css && node --check rk.js && node --check rk-ground.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "lightningcss": "1.30.2",
+    "sharp": "0.34.5",
+    "three": "0.169.0"
+  }
+}

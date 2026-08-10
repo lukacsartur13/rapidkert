@@ -2507,6 +2507,15 @@ function updateSection(ex, w, h) {
   });
 }
 
+/* A label's height is a typographic fact, not a per-frame one: it changes when
+   the viewport changes or when the display face swaps in, and at no other
+   time. Reading offsetHeight inside the loop made every live annotation cost
+   a forced layout — on WATER and EXPLODED that is five or six per frame, all
+   returning the same number they returned last frame.            [PHASE 3.2C] */
+function measureLabelHeights() {
+  for (const l of labels) l.__lh = l.offsetHeight || 22;
+}
+
 function updateAnnotations(p, w, h) {
   const live = [];
   for (const l of labels) {
@@ -2571,7 +2580,7 @@ function updateAnnotations(p, w, h) {
     const lx = sx + side * gap;
     let ly = sy + off;
 
-    live.push({ l, lx, ly, sx, sy, side, fade, lh: l.offsetHeight || 22 });
+    live.push({ l, lx, ly, sx, sy, side, fade, lh: l.__lh || 22 });
   }
 
   /* THE LEADERS STOP AT THE COPY.                               [PHASE 3.1]
@@ -2903,15 +2912,42 @@ function introEase() {
   return e >= 1 ? 1 : 1 - Math.pow(1 - e, 3);
 }
 let vw = 0, vh = 0, dpr = 1, lastBg = '', lastOut = '', lastHanded = false;
+let pendingResize = false;
 let last = performance.now(), slow = 0, downgraded = false, lastDrawn = -1;
 
+/* WHERE THE SCROLL IS, WITHOUT ASKING THE LAYOUT.                [PHASE 3.2C]
+   This used to be one getBoundingClientRect() per frame. That single call was
+   the most expensive thing in the loop — 570ms of a 8.9s profile at 6x CPU,
+   more than the whole of apply() — because apply() writes styles and the next
+   frame's read then forces the engine to flush all of them back through
+   layout. Sixty synchronous layouts a second, to learn a number that only
+   changes when the visitor scrolls.
+
+   So the section's position and height are cached in DOCUMENT space, and the
+   scroll offset is captured in a passive scroll listener — where layout is
+   already clean — instead of being demanded mid-frame. A page standing still
+   now reads nothing at all, which is exactly the state Lighthouse measures.
+
+   The cache is invalidated by every event that can actually move the section:
+   viewport resize, orientation, font swap, and any change in the height of
+   the document above it (images arriving, the menu opening) via a
+   ResizeObserver on the body. */
+let secTop = 0, secSpan = 0, secMeasured = false, scrollNow = 0;
+
+function measureSection() {
+  const r = section.getBoundingClientRect();
+  secTop = r.top + (window.scrollY || 0);
+  secSpan = r.height - innerHeight;
+  secMeasured = true;
+}
 function readProgress() {
   if (frozen !== null) return frozen;
-  const r = section.getBoundingClientRect();
-  const total = r.height - innerHeight;
-  if (total <= 0) return 0;
-  return Math.min(Math.max(-r.top / total, 0), 1);
+  if (!secMeasured) measureSection();
+  if (secSpan <= 0) return 0;
+  return Math.min(Math.max((scrollNow - secTop) / secSpan, 0), 1);
 }
+addEventListener('scroll', () => { scrollNow = window.scrollY || 0; }, { passive: true });
+scrollNow = window.scrollY || 0;
 
 /* Reduced motion: snap to the nearest authored chapter instead of travelling
    through the timeline. The visitor still gets every composition — surface,
@@ -2927,9 +2963,14 @@ function snapProgress(v) {
 }
 
 function resize() {
+  /* clientWidth/clientHeight are layout reads, so this is no longer called
+     from frame(). Everything that can change the stage's size calls it
+     directly, and the loop only consults the flag those calls set. The old
+     per-frame invocation was a second forced layout on top of readProgress's
+     — the two together were most of the loop's main-thread cost. [PHASE 3.2C] */
   const w = stage.clientWidth || innerWidth;
   const h = stage.clientHeight || innerHeight;
-  if (w === vw && h === vh) return false;
+  if (w === vw && h === vh) { measureSection(); return false; }
   vw = w; vh = h;
   measureLayout();
   dpr = Math.min(devicePixelRatio || 1, Q.dpr);
@@ -2941,7 +2982,23 @@ function resize() {
   if (annoSvg) annoSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   measureDatum();
   measureChapterTops();
+  measureLabelHeights();
+  measureSection();
+  pendingResize = true;
   return true;
+}
+
+/* The stage's own size is not the only thing that can move the timeline under
+   the loop: anything that changes the height of the document above the
+   section does too. A ResizeObserver on the body catches the cases no resize
+   event does — late images, the mobile menu, a details element opening — and
+   costs nothing while the page is still.                        [PHASE 3.2C] */
+if (window.ResizeObserver) {
+  let roT = 0;
+  new ResizeObserver(() => {
+    clearTimeout(roT);
+    roT = setTimeout(() => { measureSection(); if (!running) draw(); }, 80);
+  }).observe(document.body);
 }
 
 const _pos = new THREE.Vector3(), _tgt = new THREE.Vector3();
@@ -3211,7 +3268,10 @@ function frame(now) {
     section.classList.toggle('is-handed', handed);
   }
 
-  const resized = resize();
+  /* resize() is a layout read and is no longer called from here; the events
+     that can actually change the stage's size raise this flag instead. */
+  const resized = pendingResize;
+  pendingResize = false;
 
   /* With the clock stopped, a frame is only worth drawing when the timeline
      has actually moved. This turns reduced motion into a genuinely idle
@@ -3259,7 +3319,10 @@ addEventListener('resize', () => { resize(); if (!running) draw(); }, { passive:
    face has actually rendered — measured against the fallback it can be most
    of a line out, and the specimen would sit visibly off the headline. */
 if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(() => { measureDatum(); measureChapterTops(); if (!running) draw(); });
+  document.fonts.ready.then(() => {
+    measureDatum(); measureChapterTops(); measureLabelHeights(); measureSection();
+    if (!running) draw();
+  });
 }
 /* Rotation resizes in two stages on iOS: the event fires while the old
    geometry is still reported, and the visual viewport settles a moment later.

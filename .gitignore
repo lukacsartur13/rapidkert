@@ -16,3 +16,8 @@
 
 # local preview mirror, if it is ever created inside the tree
 /preview-mirror/
+
+# build
+/node_modules/
+/dist/
+/.cache/

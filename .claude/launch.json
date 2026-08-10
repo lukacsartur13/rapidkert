@@ -48,7 +48,17 @@
       "runtimeArgs": [
         "/private/tmp/rk-serve-32c.sh"
       ],
-      "port": 8841
+      "port": 8841,
+      "url": "https://localhost:8841"
+    },
+    {
+      "name": "rapidkert-p32c-base",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": [
+        "/private/tmp/rk-serve-base.sh"
+      ],
+      "port": 8843,
+      "url": "https://localhost:8843"
     }
   ]
 }

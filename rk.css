@@ -38,6 +38,19 @@
   --moss:        #627056;   /* living green — restrained                 */
   --moss-lift:   #7C8C6C;   /* moss on dark backgrounds                  */
   --clay:        #A56F52;   /* warm accent — earth, terracotta           */
+  /* CLAY AS TEXT.                                              [PHASE 3.2C]
+     #A56F52 is 4.24:1 on --soil and 3.76:1 on --paper: the accent fails AA
+     for body-size text on BOTH of its grounds, and axe found it doing so
+     in 100 places — every plate number, spec number and eyebrow on the
+     inner pages. No single value can fix that: clearing 4.5:1 against a
+     0.885-luminance paper needs a colour below 0.158, and clearing it
+     against a 0.009-luminance soil needs one above 0.214.
+     So the accent itself is untouched — it still draws every rule, dot,
+     tick and leader line — and TEXT set in clay reads --clay-txt, which
+     the dark sections re-point below. Same hue, same terracotta, moved
+     along lightness only, which is what §49 asks for.                   */
+  --clay-txt:    #845942;   /* clay text on a LIGHT ground  — 5.39:1 on paper */
+  --clay-lift:   #B78C75;   /* clay text on a DARK ground   — 5.95:1 on soil  */
   --water:       #6E8794;   /* the one cool tone: water / irrigation     */
 
   /* Semantic ------------------------------------------------------------ */
@@ -167,6 +180,18 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 .rule{height:1px;background:var(--rule);border:0}
 .sec--dark .rule{background:var(--rule-dark)}
 
+/* THE DARK GROUNDS.                                            [PHASE 3.2C]
+   One inherited custom property instead of thirty-five edited rules: a
+   `color:var(--clay-txt)` anywhere inside these resolves to the light
+   terracotta, and the same declaration on a light page resolves to the
+   dark one. New dark sections get it for free by being listed here. */
+.sec--dark,.gd,.brg,.fld,.asm,.prf,.end,.grd,.pin,.rk-nav__panel,.lb,.film{
+  --clay-txt:var(--clay-lift);
+}
+/* ASSEMBLY turns its stage over to limestone halfway through. The token
+   has to turn with it or the station numerals go pale on white. */
+.asm__stage.is-lit,.asm.is-lit{--clay-txt:#845942}
+
 /* --------------------------------------------------------------------------
    04 — TYPOGRAPHY SYSTEM
    -------------------------------------------------------------------------- */
@@ -204,7 +229,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
   line-height:1;
 }
 .sec--dark .label{color:var(--on-dark-mute)}
-.label--clay{color:var(--clay)}
+.label--clay{color:var(--clay-txt)}
 
 /* Section plate header: 01 — TITLE with a rule running to the edge */
 .plate{
@@ -215,7 +240,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 .sec--dark .plate{border-color:var(--rule-dark)}
 .plate__no{
   font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.14em;color:var(--clay);flex:none;
+  letter-spacing:.14em;color:var(--clay-txt);flex:none;
 }
 .plate__title{
   font-family:var(--font-mono);font-size:var(--t-label);
@@ -392,7 +417,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 .topo path{fill:none;stroke:currentColor;vector-effect:non-scaling-stroke}
 .topo--ambient{opacity:.16;color:var(--moss-lift)}
 .topo--edge{opacity:.13;color:var(--limestone)}
-.topo--accent{opacity:.30;color:var(--clay);position:relative;inset:auto;height:64px}
+.topo--accent{opacity:.30;color:var(--clay-txt);position:relative;inset:auto;height:64px}
 
 /* --------------------------------------------------------------------------
    08 — NAVIGATION  (rk- prefixed: portable to the legacy inner pages)
@@ -516,7 +541,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 }
 .rk-menu__no{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  color:var(--clay);flex:none;width:2.4em;
+  color:var(--clay-txt);flex:none;width:2.4em;
   transition:transform var(--dur) var(--ease-out);
 }
 .rk-menu__txt{
@@ -617,7 +642,7 @@ h1,h2,h3,h4{font-weight:inherit;line-height:1}
 }
 .svc__no{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  color:var(--clay);align-self:start;padding-top:.55em;
+  color:var(--clay-txt);align-self:start;padding-top:.55em;
 }
 /* Both are <span> in the markup (they sit inside a link), so they must be
    made block-level explicitly or they run together on one line. */
@@ -685,7 +710,7 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 .proc{position:relative}
 .proc__path{
   position:absolute;left:0;right:0;top:0;height:min(62%,300px);
-  pointer-events:none;z-index:0;color:var(--clay);opacity:.42;
+  pointer-events:none;z-index:0;color:var(--clay-txt);opacity:.42;
 }
 .proc__path path{fill:none;stroke:currentColor;stroke-width:1;stroke-dasharray:var(--len,2000);stroke-dashoffset:var(--len,2000)}
 .proc.is-in .proc__path path{transition:stroke-dashoffset 2.2s var(--ease-out);stroke-dashoffset:0}
@@ -697,7 +722,7 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 .proc__step:nth-child(even){padding-top:clamp(60px,8vw,110px)}
 .proc__no{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
-  color:var(--clay);display:block;margin-bottom:1rem;
+  color:var(--clay-txt);display:block;margin-bottom:1rem;
   padding-bottom:.8rem;border-bottom:1px solid var(--rule);
 }
 .proc__step h3{
@@ -723,7 +748,8 @@ details.svc__row[open] > summary .display--lg{color:var(--moss)}
 .partners img:hover{opacity:.9}
 .partners__word{
   font-family:var(--font-display);font-weight:600;font-size:clamp(1rem,1.5vw,1.25rem);
-  letter-spacing:-.01em;color:var(--on-dark);opacity:.5;
+  /* .5 of --on-dark on --soil is 4.43:1 — five hundredths short. */
+  letter-spacing:-.01em;color:var(--on-dark);opacity:.54;
 }
 
 /* --------------------------------------------------------------------------
@@ -1211,7 +1237,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   display:flex;align-items:baseline;gap:.6em;
   transition:opacity var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);
 }
-.gd__rail li span{color:var(--clay)}
+.gd__rail li span{color:var(--clay-txt)}
 .gd__rail li.is-live{opacity:1;color:var(--on-dark)}
 .gd__rail li.is-live span{color:var(--moss-lift)}
 .gd-on .gd__ch--rail{align-items:flex-start}
@@ -1306,7 +1332,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   text-transform:uppercase;color:var(--on-dark-mute);white-space:nowrap;
 }
 .gd__horizon-l{left:var(--pad)}
-.gd__horizon-r{right:var(--pad);color:var(--clay)}
+.gd__horizon-r{right:var(--pad);color:var(--clay-txt)}
 
 /* --------------------------------------------------------------------------
    31.5 — ANNOTATIONS
@@ -1338,7 +1364,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   padding:.35em 0;
   display:flex;align-items:baseline;gap:.7em;
 }
-.gd__lbl b{font-weight:400;color:var(--clay)}
+.gd__lbl b{font-weight:400;color:var(--clay-txt)}
 .gd__lbl i{font-style:normal;color:var(--on-dark-mute);letter-spacing:.12em}
 .gd__lbl--tech b{
   color:var(--soil);background:var(--limestone);
@@ -1378,7 +1404,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 }
 .gd__dim-datum{
   translate:-100% -100%;
-  font-size:var(--t-label);letter-spacing:.14em;color:var(--clay);
+  font-size:var(--t-label);letter-spacing:.14em;color:var(--clay-txt);
 }
 .gd__dim-datum i{font-style:normal;color:var(--on-dark-mute);letter-spacing:.2em}
 .gd__dim-cap{
@@ -2067,7 +2093,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   opacity:clamp(0,calc((var(--q) - .30) / .28),1);
   transform:translateY(calc((1 - clamp(0,calc((var(--q) - .30) / .28),1)) * 14px));
 }
-.brg__eyebrow{color:var(--clay);margin-bottom:.9rem}
+.brg__eyebrow{color:var(--clay-txt);margin-bottom:.9rem}
 /* SECTION scale, not monumental. The monumental register on this page belongs
    to the hero, the three services, the proof and the closing line; if every
    section headline is also 7.6vw there is no hierarchy, only size. */
@@ -2271,7 +2297,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   opacity:calc(clamp(0,calc(1 - var(--close,0) * 2.4),1) * (1 - var(--veil,0) * .88));
 }
 .fld__hud-l{top:clamp(84px,12vh,124px);left:var(--pad)}
-.fld__hud-r{top:clamp(84px,12vh,124px);right:var(--pad);color:var(--clay)}
+.fld__hud-r{top:clamp(84px,12vh,124px);right:var(--pad);color:var(--clay-txt)}
 .fld__hud-n{
   left:var(--pad);bottom:clamp(28px,5vh,54px);
   font-size:clamp(2.2rem,4.4vw,3.6rem)!important;letter-spacing:-.03em!important;
@@ -2804,7 +2830,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   display:flex;align-items:baseline;gap:clamp(14px,2.4vw,40px);
   padding-bottom:.9rem;border-bottom:1px solid var(--rule);
 }
-.lyr__no{color:var(--clay);flex:none}
+.lyr__no{color:var(--clay-txt);flex:none}
 .lyr__h2{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
   font-size:clamp(.95rem,1.5vw,1.25rem);letter-spacing:-.01em;
@@ -2823,7 +2849,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .lyr__it.is-live{opacity:1;visibility:visible}
 .lyr__it-no{
   display:block;font-family:var(--font-mono);font-size:var(--t-label);
-  letter-spacing:.16em;color:var(--clay);margin-bottom:1.1rem;
+  letter-spacing:.16em;color:var(--clay-txt);margin-bottom:1.1rem;
 }
 /* MONUMENTAL. This is one of the four places on the page allowed to be this
    size, and it is allowed to run nearly the full measure. Word-level
@@ -2927,7 +2953,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
    measure again and the gutter comes back. */
 .asm__head{position:absolute;left:0;right:0;top:clamp(84px,12vh,124px)}
 .asm__head .asm__h2,.asm__head .asm__lede{width:min(38%,44ch)}
-.asm__no{display:block;color:var(--clay);margin-bottom:.9rem}
+.asm__no{display:block;color:var(--clay-txt);margin-bottom:.9rem}
 .asm__h2{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
   font-size:clamp(1.8rem,3.4vw,3rem);letter-spacing:-.03em;line-height:.98;
@@ -2974,7 +3000,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   content:"";position:absolute;top:0;left:0;width:1px;height:12px;
   background:var(--rule-dark);
 }
-.asm__stations li b{font-weight:400;color:var(--clay);margin-right:.7em;opacity:.5;transition:opacity .4s var(--ease)}
+.asm__stations li b{font-weight:400;color:var(--clay-txt);margin-right:.7em;opacity:.5;transition:opacity .4s var(--ease)}
 .asm__stations li.is-live{color:var(--on-dark)}
 .asm__stations li.is-live b{opacity:1}
 .asm__stations li.is-done{color:rgba(232,229,218,.55)}
@@ -3069,7 +3095,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
    rule the previous section had left. There is one grade line on this
    page and it belongs to the world; the claim stands above it and its
    qualifier hangs under it, which is what the composition always meant. */
-.prf__no{position:absolute;top:clamp(84px,12vh,124px);left:0;color:var(--clay)}
+.prf__no{position:absolute;top:clamp(84px,12vh,124px);left:0;color:var(--clay-txt)}
 .prf__of{position:absolute;top:clamp(84px,12vh,124px);right:0;color:var(--fg-mute)}
 .prf__of i{font-style:normal;color:var(--fg)}
 
@@ -3176,7 +3202,10 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .prf__foot .partners{border-color:var(--rule)}
 .prf__foot .partners img{filter:grayscale(1);opacity:.42}
 .prf__foot .partners img:hover{opacity:.8}
-.prf__foot .partners__word{color:var(--fg);opacity:.42}
+/* .42 put --soil at #979691 on paper: 2.64:1, and this is a partner's
+   NAME, not decoration. .62 is 4.79:1 and still sits behind the row's
+   logotypes, which are images and carry no contrast requirement. */
+.prf__foot .partners__word{color:var(--fg);opacity:.62}
 
 /* --------------------------------------------------------------------------
    32.6 — SPECIFICATION SHEET  (FAQ)
@@ -3240,7 +3269,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 }
 .sheet__head::before{bottom:-6px}
 .sheet__row > summary::before{top:0}
-.sheet__no{color:var(--clay)}
+.sheet__no{color:var(--clay-txt)}
 .sheet__h2{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
   font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.015em;
@@ -3258,7 +3287,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .sheet__row > summary::-webkit-details-marker{display:none}
 .sheet__i{
   font-family:var(--font-mono);font-size:clamp(1rem,1.5vw,1.3rem);
-  letter-spacing:.04em;color:var(--clay);
+  letter-spacing:.04em;color:var(--clay-txt);
 }
 .sheet__q{
   font-family:var(--font-display);font-weight:500;
@@ -3357,7 +3386,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   position:relative;z-index:2;padding-bottom:clamp(2.2rem,5vh,4rem);
   transform:translate3d(0,calc(var(--g-lift,0) * -1svh),0);
 }
-.grd__no{display:block;color:var(--clay);margin-bottom:1.6rem}
+.grd__no{display:block;color:var(--clay-txt);margin-bottom:1.6rem}
 /* MONUMENTAL — the fourth and last time on the page. */
 .grd__h2{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
@@ -3386,7 +3415,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   position:absolute;top:.9em;color:var(--on-dark-mute);white-space:nowrap;
 }
 .grd__mk--l{left:var(--pad)}
-.grd__mk--r{right:var(--pad);color:var(--clay)}
+.grd__mk--r{right:var(--pad);color:var(--clay-txt)}
 .grd__turf{position:absolute;left:0;right:0;bottom:0;height:18px;width:100%;
   transition:opacity .4s var(--ease)}
 .grd__turf path{fill:none;stroke:var(--moss-lift);stroke-width:1.2;opacity:.7;vector-effect:non-scaling-stroke}
@@ -4012,7 +4041,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .rk-menu__link[aria-current="page"] .rk-menu__no{color:var(--limestone)}
 .rk-menu__link[aria-current="page"] .rk-menu__txt{color:var(--moss-lift)}
 .rk-menu__link[aria-current="page"] .rk-menu__tag::after{
-  content:" ·  Jelenlegi oldal";color:var(--clay);
+  content:" ·  Jelenlegi oldal";color:var(--clay-txt);
 }
 
 /* --------------------------------------------------------------------------
@@ -4039,7 +4068,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 }
 .pin__eyebrow b{
   font-family:var(--font-mono);font-size:var(--t-label);font-weight:400;
-  letter-spacing:.18em;text-transform:uppercase;color:var(--clay);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--clay-txt);
 }
 .pin__eyebrow span{
   font-family:var(--font-mono);font-size:var(--t-label);
@@ -4125,7 +4154,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .sec--dark .spec__it{border-color:var(--rule-dark)}
 .spec__no{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;
-  color:var(--clay);
+  color:var(--clay-txt);
 }
 .spec__k{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
@@ -4183,7 +4212,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   border-bottom:1px solid var(--rule);
 }
 .sec--dark .xnav a{border-color:var(--rule-dark)}
-.xnav__no{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;color:var(--clay)}
+.xnav__no{font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.14em;color:var(--clay-txt)}
 .xnav__t{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
   font-size:clamp(1.2rem,2.8vw,2.2rem);letter-spacing:-.03em;line-height:1;
@@ -4342,7 +4371,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .sec--dark .arch__mk{border-color:var(--rule-dark)}
 .arch__mk b{
   font-family:var(--font-mono);font-size:var(--t-label);font-weight:400;
-  letter-spacing:.14em;color:var(--clay);
+  letter-spacing:.14em;color:var(--clay-txt);
 }
 .arch__mk span{
   font-family:var(--font-mono);font-size:var(--t-label);
@@ -4385,7 +4414,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .sec--dark .arch__cap{border-color:var(--rule-dark);color:var(--on-dark-mute)}
 .arch__cap b{color:var(--fg);font-weight:400;flex:none}
 .sec--dark .arch__cap b{color:var(--on-dark)}
-.arch__cap .arch__tag{margin-left:auto;color:var(--clay);flex:none}
+.arch__cap .arch__tag{margin-left:auto;color:var(--clay-txt);flex:none}
 /* The descriptive line is normally quiet and lifts on pointer/focus. */
 .arch__desc{
   display:block;margin-top:.6rem;font-family:var(--font-ui);font-size:var(--t-sm);
@@ -4431,7 +4460,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   font-family:var(--font-mono);font-size:var(--t-label);
   letter-spacing:.16em;text-transform:uppercase;
 }
-.lb__count{color:var(--clay)}
+.lb__count{color:var(--clay-txt)}
 .lb__ttl{color:var(--on-dark-mute)}
 .lb__x{
   margin-left:auto;display:flex;align-items:center;gap:.7em;
@@ -4500,7 +4529,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
   text-transform:uppercase;color:var(--on-dark-mute);
 }
-.frm__f label .req{color:var(--clay)}
+.frm__f label .req{color:var(--clay-txt)}
 .frm__f input,.frm__f select,.frm__f textarea{
   font:inherit;font-size:var(--t-body);color:var(--on-dark);
   background:transparent;border:0;border-bottom:1px solid var(--rule-dark);
@@ -4528,13 +4557,13 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .frm__f.is-bad input,.frm__f.is-bad select,.frm__f.is-bad textarea{border-bottom-color:var(--clay)}
 .frm__err{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.11em;
-  text-transform:uppercase;color:var(--clay);display:none;
+  text-transform:uppercase;color:var(--clay-txt);display:none;
 }
 .frm__f.is-bad .frm__err{display:block}
 .frm__note{
   font-size:var(--t-sm);color:var(--on-dark-mute);max-width:62ch;line-height:1.6;
 }
-.frm__note .req{color:var(--clay)}
+.frm__note .req{color:var(--clay-txt)}
 .frm__status{
   display:none;padding:1.1rem 1.3rem;border-left:2px solid var(--moss-lift);
   background:var(--soil-2);font-size:var(--t-sm);line-height:1.6;color:var(--on-dark);
@@ -4555,7 +4584,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 }
 .cx__k{
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--clay);
+  text-transform:uppercase;color:var(--clay-txt);
 }
 .cx__v{font-size:var(--t-md);color:var(--on-dark);line-height:1.35}
 .cx__v small{
@@ -4577,7 +4606,7 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .doc .eyebrow,.legal .eyebrow{
   display:block;margin-bottom:1.4rem;
   font-family:var(--font-mono);font-size:var(--t-label);letter-spacing:.18em;
-  text-transform:uppercase;color:var(--clay);
+  text-transform:uppercase;color:var(--clay-txt);
 }
 .doc h1,.legal h1{
   font-family:var(--font-display);text-transform:uppercase;font-weight:600;
@@ -4917,7 +4946,11 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
   position:relative;
   font-family:var(--font-mono);font-size:var(--t-label);
   letter-spacing:.15em;text-transform:uppercase;color:var(--on-dark);
-  opacity:.55;padding:.4em 0;
+  /* .55 reads 5.08:1 over the dark bar but the SOLID bar recolours this to
+     --fg over paper, where the same .55 is 3.81:1. The inactive language is
+     a link a visitor is meant to be able to read before deciding to use it,
+     so it takes the value that clears AA on both grounds.     [PHASE 3.2C] */
+  opacity:.62;padding:.4em 0;
   transition:opacity var(--dur-fast) var(--ease),color .45s var(--ease);
 }
 .rk-lang__i:hover{opacity:.9}
@@ -4952,7 +4985,10 @@ html:not(.gd-on) .gd__ch--hero .gd__datum{height:.34em}
 .rk-nav.is-solid .rk-lang__sep,
 .rk-nav.is-locked .rk-lang__i,
 .rk-nav.is-locked .rk-lang__sep{color:var(--fg)}
-.rk-nav.is-film .rk-lang__i{opacity:.46}
+/* The film bar sits over the full-bleed plate and steps everything back; .46
+   put the inactive language at 4.0:1, so it steps back to the AA floor and
+   no further. */
+.rk-nav.is-film .rk-lang__i{opacity:.54}
 .rk-nav.is-film .rk-lang__i[aria-current]{opacity:.82}
 .rk-nav.is-film .rk-lang__i:hover{opacity:1}
 
