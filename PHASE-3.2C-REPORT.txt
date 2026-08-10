@@ -731,6 +731,26 @@ Other pages, same profile:
 
 Calibrated profile (9x), production build:  98 / 98 / 98, Accessibility 100.
 
+DEPLOYED — https://lukacsartur13.github.io/rapidkert/ after the push, which is
+the SOURCE tree, because the Pages source is still "Deploy from a branch":
+
+  RUN 1   Performance 90   Accessibility 100   FCP 2.67  LCP 2.97  TBT  0  CLS 0
+  RUN 2   Performance 82   Accessibility 100   FCP 3.08  LCP 3.46  TBT 13  CLS 0
+  RUN 3   Performance 83   Accessibility 100   FCP 3.27  LCP 3.65  TBT 14  CLS 0
+
+  Against the same URL before the push: 86 / 78, Accessibility 96, TBT 253/36
+  — and 57 / 94 with TBT 1,820ms on the machine that produced the brief's
+  audit. Accessibility is 100 on the live site now. Total Blocking Time is
+  effectively zero on the live site now.
+
+  The 82–90 spread is GitHub Pages' own network variance: FCP moves between
+  2.67s and 3.27s across three runs of an identical document. The local
+  harness does not have that noise, which is why iteration happened there.
+
+  The remaining distance from 83–90 to 99 is entirely the build — minified
+  CSS and JS, the tree-shaken Three, the critical-CSS split, the 4KB logos
+  and the AVIF plates — none of which Pages is serving yet.
+
 
 ════════════════════════════════════════════════════════════════════════════
 16 — WHAT WAS NOT DONE
