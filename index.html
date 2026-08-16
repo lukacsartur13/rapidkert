@@ -81,15 +81,40 @@
     if (!gl || gl.getParameter(gl.MAX_TEXTURE_SIZE) < 2048) {
       off = true; why = 'no-webgl';
     } else {
+      /* FOUR PLACES THE SAME FACT CAN BE WRITTEN, AND THE BROWSER PICKS.
+         WEBGL_debug_renderer_info is the extension every browser has answered
+         for a decade, and it is the one this gate was first built on. It is
+         also the one being retired: Chrome is moving the unmasked strings
+         onto the plain RENDERER and VENDOR parameters, so a browser that has
+         already dropped the extension leaves the old path holding nothing —
+         and nothing reads as "ambiguous", which keeps the scene. That is the
+         right default for a privacy setting and the wrong one for a CPU
+         rasteriser, and the two were indistinguishable here.
+
+         Reading all four costs two more getParameter calls and removes the
+         single point of failure: a rasteriser that names itself in ANY of
+         them is caught. `name` stays the renderer's identity for the debug
+         object, and the masked placeholders are not identities, so a browser
+         that is withholding still lands on the ambiguous branch.  [PHASE 3.2E] */
       var dbg = gl.getExtension('WEBGL_debug_renderer_info');
-      name = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || '') : '';
+      var plain = String(gl.getParameter(gl.RENDERER) || '');
+      var said = plain + ' ' + String(gl.getParameter(gl.VENDOR) || '');
+      if (dbg) {
+        said += ' ' + String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || '') +
+                ' ' + String(gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) || '');
+        name = String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || '');
+      }
+      /* The generic strings a browser substitutes for the real one. None of
+         them names a renderer, so none of them counts as one. */
+      if (!name && !/^(webkit webgl|mozilla|opera|)$/i.test(plain)) name = plain;
+
       /* CONSERVATIVE ON PURPOSE. Firefox behind privacy.resistFingerprinting,
-         and any browser that decides WEBGL_debug_renderer_info is too much
-         information, leave this empty. Unknown is NOT software: a capable
+         and any browser that decides the renderer is too much information,
+         leave all four empty or generic. Unknown is NOT software: a capable
          visitor must never lose the experience to a privacy setting. The
          quality tiers and the adaptive frame guard handle the rest. */
-      if (!name) why = 'renderer-withheld';
-      else if (SOFT.test(name)) { off = true; why = 'software-rasteriser'; }
+      if (SOFT.test(said)) { off = true; why = 'software-rasteriser'; }
+      else if (!name) why = 'renderer-withheld';
     }
   } catch (e) { off = true; why = 'no-webgl'; }
 
