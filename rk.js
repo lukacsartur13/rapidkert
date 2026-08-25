@@ -4223,12 +4223,60 @@
       /* The rail's length is the distance from the top of the section to
          grade, measured rather than assumed — the header block above it is
          two fluid clamps and a headline that wraps differently at every
-         width, so any figure written here would be right at one viewport. */
+         width, so any figure written here would be right at one viewport.
+
+         MEASURED AS A DELTA BETWEEN TWO RECTS, NEVER AS offsetTop. offsetTop
+         is reported against the offsetParent, and the offsetParent is only
+         this section while this section is positioned. .grd gets its
+         position:relative from §32.0 of the stylesheet, ~1500 rules in, and
+         this file is `defer` — which orders it after the DOM but NOT after
+         the last byte of a 250KB stylesheet has been applied. Lose that race
+         and .grd is still static, the offsetParent walks up to <body>, and
+         offsetTop returns the line's offset within the WHOLE DOCUMENT —
+         ~20000px instead of ~350px. That number went into --rail-h, and
+         .grd__rail is absolutely positioned, so the section grew a
+         20000px-tall invisible child: an entire page of blank document
+         hanging off the end, below the footer. Two rects subtracted are
+         always intra-section, whatever position the section is holding. */
       function measure() {
-        if (rail) sec.style.setProperty('--rail-h', line.offsetTop + 'px');
+        if (!rail) return;
+        var h = line.getBoundingClientRect().top - sec.getBoundingClientRect().top;
+        /* A rect delta cannot run away, but it CAN still be read before the
+           stylesheet lands, when the clamps above the line are unresolved.
+           Nothing here is additive, so the last write wins and re-running it
+           is free: same input, same geometry, every time. */
+        sec.style.setProperty('--rail-h', (h > 0 ? h : 0).toFixed(1) + 'px');
       }
       measure();
       window.addEventListener('resize', measure, { passive: true });
+
+      /* AND MEASURE AGAIN WHENEVER THE ANSWER CAN HAVE CHANGED. The first
+         read above is not trustworthy on the built site: the stylesheet ships
+         as <link rel=preload onload="this.rel='stylesheet'">, so it is applied
+         ASYNCHRONOUSLY and does not hold up DOMContentLoaded or load — this
+         file can and does run first, against a section that has not been
+         styled yet. Waiting on `load` is not a fix for that; load has already
+         fired by then.
+
+         Two boxes decide where grade sits: this section's own padding-top and
+         the height of the header block standing on it. Watching them directly
+         covers every way the figure moves — the stylesheet landing, a webfont
+         swapping under the headline, a rotation, a wrap at a new width —
+         without naming a lifecycle moment and hoping it is late enough.
+
+         No feedback loop: --rail-h only sizes .grd__rail, which is absolutely
+         positioned and so contributes nothing back to either observed box. */
+      if (window.ResizeObserver) {
+        var ro = new ResizeObserver(measure);
+        ro.observe(sec);
+        var above = sec.querySelector('.grd__above');
+        if (above) ro.observe(above);
+      } else {
+        /* Without an observer, the latest moments still worth re-reading. */
+        window.addEventListener('load', measure);
+        window.addEventListener('pageshow', measure);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+      }
 
       /* Stilled, not absent: the rail is the section's one inherited
          object and every other value here already defaults to its

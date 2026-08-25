@@ -126,6 +126,12 @@
 html{
   -webkit-text-size-adjust:100%;
   scroll-behavior:smooth;
+  /* THE CANVAS, NOT THE PAGE. body still carries --bg, so every light
+     section is composed exactly as before; this only paints the strip
+     BEYOND the body box, which is all the visitor can rubber-band into.
+     The document opens on the ground section and closes on the footer —
+     dark at both ends — so overscroll should show ground, not paper. */
+  background:var(--soil);
 }
 body{
   font-family:var(--font-ui);
