@@ -1,0 +1,37 @@
+# Rapidkert Kft.
+
+> Kertépítés és automata öntözőrendszer tervezése és kivitelezése Győrben és környékén. Tereprendezéstől az öntözésig, egy csapattól. Ingyenes helyszíni felmérés.
+> Garden construction and automatic irrigation, planned and built in Győr, Hungary and the surrounding area. Earthworks to handover, from one team. Free site survey.
+> 9025 Győr, Ikrényi út 14., Magyarország — +36 30 726 0024 — info@rapidkert.com
+
+A honlap két nyelven érhető el: magyarul a gyökérben, angolul a /en/ alatt. A három
+jogi dokumentum csak magyarul létezik.
+
+The site is published in two languages: Hungarian at the root, English under /en/.
+The three legal documents exist in Hungarian only.
+
+## Magyar oldalak
+
+- [Kertépítés és öntözőrendszer Győr](https://rapidkert.com/): Kertépítés és automata öntözőrendszer tervezése és kivitelezése Győrben és környékén. Tereprendezéstől az öntözésig, egy csapattól. Ingyenes helyszíni felmérés.
+- [Kertépítés Győr – tervezés és kivitelezés](https://rapidkert.com/kertepites-gyor.html): Kulcsrakész kertépítés Győrben és környékén: tereprendezés, gyepesítés, növénytelepítés, térburkolat. Tervezéstől az átadásig, egy csapattól, garanciával.
+- [Öntözőrendszer Győr – tervezés és kivitelezés](https://rapidkert.com/ontozorendszer-gyor.html): Automata öntözőrendszer tervezése és kivitelezése Győrben és környékén. Zónázott rendszer okos vezérléssel, a vízforrásod valós adataira méretezve.
+- [Felszín alatti öntözés Győr – SDI rendszer](https://rapidkert.com/felszin-alatti-ontozes.html): Felszín alatti, gyökérzónás csepegtető öntözés (SDI) Győrben és környékén. Szórófej nélkül, párolgásmentesen, akár 70% vízmegtakarítással.
+- [Referenciák – megvalósult kertjeink](https://rapidkert.com/referenciak.html): Megvalósult kertépítési és öntözőrendszer munkáink Győrben és környékén. Nézd meg, hogyan lesz üres telekből vagy elhanyagolt udvarból kész, élhető kert.
+- [Kapcsolat és ajánlatkérés](https://rapidkert.com/kapcsolat.html): Kérj ingyenes helyszíni felmérést és tételes ajánlatot kertépítésre vagy öntözőrendszerre Győrben és környékén. Hívj: +36 30 726 0024.
+- [Rólunk – kertépítő csapat Győrben](https://rapidkert.com/rolunk.html): A Rapidkert győri kertépítő és öntözéstechnikai csapat. Tervezés és kivitelezés egy kézben, a felméréstől az átadásig. Ismerd meg, hogyan dolgozunk.
+
+## English pages
+
+- [Garden construction and irrigation in Győr, Hungary](https://rapidkert.com/en/): Garden construction and automatic irrigation, planned and built in Győr, Hungary and the surrounding area. Earthworks to handover, from one team. Free site survey.
+- [Garden construction in Győr – planned and built](https://rapidkert.com/en/garden-construction.html): Turnkey garden construction in Győr, Hungary and the surrounding area: earthworks, turfing, planting, paving. From plan to handover, from one team, with a warranty.
+- [Irrigation systems in Győr – designed and installed](https://rapidkert.com/en/irrigation-systems.html): Automatic irrigation systems designed and installed in Győr, Hungary and the surrounding area. Zoned, smart-controlled, and sized on the real figures from your water source.
+- [Subsurface irrigation in Győr – SDI systems](https://rapidkert.com/en/subsurface-irrigation.html): Subsurface drip irrigation (SDI) in Győr, Hungary and the surrounding area. Water delivered straight to the root zone, no sprinklers, no evaporation — up to 70% less water.
+- [Projects – gardens we have built](https://rapidkert.com/en/projects.html): Completed garden construction and irrigation projects in Győr, Hungary and the surrounding area. See how an empty plot or a neglected yard becomes a finished garden.
+- [Contact and quote requests](https://rapidkert.com/en/contact.html): Book a free site survey and an itemised quote for garden construction or irrigation in Győr, Hungary and the surrounding area. Call +36 30 726 0024.
+- [About – a garden construction team in Győr](https://rapidkert.com/en/about.html): Rapidkert is a garden construction and irrigation team based in Győr, Hungary. Planning and building in one pair of hands, from survey to handover.
+
+## Optional
+
+- [Impresszum](https://rapidkert.com/impresszum.html): A Rapidkert Kft. impresszuma: szolgáltatói adatok, elérhetőség, tárhelyszolgáltató és felelősségi nyilatkozat.
+- [Adatkezelési tájékoztató](https://rapidkert.com/adatkezelesi-tajekoztato.html): A Rapidkert Kft. adatkezelési tájékoztatója: milyen adatokat kezelünk, milyen célból, meddig, és milyen jogaid vannak. GDPR szerint.
+- [Cookie tájékoztató](https://rapidkert.com/cookie-tajekoztato.html): A rapidkert.com cookie (süti) tájékoztatója: milyen sütiket használ a weboldal, és hogyan kezelheted őket.

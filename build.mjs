@@ -238,7 +238,7 @@ for (const f of referenced) {
 }
 
 /* Unhashed passthroughs: crawler-facing files whose URLs are public contracts. */
-for (const f of ['robots.txt', 'sitemap.xml', 'assets.json']) {
+for (const f of ['robots.txt', 'sitemap.xml', 'assets.json', 'llms.txt']) {
   if (fs.existsSync(path.join(ROOT, f))) fs.copyFileSync(path.join(ROOT, f), path.join(DIST, f));
 }
 

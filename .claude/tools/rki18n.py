@@ -158,6 +158,43 @@ def check(root='.'):
             fails.append(f'{p}: links to {bad} — a duplicate URL for a page that '
                          f'already has a canonical one; link the directory instead')
 
+    # 10 — inLanguage belongs to CreativeWork, not to the business or its
+    # services. schema.org lists the property on CreativeWork, Event,
+    # BroadcastService and a few actions; LocalBusiness is an Organization and
+    # a Place, and Service is an Intangible, so neither may carry it. Tagging
+    # the English tree by hand is exactly how it got onto all four in the
+    # first place, and only the LocalBusiness one was loud enough for an
+    # external validator to catch.
+    CREATIVEWORK = {'CreativeWork', 'WebPage', 'AboutPage', 'ContactPage',
+                    'CollectionPage', 'WebSite', 'FAQPage', 'ItemPage',
+                    'Article', 'Event', 'BroadcastService'}
+
+    def scan(node, path, where):
+        if isinstance(node, list):
+            for i, x in enumerate(node):
+                scan(x, f'{path}[{i}]', where)
+            return
+        if not isinstance(node, dict):
+            return
+        if 'inLanguage' in node:
+            t = str(node.get('@type'))
+            if t not in CREATIVEWORK:
+                fails.append(f'{where}: inLanguage on {t} at {path or "(root)"} — '
+                             f'schema.org allows it on CreativeWork and Event, '
+                             f'not on a business or a service')
+        for k, v in node.items():
+            scan(v, f'{path}.{k}', where)
+
+    for p in [r for pair in ROUTES for r in pair[:2]] + HU_ONLY:
+        if not os.path.exists(os.path.join(root, p)):
+            continue
+        for b in re.findall(r'<script type="application/ld\+json">(.*?)</script>',
+                            read(root, p), re.S):
+            try:
+                scan(json.loads(b), '', p)
+            except Exception:
+                pass          # check 8 already reports blocks that do not parse
+
     for p in HU_ONLY:
         need(p, 'Hungarian-only legal document')
 
