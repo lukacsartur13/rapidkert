@@ -283,7 +283,7 @@ for (const doc of HTML) {
   for (const [src, out] of imageMap) {
     const to = out.plain || out.png || out.jpg;
     t = t.split(`"${prefix}${src}"`).join(`"${P(to)}"`);
-    t = t.split(`https://www.rapidkert.com/${src}`).join(`https://www.rapidkert.com/${to}`);
+    t = t.split(`https://rapidkert.com/${src}`).join(`https://rapidkert.com/${to}`);
   }
 
   t = minifyHtml(t);

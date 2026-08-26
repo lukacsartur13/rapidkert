@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.rapidkert.com/sitemap.xml
+Sitemap: https://rapidkert.com/sitemap.xml

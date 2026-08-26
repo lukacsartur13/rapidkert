@@ -27,7 +27,7 @@ exit 0 = PASS, 1 = FAIL
 """
 import json, os, re, sys
 
-BASE = 'https://www.rapidkert.com/'
+BASE = 'https://rapidkert.com/'
 
 # HU route, EN route, and the canonical URL each one must declare.
 ROUTES = [
@@ -39,6 +39,13 @@ ROUTES = [
     ('rolunk.html',               'en/about.html',                 None, None),
     ('kapcsolat.html',            'en/contact.html',               None, None),
 ]
+
+# The two homepages are reached by DIRECTORY, never by filename. GitHub Pages
+# answers /index.html and /en/index.html with 200 rather than a redirect, so a
+# link to the filename hands a crawler a second URL for a page that already has
+# a canonical one — the duplicate-content half of the Semrush sitemap finding.
+# Every other route is a real filename and links as itself.
+LINK_FORM = {'index.html': './', 'en/index.html': 'en/'}
 
 # Hungarian-only by decision, not by omission: these are the filings of a
 # Hungarian company and no English version of them has been approved.
@@ -105,8 +112,10 @@ def check(root='.'):
             if 'rk-lang__i' not in s:
                 fails.append(f'{path}: no language switch')
             else:
-                want = ('../' + hu) if lang == 'en' else (en if path == 'index.html' else en)
-                want = ('../' + hu) if lang == 'en' else en
+                if lang == 'en':
+                    want = '../' if hu == 'index.html' else '../' + hu
+                else:
+                    want = LINK_FORM.get(en, en)
                 if f'href="{want}"' not in s:
                     fails.append(f'{path}: language switch does not link to its counterpart '
                                  f'(expected href="{want}")')
@@ -137,6 +146,17 @@ def check(root='.'):
                 fails.append(f'{en}: does not load {a}')
         if en == 'en/index.html' and '../rk-ground.js' not in s:
             fails.append('en/index.html: does not load ../rk-ground.js')
+
+    # 9 — nobody reintroduces the duplicate homepage URL. A link to
+    # index.html, en/index.html or ../index.html resolves to the same document
+    # as ./, en/ and ../ do, but it is a DIFFERENT URL to a crawler, and it is
+    # not the one the canonical names.
+    for p in [r for pair in ROUTES for r in pair[:2]] + HU_ONLY:
+        if not os.path.exists(os.path.join(root, p)):
+            continue
+        for bad in re.findall(r'href="((?:\.\./|en/)?index\.html)"', read(root, p)):
+            fails.append(f'{p}: links to {bad} — a duplicate URL for a page that '
+                         f'already has a canonical one; link the directory instead')
 
     for p in HU_ONLY:
         need(p, 'Hungarian-only legal document')

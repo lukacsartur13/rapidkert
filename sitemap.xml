@@ -3,82 +3,91 @@
      legal documents are Hungarian-only and carry no alternate, because there
      is no English version of them to declare — see the note in the English
      footer, which says so in English before the link is clicked. -->
+
+<!-- HOST: the apex, never www. GitHub Pages serves this site on
+     rapidkert.com and answers every www.rapidkert.com request with a 301 to
+     the apex, so a www URL here is a redirect, and a sitemap full of
+     redirects is what Semrush flags (and what a crawler wastes its budget
+     on). Every <loc>, every xhtml:link href, every canonical and hreflang in
+     the HTML, and the Sitemap: line in robots.txt use the bare apex for the
+     same reason. If the Pages custom domain is ever moved to www, all of
+     those move with it — not just this file. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <url><loc>https://www.rapidkert.com/</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://www.rapidkert.com/kertepites-gyor.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/kertepites-gyor.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/garden-construction.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/kertepites-gyor.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.rapidkert.com/ontozorendszer-gyor.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/ontozorendszer-gyor.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/irrigation-systems.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/ontozorendszer-gyor.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.rapidkert.com/felszin-alatti-ontozes.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/felszin-alatti-ontozes.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/subsurface-irrigation.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/felszin-alatti-ontozes.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.rapidkert.com/referenciak.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/referenciak.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/projects.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/referenciak.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
-  <url><loc>https://www.rapidkert.com/kapcsolat.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/kapcsolat.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/contact.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/kapcsolat.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.rapidkert.com/rolunk.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/rolunk.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/about.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/rolunk.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://rapidkert.com/</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://rapidkert.com/kertepites-gyor.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/kertepites-gyor.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/garden-construction.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/kertepites-gyor.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://rapidkert.com/ontozorendszer-gyor.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/ontozorendszer-gyor.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/irrigation-systems.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/ontozorendszer-gyor.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://rapidkert.com/felszin-alatti-ontozes.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/felszin-alatti-ontozes.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/subsurface-irrigation.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/felszin-alatti-ontozes.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://rapidkert.com/referenciak.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/referenciak.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/projects.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/referenciak.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://rapidkert.com/kapcsolat.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/kapcsolat.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/contact.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/kapcsolat.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rapidkert.com/rolunk.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/rolunk.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/about.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/rolunk.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>yearly</changefreq><priority>0.6</priority></url>
 
-  <url><loc>https://www.rapidkert.com/en/</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.rapidkert.com/en/garden-construction.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/kertepites-gyor.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/garden-construction.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/kertepites-gyor.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.rapidkert.com/en/irrigation-systems.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/ontozorendszer-gyor.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/irrigation-systems.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/ontozorendszer-gyor.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.rapidkert.com/en/subsurface-irrigation.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/felszin-alatti-ontozes.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/subsurface-irrigation.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/felszin-alatti-ontozes.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.rapidkert.com/en/projects.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/referenciak.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/projects.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/referenciak.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://www.rapidkert.com/en/contact.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/kapcsolat.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/contact.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/kapcsolat.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>yearly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.rapidkert.com/en/about.html</loc>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://www.rapidkert.com/rolunk.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rapidkert.com/en/about.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rapidkert.com/rolunk.html"/>
-    <lastmod>2026-08-10</lastmod><changefreq>yearly</changefreq><priority>0.55</priority></url>
+  <url><loc>https://rapidkert.com/en/</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://rapidkert.com/en/garden-construction.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/kertepites-gyor.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/garden-construction.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/kertepites-gyor.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rapidkert.com/en/irrigation-systems.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/ontozorendszer-gyor.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/irrigation-systems.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/ontozorendszer-gyor.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rapidkert.com/en/subsurface-irrigation.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/felszin-alatti-ontozes.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/subsurface-irrigation.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/felszin-alatti-ontozes.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rapidkert.com/en/projects.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/referenciak.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/projects.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/referenciak.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://rapidkert.com/en/contact.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/kapcsolat.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/contact.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/kapcsolat.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://rapidkert.com/en/about.html</loc>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://rapidkert.com/rolunk.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rapidkert.com/en/about.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rapidkert.com/rolunk.html"/>
+    <lastmod>2026-08-26</lastmod><changefreq>yearly</changefreq><priority>0.55</priority></url>
 
-  <url><loc>https://www.rapidkert.com/impresszum.html</loc><lastmod>2026-08-10</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
-  <url><loc>https://www.rapidkert.com/adatkezelesi-tajekoztato.html</loc><lastmod>2026-08-10</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
-  <url><loc>https://www.rapidkert.com/cookie-tajekoztato.html</loc><lastmod>2026-08-10</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://rapidkert.com/impresszum.html</loc><lastmod>2026-08-26</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://rapidkert.com/adatkezelesi-tajekoztato.html</loc><lastmod>2026-08-26</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://rapidkert.com/cookie-tajekoztato.html</loc><lastmod>2026-08-26</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
 </urlset>
