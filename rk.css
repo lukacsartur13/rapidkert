@@ -3219,16 +3219,16 @@ html:not(.gd-on) .gd__rail li span{color:var(--moss-lift)}
 /* The stations, ALONG the line rather than across it — so they are the
    same mark in both orientations, and the mark they become is exactly
    .sheet__row > summary::before. */
-.prf__rail b{
+.prf__rail span{
   position:absolute;left:0;width:1px;height:12px;
   background:var(--clay);opacity:calc(.65 + var(--rail-hi,0) * .35);
 }
-.prf__rail b:nth-child(1){top:8svh}
-.prf__rail b:nth-child(2){top:20svh}
-.prf__rail b:nth-child(3){top:32svh}
-.prf__rail b:nth-child(4){top:44svh}
-.prf__rail b:nth-child(5){top:56svh}
-.prf__rail b:nth-child(6){top:68svh}
+.prf__rail span:nth-child(1){top:8svh}
+.prf__rail span:nth-child(2){top:20svh}
+.prf__rail span:nth-child(3){top:32svh}
+.prf__rail span:nth-child(4){top:44svh}
+.prf__rail span:nth-child(5){top:56svh}
+.prf__rail span:nth-child(6){top:68svh}
 
 .prf__foot{
   position:relative;z-index:2;
@@ -4540,7 +4540,7 @@ html:not(.gd-on) .gd__rail li span{color:var(--moss-lift)}
   letter-spacing:.13em;text-transform:uppercase;color:var(--on-dark-mute);
   text-align:center;flex:none;
 }
-.lb__cap b{color:var(--on-dark);font-weight:400}
+.lb__cap .lb__tag{color:var(--on-dark);font-weight:400}
 .lb__nav{
   position:absolute;top:50%;transform:translateY(-50%);
   width:clamp(44px,5vw,58px);height:clamp(44px,5vw,58px);
