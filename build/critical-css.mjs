@@ -57,6 +57,11 @@ const KEEP = [
      block of unstyled type across the bottom of the hero — 45,000 square
      pixels of it, enough that Lighthouse picked it as the LCP element. */
   /^\.gd__(stage|canvas|vig|scroll|ui|ch|inner|h1|h2|step|datum|lede|body|lead|cta|foot|stats|stat|fb|horizon|anno|photo|mid|rail|lbl|mark|dim-datum|dim-cap|lines)\b/,
+  /* The Awwwards ribbon (§33). Position-only, but it is `position:fixed`
+     on an element in the flow until this sheet says otherwise, so deferring
+     it puts a 53x171 white column between the skip link and the header on
+     every document for as long as the async stylesheet takes. */
+  /^\.rk-aww\b/,
   /* the type primitives every one of those elements is set in */
   /^\.display\b/, /^\.label\b/, /^\.body\b/, /^\.btn\b/, /^\.cue\b/, /^\.ulink\b/,
 ];
