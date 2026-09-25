@@ -5155,7 +5155,7 @@ html[lang="en"] .rk-menu__link[aria-current="page"] .rk-menu__tag::after{
 }
 
 /* --------------------------------------------------------------------------
-   33 — AWWWARDS NOMINEE BADGE
+   33 — AWWWARDS HONORS BADGE
    --------------------------------------------------------------------------
    The official ribbon, pinned to the right edge on every document. Three
    things about it are ours rather than Awwwards':
@@ -5166,17 +5166,27 @@ html[lang="en"] .rk-menu__link[aria-current="page"] .rk-menu__tag::after{
    top of a full-screen photograph. 150 is above the header (120) and the
    menu overlay (110), which is where it has to be, and under both of those.
    Both full-screen overlays fade it out outright instead of arguing with
-   it: under the lightbox it is a white shape showing through the scrim
-   with the "next" arrow sitting on it, and over the opened menu it
-   lands on the row tags. The badge is the last sibling in every
-   document, which is what lets a plain `~` do that without :has().
+   it: under the lightbox it is a slab showing through the scrim with the
+   "next" arrow sitting on it, and over the opened menu it lands on the
+   row tags. The badge is the last sibling in every document, which is
+   what lets a plain `~` do that without :has().
 
    FIRST PAINT. The built pages apply rk.css asynchronously, so anything
    positioned only from this sheet renders in the flow for a moment first —
-   here that is a 53x171 white column shoved between the skip link and the
+   here that is a 53x171 black column shoved between the skip link and the
    header. The selector is on the critical allow-list in
    build/critical-css.mjs for that reason; the rule below is the one that
    gets inlined, so keep it self-contained and cheap.
+
+   THE EDGE ON DARK GROUND. The black colourway is the one that belongs to
+   this palette, and on the paper and clay sections it reads as a crisp
+   black slab. On the hero it does not: --soil is within a few points of
+   black, so the badge loses its own silhouette and the white "w." and
+   "Honors" float free on the ground. The drop shadow cannot help — it is
+   dark, on a dark field. So the shadow carries a hairline of light on the
+   left edge as well: invisible where the background is pale and the
+   ambient shadow does the work, and the only thing separating badge from
+   soil where it is not. The mark's own colours are untouched.
 
    THE SMALL-SCREEN BEHAVIOUR. A ribbon pinned to the right edge is only
    free real estate while the measure stops short of it. On tablets it does:
@@ -5185,19 +5195,19 @@ html[lang="en"] .rk-menu__link[aria-current="page"] .rk-menu__tag::after{
    wrote `scale()` alone would drop the badge half its own height down the
    page. On phones the measure runs edge to edge, and the badge lands on top
    of the hero paragraph: measured at 375px it covers the last word of two
-   lines. So it stops below 620px. The nomination is worth showing, but not
-   at the cost of the design being judged behind it — and the jury's mobile
+   lines. So it stops below 620px. The award is worth showing, but not at
+   the cost of the design being judged behind it — and the jury's mobile
    score is one of the five things this ribbon is here to celebrate.
    -------------------------------------------------------------------------- */
 .rk-aww{
   position:fixed;top:50%;right:0;z-index:150;
   transform:translateY(-50%);transform-origin:100% 50%;
   display:block;line-height:0;border-radius:2px 0 0 2px;
-  box-shadow:0 2px 22px rgba(23,28,20,.20);
+  box-shadow:-1px 0 0 rgba(255,255,255,.18),0 2px 22px rgba(23,28,20,.20);
   transition:box-shadow .35s var(--ease,ease),opacity .3s var(--ease,ease);
 }
 .rk-aww svg{display:block}
-.rk-aww:hover{box-shadow:0 4px 30px rgba(23,28,20,.34)}
+.rk-aww:hover{box-shadow:-1px 0 0 rgba(255,255,255,.28),0 4px 30px rgba(23,28,20,.34)}
 .rk-aww:focus-visible{outline:2px solid var(--moss);outline-offset:3px}
 .lb.is-on ~ .rk-aww,
 .rk-nav.is-open ~ .rk-aww{opacity:0;pointer-events:none}
